@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Video, BookOpen } from "lucide-react";
+import { Calendar, Video, BookOpen, MessageSquare } from "lucide-react";
 
 export const Hero = () => {
   return (
@@ -39,25 +39,33 @@ export const Hero = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
+            <div
+              className="p-6 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+              style={{ animationDelay: '1s' }}
+            >
+              <MessageSquare className="w-10 h-10 text-primary mb-4" />
+              <h3 className="text-lg font-semibold mb-2">AI Chatbot</h3>
+              <p className="text-gray-600">Get instant answers to your healthcare questions 24/7</p>
+            </div>
             {[
               {
                 icon: Calendar,
                 title: "Easy Scheduling",
                 description: "Book appointments online with our caring providers",
-                delay: "1s"
+                delay: "1.2s"
               },
               {
                 icon: Video,
                 title: "Telehealth Services",
                 description: "Connect with doctors from the comfort of home",
-                delay: "1.2s"
+                delay: "1.4s"
               },
               {
                 icon: BookOpen,
                 title: "Health Resources",
                 description: "Access educational materials about geriatric care",
-                delay: "1.4s"
+                delay: "1.6s"
               },
             ].map((feature, index) => (
               <div
