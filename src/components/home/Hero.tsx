@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall, Bell, Heart, Activity, Pill } from "lucide-react";
+import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall, Bell, Heart, Activity, Pill, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const Hero = () => {
@@ -79,6 +79,14 @@ export const Hero = () => {
               >
                 <PhoneCall className="w-6 h-6" />
                 Emergency Call
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
+              >
+                <User className="w-6 h-6" />
+                My Profile
               </Button>
               <AudioWaveform 
                 className="h-5 w-5 cursor-pointer hover:text-primary/80" 
