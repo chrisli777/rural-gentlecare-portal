@@ -17,7 +17,7 @@ export const Hero = () => {
             className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in"
             style={{ animationDelay: '0.4s' }}
           >
-            Specialized Geriatric Care for Our Rural Community
+            Virtual Rural Healthcare
           </h1>
           
           <p 
