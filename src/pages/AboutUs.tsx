@@ -1,6 +1,6 @@
 import { Background } from "@/components/home/Background";
 import { Button } from "@/components/ui/button";
-import { AudioWaveform, Home } from "lucide-react";
+import { Home, AudioWaveform } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AboutUs = () => {
@@ -18,54 +18,52 @@ const AboutUs = () => {
       </div>
 
       <div className="container mx-auto px-4 pt-20">
-        {/* AI Healthcare Section */}
-        <div className="mb-12 animate-fade-in">
+        {/* Healthcare Section */}
+        <section className="mb-12 text-left">
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-2xl font-bold text-primary">AI Healthcare Solutions</h2>
+            <h2 className="text-2xl font-bold text-primary">Our Healthcare Services</h2>
             <AudioWaveform className="w-5 h-5 text-primary cursor-pointer" />
           </div>
-          <p className="text-gray-700 mb-4">
-            Our clinic leverages cutting-edge AI technology to enhance patient care and support our healthcare providers. From intelligent diagnostics to personalized treatment recommendations, we're bringing the future of healthcare to Adams County.
-          </p>
-        </div>
+          <div className="flex items-start gap-2">
+            <p className="text-gray-700 leading-relaxed">
+              Adams Rural Care specializes in providing comprehensive healthcare services 
+              tailored to our rural community's needs. With a focus on geriatric care, 
+              we offer personalized medical attention, preventive care, and chronic disease 
+              management to ensure the well-being of our elderly population.
+            </p>
+            <AudioWaveform className="w-5 h-5 text-primary cursor-pointer mt-1 flex-shrink-0" />
+          </div>
+        </section>
 
-        {/* Our Commitments Section */}
-        <div className="mb-12 animate-fade-in">
+        {/* Commitments Section */}
+        <section className="mb-12 text-left">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-2xl font-bold text-primary">Our Commitments</h2>
             <AudioWaveform className="w-5 h-5 text-primary cursor-pointer" />
           </div>
-          <ul className="list-disc list-inside text-gray-700 space-y-2">
-            <li>Providing accessible healthcare to all residents of Adams County</li>
-            <li>Maintaining the highest standards of patient care and safety</li>
-            <li>Continuous improvement of our services through technology adoption</li>
-            <li>Supporting our rural community's unique healthcare needs</li>
-            <li>Ensuring affordable and transparent healthcare services</li>
-          </ul>
-        </div>
-
-        {/* Healthcare Providers Section */}
-        <div className="grid md:grid-cols-2 gap-8 mt-8">
-          <div className="bg-card p-6 rounded-lg shadow-md">
-            <div className="flex items-center gap-2 mb-4">
-              <h3 className="text-xl font-semibold">For Healthcare Providers</h3>
-              <AudioWaveform className="w-5 h-5 text-primary cursor-pointer" />
-            </div>
-            <p className="text-gray-700">
-              Access our comprehensive suite of tools designed to streamline your practice. From patient management to AI-assisted diagnostics, we provide everything you need to deliver exceptional care.
-            </p>
+          <div className="space-y-4">
+            {[
+              "Providing accessible healthcare to all residents of Adams County",
+              "Maintaining the highest standards of medical care and patient safety",
+              "Supporting our elderly community with specialized geriatric services",
+              "Fostering a compassionate and welcoming environment",
+              "Continuous improvement of our healthcare services"
+            ].map((commitment, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <p className="text-gray-700">{commitment}</p>
+                <AudioWaveform className="w-5 h-5 text-primary cursor-pointer mt-1 flex-shrink-0" />
+              </div>
+            ))}
           </div>
+        </section>
 
-          <div className="bg-card p-6 rounded-lg shadow-md">
-            <div className="flex items-center gap-2 mb-4">
-              <h3 className="text-xl font-semibold">For Patients</h3>
-              <AudioWaveform className="w-5 h-5 text-primary cursor-pointer" />
-            </div>
-            <p className="text-gray-700">
-              Experience healthcare that puts you first. Our patient portal gives you easy access to your health records, appointment scheduling, and educational resources tailored to your needs.
-            </p>
-          </div>
-        </div>
+        {/* Original back button position */}
+        <Link to="/">
+          <Button variant="outline" className="mb-6 flex items-center gap-2">
+            <Home className="w-4 h-4" />
+            Back to Home
+          </Button>
+        </Link>
       </div>
     </div>
   );
