@@ -25,29 +25,29 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#7C9082",
+          DEFAULT: "#4A90E2",
           foreground: "#FFFFFF",
-          hover: "#6A7C70",
+          hover: "#357ABD",
         },
         secondary: {
-          DEFAULT: "#E8ECE9",
-          foreground: "#2A2B2A",
+          DEFAULT: "#F5F5DC",
+          foreground: "#333333",
         },
         destructive: {
-          DEFAULT: "#FF6B6B",
+          DEFAULT: "#C0392B",
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#F3F4F6",
-          foreground: "#6B7280",
+          DEFAULT: "#EAEAEA",
+          foreground: "#666666",
         },
         accent: {
-          DEFAULT: "#F9FAFB",
-          foreground: "#2A2B2A",
+          DEFAULT: "#A8D5BA",
+          foreground: "#2C3E50",
         },
         card: {
           DEFAULT: "#FFFFFF",
-          foreground: "#2A2B2A",
+          foreground: "#333333",
         },
       },
       borderRadius: {
