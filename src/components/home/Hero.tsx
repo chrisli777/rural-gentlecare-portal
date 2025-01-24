@@ -58,9 +58,6 @@ export const Hero = () => {
               <PhoneCall className="w-6 h-6" />
               Emergency Call
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto hover:scale-105 transition-transform">
-              Learn More
-            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
