@@ -58,9 +58,9 @@ export const Hero = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
             <div
-              className="p-6 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+              className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
               style={{ animationDelay: '1s' }}
             >
               <MessageSquare className="w-10 h-10 text-primary mb-4" />
@@ -95,7 +95,7 @@ export const Hero = () => {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="p-6 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+                className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
                 style={{ animationDelay: feature.delay }}
               >
                 <feature.icon className="w-10 h-10 text-primary mb-4" />
