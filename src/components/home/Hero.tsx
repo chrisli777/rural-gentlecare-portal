@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall, Bell } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
-  const navigate = useNavigate();
-  
   const speakText = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(utterance);
@@ -67,14 +64,6 @@ export const Hero = () => {
                 onClick={() => speakText("Emergency Call")}
               />
             </div>
-
-            <Button
-              size="lg"
-              className="w-full sm:w-auto hover:scale-105 transition-transform"
-              onClick={() => navigate("/select-role")}
-            >
-              Access Portal
-            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
