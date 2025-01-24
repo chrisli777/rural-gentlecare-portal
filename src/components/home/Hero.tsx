@@ -50,18 +50,20 @@ export const Hero = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
             style={{ animationDelay: '0.8s' }}
           >
-            <Button 
-              size="lg" 
-              variant="destructive"
-              className="w-full sm:w-auto hover:scale-105 transition-transform text-xl py-6 px-8 flex items-center gap-2 relative"
-            >
-              <PhoneCall className="w-6 h-6" />
-              Emergency Call
+            <div className="flex items-center gap-4">
+              <Button 
+                size="lg" 
+                variant="destructive"
+                className="w-full sm:w-auto hover:scale-105 transition-transform text-xl py-6 px-8 flex items-center gap-2"
+              >
+                <PhoneCall className="w-6 h-6" />
+                Emergency Call
+              </Button>
               <AudioWaveform 
-                className="ml-4 h-5 w-5 cursor-pointer hover:text-white/80" 
+                className="h-5 w-5 cursor-pointer hover:text-primary/80" 
                 onClick={() => speakText("Emergency Call")}
               />
-            </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
