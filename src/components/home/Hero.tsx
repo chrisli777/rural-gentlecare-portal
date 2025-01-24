@@ -15,35 +15,23 @@ export const Hero = () => {
             className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full animate-fade-in"
             style={{ animationDelay: '0.2s' }}
           >
-            <span className="text-sm font-medium flex items-center gap-2">
+            <span className="text-sm font-medium">
               Serving Adams County Since 1985
-              <AudioWaveform 
-                className="h-4 w-4 cursor-pointer hover:text-primary/80" 
-                onClick={() => speakText("Serving Adams County Since 1985")}
-              />
             </span>
           </div>
           
           <h1 
-            className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in flex items-center justify-center gap-3"
+            className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in"
             style={{ animationDelay: '0.4s' }}
           >
             Virtual Rural Healthcare
-            <AudioWaveform 
-              className="h-8 w-8 cursor-pointer hover:text-primary/80" 
-              onClick={() => speakText("Virtual Rural Healthcare")}
-            />
           </h1>
           
           <p 
-            className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in flex items-center justify-center gap-2"
+            className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in"
             style={{ animationDelay: '0.6s' }}
           >
             Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.
-            <AudioWaveform 
-              className="h-5 w-5 cursor-pointer hover:text-primary/80 flex-shrink-0" 
-              onClick={() => speakText("Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.")}
-            />
           </p>
 
           <div 
@@ -62,31 +50,31 @@ export const Hero = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
             <div
-              className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+              className="relative p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
               style={{ animationDelay: '1s' }}
             >
               <MessageSquare className="w-10 h-10 text-primary mb-4" />
+              <AudioWaveform 
+                className="absolute top-4 right-4 h-6 w-6 cursor-pointer hover:text-primary/80" 
+                onClick={() => speakText("Get instant answers to your healthcare questions 24/7")}
+              />
               <h3 className="text-lg font-semibold mb-2">AI Chatbot</h3>
               <p className="text-gray-600">
                 Get instant answers to your healthcare questions 24/7
-                <AudioWaveform 
-                  className="inline-block ml-2 h-6 w-6 cursor-pointer hover:text-primary/80" 
-                  onClick={() => speakText("Get instant answers to your healthcare questions 24/7")}
-                />
               </p>
             </div>
             <div
-              className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+              className="relative p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
               style={{ animationDelay: '1.2s' }}
             >
               <Bell className="w-10 h-10 text-primary mb-4" />
+              <AudioWaveform 
+                className="absolute top-4 right-4 h-6 w-6 cursor-pointer hover:text-primary/80" 
+                onClick={() => speakText("Never miss your medication with timely reminders")}
+              />
               <h3 className="text-lg font-semibold mb-2">Medication Alerts</h3>
               <p className="text-gray-600">
                 Never miss your medication with timely reminders
-                <AudioWaveform 
-                  className="inline-block ml-2 h-6 w-6 cursor-pointer hover:text-primary/80" 
-                  onClick={() => speakText("Never miss your medication with timely reminders")}
-                />
               </p>
             </div>
             {[
@@ -105,17 +93,17 @@ export const Hero = () => {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+                className="relative p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
                 style={{ animationDelay: feature.delay }}
               >
                 <feature.icon className="w-10 h-10 text-primary mb-4" />
+                <AudioWaveform 
+                  className="absolute top-4 right-4 h-6 w-6 cursor-pointer hover:text-primary/80" 
+                  onClick={() => speakText(feature.description)}
+                />
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">
                   {feature.description}
-                  <AudioWaveform 
-                    className="inline-block ml-2 h-6 w-6 cursor-pointer hover:text-primary/80" 
-                    onClick={() => speakText(feature.description)}
-                  />
                 </p>
               </div>
             ))}
