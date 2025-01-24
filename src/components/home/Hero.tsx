@@ -11,19 +11,6 @@ export const Hero = () => {
     <section className="pt-24 pb-16 px-4 min-h-screen flex items-center bg-gradient-to-b from-secondary/50 via-white to-white overflow-hidden">
       <div className="container mx-auto">
         <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div 
-            className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-6 py-2 rounded-full animate-fade-in"
-            style={{ animationDelay: '0.2s' }}
-          >
-            <span className="text-sm font-medium relative pr-3">
-              Serving Adams County Since 1985
-              <AudioWaveform 
-                className="absolute -right-3 top-1/2 -translate-y-1/2 h-4 w-4 cursor-pointer hover:text-primary/80" 
-                onClick={() => speakText("Serving Adams County Since 1985")}
-              />
-            </span>
-          </div>
-          
           <h1 
             className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in relative pr-8"
             style={{ animationDelay: '0.4s' }}
