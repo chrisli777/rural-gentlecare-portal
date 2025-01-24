@@ -16,8 +16,14 @@ const AboutUs = () => {
           </Button>
         </Link>
       </div>
-      {/* Content container */}
+      {/* Original back button position */}
       <div className="container mx-auto px-4 pt-20">
+        <Link to="/">
+          <Button variant="outline" className="mb-6 flex items-center gap-2">
+            <Home className="w-4 h-4" />
+            Back to Home
+          </Button>
+        </Link>
       </div>
     </div>
   );
