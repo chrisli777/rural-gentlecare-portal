@@ -7,8 +7,7 @@ export const Background = () => {
     <section className="py-16 px-4 bg-white">
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto space-y-12">
-          {/* Thesis and Hypothesis */}
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <h2 className="text-3xl font-bold text-gray-900">Our Mission</h2>
             <p className="text-lg text-gray-600">
               "Integrating artificial intelligence into rural healthcare systems in Adams County, Washington, can significantly improve service efficiency and patient outcomes by streamlining administrative processes and addressing the specific needs of geriatric care."
@@ -18,8 +17,7 @@ export const Background = () => {
             </p>
           </div>
 
-          {/* Healthcare Access Context */}
-          <Card className="bg-secondary/20">
+          <Card className="bg-secondary/20 transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <CardContent className="pt-6">
               <h3 className="text-2xl font-semibold mb-4">Rural Healthcare in Adams County</h3>
               <p className="text-gray-600 leading-relaxed">
@@ -28,9 +26,8 @@ export const Background = () => {
             </CardContent>
           </Card>
 
-          {/* User Personas */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.6s' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <Users className="text-primary h-6 w-6" />
@@ -48,7 +45,7 @@ export const Background = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.8s' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <Users className="text-primary h-6 w-6" />
@@ -67,34 +64,57 @@ export const Background = () => {
             </Card>
           </div>
 
-          {/* AI Integration */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in" style={{ animationDelay: '1s' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <Brain className="text-primary h-6 w-6" />
                   <h4 className="text-xl font-semibold">AI in Healthcare</h4>
                 </div>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Automated medical form completion</li>
-                  <li>• Smart appointment scheduling</li>
-                  <li>• Health risk assessment</li>
-                  <li>• Patient record management</li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Automated medical form completion
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Smart appointment scheduling
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Health risk assessment
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Patient record management
+                  </li>
                 </ul>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in" style={{ animationDelay: '1.2s' }}>
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <Shield className="text-primary h-6 w-6" />
                   <h4 className="text-xl font-semibold">Our Commitments</h4>
                 </div>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Ethical AI implementation</li>
-                  <li>• Strong privacy protection</li>
-                  <li>• Comprehensive staff training</li>
-                  <li>• Community-focused solutions</li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Ethical AI implementation
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Strong privacy protection
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Comprehensive staff training
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                    Community-focused solutions
+                  </li>
                 </ul>
               </CardContent>
             </Card>
