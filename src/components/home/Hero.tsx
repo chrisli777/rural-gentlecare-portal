@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall } from "lucide-react";
+import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall, Bell } from "lucide-react";
 
 export const Hero = () => {
   const speakText = (text: string) => {
@@ -63,7 +63,7 @@ export const Hero = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
             <div
               className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
               style={{ animationDelay: '1s' }}
@@ -78,18 +78,32 @@ export const Hero = () => {
                 />
               </p>
             </div>
+            <div
+              className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
+              style={{ animationDelay: '1.2s' }}
+            >
+              <Bell className="w-10 h-10 text-primary mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Medication Alerts</h3>
+              <p className="text-gray-600">
+                Never miss your medication with timely reminders
+                <AudioWaveform 
+                  className="inline-block ml-2 h-6 w-6 cursor-pointer hover:text-primary/80" 
+                  onClick={() => speakText("Never miss your medication with timely reminders")}
+                />
+              </p>
+            </div>
             {[
               {
                 icon: Calendar,
                 title: "Easy Scheduling",
                 description: "Book appointments online with our caring providers",
-                delay: "1.2s"
+                delay: "1.4s"
               },
               {
                 icon: BookOpen,
                 title: "Health Resources",
                 description: "Access educational materials about geriatric care",
-                delay: "1.4s"
+                delay: "1.6s"
               },
             ].map((feature, index) => (
               <div
