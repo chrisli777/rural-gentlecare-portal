@@ -88,26 +88,28 @@ const Index = () => {
                 className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
                 <div className="flex flex-col items-center gap-2">
-                  <h2 className="text-2xl font-semibold mb-4 text-primary flex items-center gap-2">
-                    Patient Portal
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-semibold mb-4 text-primary">Patient Portal</h2>
                     <AudioWaveform 
                       className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                      onClick={() => speakText("Patient Portal")}
+                      onClick={() => speakText("Patient Portal. Access your health records, appointments, and medical resources")}
                     />
-                  </h2>
-                  <p className="text-gray-600 mb-6 flex items-center gap-2">
+                  </div>
+                  <p className="text-gray-600 mb-6">
                     Access your health records, appointments, and medical resources
-                    <AudioWaveform 
-                      className="h-4 w-4 cursor-pointer hover:text-primary/80" 
-                      onClick={() => speakText("Access your health records, appointments, and medical resources")}
-                    />
                   </p>
-                  <Button 
-                    onClick={() => navigate("/patient/login")} 
-                    className="w-full text-lg py-6"
-                  >
-                    Enter as Patient
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      onClick={() => navigate("/patient/login")} 
+                      className="w-full text-lg py-6"
+                    >
+                      Enter as Patient
+                    </Button>
+                    <AudioWaveform 
+                      className="h-5 w-5 cursor-pointer hover:text-primary/80" 
+                      onClick={() => speakText("Enter as Patient")}
+                    />
+                  </div>
                 </div>
               </motion.div>
 
@@ -116,26 +118,28 @@ const Index = () => {
                 className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
                 <div className="flex flex-col items-center gap-2">
-                  <h2 className="text-2xl font-semibold mb-4 text-primary flex items-center gap-2">
-                    Provider Portal
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-semibold mb-4 text-primary">Provider Portal</h2>
                     <AudioWaveform 
                       className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                      onClick={() => speakText("Provider Portal")}
+                      onClick={() => speakText("Provider Portal. Access patient records, schedules, and clinical tools")}
                     />
-                  </h2>
-                  <p className="text-gray-600 mb-6 flex items-center gap-2">
+                  </div>
+                  <p className="text-gray-600 mb-6">
                     Access patient records, schedules, and clinical tools
-                    <AudioWaveform 
-                      className="h-4 w-4 cursor-pointer hover:text-primary/80" 
-                      onClick={() => speakText("Access patient records, schedules, and clinical tools")}
-                    />
                   </p>
-                  <Button 
-                    onClick={() => navigate("/provider/login")} 
-                    className="w-full text-lg py-6"
-                  >
-                    Enter as Provider
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      onClick={() => navigate("/provider/login")} 
+                      className="w-full text-lg py-6"
+                    >
+                      Enter as Provider
+                    </Button>
+                    <AudioWaveform 
+                      className="h-5 w-5 cursor-pointer hover:text-primary/80" 
+                      onClick={() => speakText("Enter as Provider")}
+                    />
+                  </div>
                 </div>
               </motion.div>
             </div>
