@@ -9,8 +9,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="pt-24 pb-16 px-4 min-h-screen flex items-center bg-gradient-to-b from-secondary/50 via-white to-white overflow-hidden relative">
-      {/* Animated background elements */}
+    <section className="pt-24 pb-24 px-4 min-h-screen flex items-center bg-gradient-to-b from-secondary/50 via-white to-white overflow-hidden relative">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{
@@ -37,34 +36,6 @@ export const Hero = () => {
           className="absolute -left-32 top-1/2 w-80 h-80 rounded-full bg-accent/20"
         />
       </div>
-
-      {/* Floating medical icons */}
-      <motion.div
-        animate={{
-          y: [-10, 10, -10],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute right-10 top-32"
-      >
-        <Heart className="w-12 h-12 text-red-400/50" />
-      </motion.div>
-      <motion.div
-        animate={{
-          y: [10, -10, 10],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute left-16 top-48"
-      >
-        <Pill className="w-10 h-10 text-primary/50" />
-      </motion.div>
 
       <div className="container mx-auto relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-8">
@@ -104,11 +75,10 @@ export const Hero = () => {
               <Button 
                 size="lg" 
                 variant="destructive"
-                className="w-full sm:w-auto hover:scale-105 transition-transform text-xl py-6 px-8 flex items-center gap-2 relative group"
+                className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
               >
                 <PhoneCall className="w-6 h-6" />
                 Emergency Call
-                <span className="absolute inset-0 rounded-md ring-2 ring-red-500 animate-ping group-hover:animate-none" />
               </Button>
               <AudioWaveform 
                 className="h-5 w-5 cursor-pointer hover:text-primary/80" 
@@ -117,7 +87,7 @@ export const Hero = () => {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mt-24">
             {[
               {
                 icon: MessageSquare,
@@ -173,28 +143,39 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* Activity line animation */}
-      <motion.div 
-        className="absolute bottom-10 left-0 right-0 flex justify-center items-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-      >
-        <Activity className="w-8 h-8 text-primary animate-pulse" />
-        <div className="h-0.5 w-32 bg-primary/20 relative overflow-hidden">
-          <motion.div 
-            className="absolute inset-0 bg-primary"
-            animate={{
-              x: ["-100%", "100%"],
+      {/* Tortuous activity line animation */}
+      <div className="absolute bottom-16 left-0 right-0 flex justify-center items-center">
+        <motion.div 
+          className="relative w-full max-w-2xl h-16 opacity-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              background: `url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,32 Q80,64 160,32 T320,32 T480,32 T640,32' stroke='%234A90E2' fill='none' stroke-width='2'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'repeat-x',
             }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        </div>
-      </motion.div>
+          >
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 flex items-center gap-8"
+              animate={{
+                x: ["-100%", "100%"],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              <Heart className="w-6 h-6 text-red-400" />
+              <Activity className="w-6 h-6 text-primary" />
+              <Pill className="w-6 h-6 text-accent" />
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 };
