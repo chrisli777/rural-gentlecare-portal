@@ -15,33 +15,33 @@ export const Hero = () => {
             className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full animate-fade-in"
             style={{ animationDelay: '0.2s' }}
           >
-            <span className="text-sm font-medium relative">
+            <span className="text-sm font-medium relative pr-6">
               Serving Adams County Since 1985
               <AudioWaveform 
-                className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 cursor-pointer hover:text-primary/80" 
+                className="absolute -right-6 top-1/2 -translate-y-1/2 h-4 w-4 cursor-pointer hover:text-primary/80" 
                 onClick={() => speakText("Serving Adams County Since 1985")}
               />
             </span>
           </div>
           
           <h1 
-            className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in relative"
+            className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in relative pr-8"
             style={{ animationDelay: '0.4s' }}
           >
             Virtual Rural Healthcare
             <AudioWaveform 
-              className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 cursor-pointer hover:text-primary/80" 
+              className="absolute -right-2 top-1/2 -translate-y-1/2 h-6 w-6 cursor-pointer hover:text-primary/80" 
               onClick={() => speakText("Virtual Rural Healthcare")}
             />
           </h1>
           
           <p 
-            className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in relative"
+            className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in relative pr-8"
             style={{ animationDelay: '0.6s' }}
           >
             Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.
             <AudioWaveform 
-              className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-5 cursor-pointer hover:text-primary/80" 
+              className="absolute -right-2 top-1/2 -translate-y-1/2 h-5 w-5 cursor-pointer hover:text-primary/80" 
               onClick={() => speakText("Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.")}
             />
           </p>
@@ -58,7 +58,7 @@ export const Hero = () => {
               <PhoneCall className="w-6 h-6" />
               Emergency Call
               <AudioWaveform 
-                className="ml-2 h-5 w-5 cursor-pointer hover:text-white/80" 
+                className="ml-4 h-5 w-5 cursor-pointer hover:text-white/80" 
                 onClick={() => speakText("Emergency Call")}
               />
             </Button>
