@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall, Bell, Heart, Activity, Pill, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   const speakText = (text: string) => {
@@ -87,14 +88,16 @@ export const Hero = () => {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
-                >
-                  <User className="w-6 h-6" />
-                  My Profile
-                </Button>
+                <Link to="/patient/profile">
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
+                  >
+                    <User className="w-6 h-6" />
+                    My Profile
+                  </Button>
+                </Link>
                 <AudioWaveform 
                   className="h-5 w-5 cursor-pointer hover:text-primary/80" 
                   onClick={() => speakText("My Profile")}
