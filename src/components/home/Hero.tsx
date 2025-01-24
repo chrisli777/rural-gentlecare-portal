@@ -72,26 +72,34 @@ export const Hero = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
           >
             <div className="flex items-center gap-4">
-              <Button 
-                size="lg" 
-                variant="destructive"
-                className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
-              >
-                <PhoneCall className="w-6 h-6" />
-                Emergency Call
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
-              >
-                <User className="w-6 h-6" />
-                My Profile
-              </Button>
-              <AudioWaveform 
-                className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                onClick={() => speakText("Emergency Call")}
-              />
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="lg" 
+                  variant="destructive"
+                  className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
+                >
+                  <PhoneCall className="w-6 h-6" />
+                  Emergency Call
+                </Button>
+                <AudioWaveform 
+                  className="h-5 w-5 cursor-pointer hover:text-primary/80" 
+                  onClick={() => speakText("Emergency Call")}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
+                >
+                  <User className="w-6 h-6" />
+                  My Profile
+                </Button>
+                <AudioWaveform 
+                  className="h-5 w-5 cursor-pointer hover:text-primary/80" 
+                  onClick={() => speakText("My Profile")}
+                />
+              </div>
             </div>
           </motion.div>
 
