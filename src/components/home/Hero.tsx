@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Video, BookOpen, MessageSquare, AudioWaveform } from "lucide-react";
+import { Calendar, Video, BookOpen, MessageSquare, AudioWaveform, PhoneCall } from "lucide-react";
 
 export const Hero = () => {
   const speakText = (text: string) => {
@@ -50,8 +50,13 @@ export const Hero = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
             style={{ animationDelay: '0.8s' }}
           >
-            <Button size="lg" className="w-full sm:w-auto hover:scale-105 transition-transform">
-              Schedule Appointment
+            <Button 
+              size="lg" 
+              variant="destructive"
+              className="w-full sm:w-auto hover:scale-105 transition-transform text-xl py-6 px-8 flex items-center gap-2"
+            >
+              <PhoneCall className="w-6 h-6" />
+              Emergency Call
             </Button>
             <Button size="lg" variant="outline" className="w-full sm:w-auto hover:scale-105 transition-transform">
               Learn More
