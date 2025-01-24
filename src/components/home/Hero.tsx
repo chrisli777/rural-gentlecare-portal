@@ -17,7 +17,7 @@ export const Hero = () => {
             opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
-            duration: 4,
+            duration: 3,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -29,7 +29,7 @@ export const Hero = () => {
             opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
-            duration: 5,
+            duration: 4,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -42,7 +42,7 @@ export const Hero = () => {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.4 }}
             className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight animate-fade-in relative pr-8"
           >
             Virtual Rural Healthcare
@@ -55,7 +55,7 @@ export const Hero = () => {
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in relative pr-8"
           >
             Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.
@@ -68,7 +68,7 @@ export const Hero = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
           >
             <div className="flex items-center gap-4">
@@ -122,21 +122,17 @@ export const Hero = () => {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className={`relative p-6 ${feature.color} backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 group`}
+                transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                whileHover={{ scale: 1.03 }}
+                className={`relative p-6 ${feature.color} backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-200 group`}
               >
-                <feature.icon className={`w-12 h-12 ${feature.iconColor} mb-4 transform group-hover:scale-110 transition-transform`} />
+                <feature.icon className={`w-12 h-12 ${feature.iconColor} mb-4`} />
                 <AudioWaveform 
                   className="absolute top-4 right-4 h-5 w-5 cursor-pointer hover:text-primary/80" 
                   onClick={() => speakText(`${feature.title}. ${feature.description}`)}
                 />
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
-                <motion.div
-                  className="absolute inset-0 rounded-lg bg-white/0 group-hover:bg-white/10 transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                />
               </motion.div>
             ))}
           </div>
