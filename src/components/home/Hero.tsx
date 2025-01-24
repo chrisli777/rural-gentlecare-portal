@@ -12,13 +12,13 @@ export const Hero = () => {
       <div className="container mx-auto">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div 
-            className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full animate-fade-in"
+            className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-6 py-2 rounded-full animate-fade-in"
             style={{ animationDelay: '0.2s' }}
           >
-            <span className="text-sm font-medium relative pr-2">
+            <span className="text-sm font-medium relative pr-3">
               Serving Adams County Since 1985
               <AudioWaveform 
-                className="absolute -right-2 top-1/2 -translate-y-1/2 h-4 w-4 cursor-pointer hover:text-primary/80" 
+                className="absolute -right-3 top-1/2 -translate-y-1/2 h-4 w-4 cursor-pointer hover:text-primary/80" 
                 onClick={() => speakText("Serving Adams County Since 1985")}
               />
             </span>
