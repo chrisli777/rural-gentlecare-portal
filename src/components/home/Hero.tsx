@@ -143,7 +143,6 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* Tortuous activity line animation */}
       <div className="absolute bottom-16 left-0 right-0 flex justify-center items-center">
         <motion.div 
           className="relative w-full max-w-2xl h-16 opacity-50"
