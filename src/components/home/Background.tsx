@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Users, Brain, Shield, SoundWave } from "lucide-react";
+import { FileText, Users, Brain, Shield, AudioWaveform } from "lucide-react";
 
 export const Background = () => {
   const speakText = (text: string) => {
@@ -15,21 +15,21 @@ export const Background = () => {
           <div className="text-center space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <h2 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
               Our Mission
-              <SoundWave 
+              <AudioWaveform 
                 className="h-6 w-6 cursor-pointer hover:text-primary/80" 
                 onClick={() => speakText("Our Mission")}
               />
             </h2>
             <p className="text-lg text-gray-600 flex items-center gap-2">
               "Integrating artificial intelligence into rural healthcare systems in Adams County, Washington, can significantly improve service efficiency and patient outcomes by streamlining administrative processes and addressing the specific needs of geriatric care."
-              <SoundWave 
+              <AudioWaveform 
                 className="h-5 w-5 cursor-pointer hover:text-primary/80 flex-shrink-0" 
                 onClick={() => speakText("Integrating artificial intelligence into rural healthcare systems in Adams County, Washington, can significantly improve service efficiency and patient outcomes by streamlining administrative processes and addressing the specific needs of geriatric care.")}
               />
             </p>
             <p className="text-primary font-medium flex items-center justify-center gap-2">
               We aim to reduce administrative workload by 30% and increase patient satisfaction scores by 20% over six months through AI-driven healthcare solutions.
-              <SoundWave 
+              <AudioWaveform 
                 className="h-5 w-5 cursor-pointer hover:text-primary/80" 
                 onClick={() => speakText("We aim to reduce administrative workload by 30% and increase patient satisfaction scores by 20% over six months through AI-driven healthcare solutions.")}
               />
