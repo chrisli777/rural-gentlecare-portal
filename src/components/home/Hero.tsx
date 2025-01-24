@@ -64,17 +64,11 @@ export const Hero = () => {
               style={{ animationDelay: '1s' }}
             >
               <MessageSquare className="w-10 h-10 text-primary mb-4" />
-              <h3 className="text-lg font-semibold mb-2 flex items-center justify-center gap-2">
-                AI Chatbot
-                <AudioWaveform 
-                  className="h-4 w-4 cursor-pointer hover:text-primary/80" 
-                  onClick={() => speakText("AI Chatbot")}
-                />
-              </h3>
-              <p className="text-gray-600 flex items-center gap-2">
+              <h3 className="text-lg font-semibold mb-2">AI Chatbot</h3>
+              <p className="text-gray-600">
                 Get instant answers to your healthcare questions 24/7
                 <AudioWaveform 
-                  className="h-4 w-4 cursor-pointer hover:text-primary/80" 
+                  className="inline-block ml-2 h-6 w-6 cursor-pointer hover:text-primary/80" 
                   onClick={() => speakText("Get instant answers to your healthcare questions 24/7")}
                 />
               </p>
@@ -105,17 +99,11 @@ export const Hero = () => {
                 style={{ animationDelay: feature.delay }}
               >
                 <feature.icon className="w-10 h-10 text-primary mb-4" />
-                <h3 className="text-lg font-semibold mb-2 flex items-center justify-center gap-2">
-                  {feature.title}
-                  <AudioWaveform 
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80" 
-                    onClick={() => speakText(feature.title)}
-                  />
-                </h3>
-                <p className="text-gray-600 flex items-center gap-2">
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600">
                   {feature.description}
                   <AudioWaveform 
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80" 
+                    className="inline-block ml-2 h-6 w-6 cursor-pointer hover:text-primary/80" 
                     onClick={() => speakText(feature.description)}
                   />
                 </p>
