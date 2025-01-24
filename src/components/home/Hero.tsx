@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Video, BookOpen, MessageSquare, Speaker } from "lucide-react";
+import { Calendar, Video, BookOpen, MessageSquare, SoundWave } from "lucide-react";
 
 export const Hero = () => {
   const speakText = (text: string) => {
@@ -17,7 +17,7 @@ export const Hero = () => {
           >
             <span className="text-sm font-medium flex items-center gap-2">
               Serving Adams County Since 1985
-              <Speaker 
+              <SoundWave 
                 className="h-4 w-4 cursor-pointer hover:text-primary/80" 
                 onClick={() => speakText("Serving Adams County Since 1985")}
               />
@@ -29,7 +29,7 @@ export const Hero = () => {
             style={{ animationDelay: '0.4s' }}
           >
             Virtual Rural Healthcare
-            <Speaker 
+            <SoundWave 
               className="h-8 w-8 cursor-pointer hover:text-primary/80" 
               onClick={() => speakText("Virtual Rural Healthcare")}
             />
@@ -40,7 +40,7 @@ export const Hero = () => {
             style={{ animationDelay: '0.6s' }}
           >
             Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.
-            <Speaker 
+            <SoundWave 
               className="h-5 w-5 cursor-pointer hover:text-primary/80 flex-shrink-0" 
               onClick={() => speakText("Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.")}
             />
@@ -66,14 +66,14 @@ export const Hero = () => {
               <MessageSquare className="w-10 h-10 text-primary mb-4" />
               <h3 className="text-lg font-semibold mb-2 flex items-center justify-center gap-2">
                 AI Chatbot
-                <Speaker 
+                <SoundWave 
                   className="h-4 w-4 cursor-pointer hover:text-primary/80" 
                   onClick={() => speakText("AI Chatbot")}
                 />
               </h3>
               <p className="text-gray-600 flex items-center gap-2">
                 Get instant answers to your healthcare questions 24/7
-                <Speaker 
+                <SoundWave 
                   className="h-4 w-4 cursor-pointer hover:text-primary/80" 
                   onClick={() => speakText("Get instant answers to your healthcare questions 24/7")}
                 />
@@ -107,14 +107,14 @@ export const Hero = () => {
                 <feature.icon className="w-10 h-10 text-primary mb-4" />
                 <h3 className="text-lg font-semibold mb-2 flex items-center justify-center gap-2">
                   {feature.title}
-                  <Speaker 
+                  <SoundWave 
                     className="h-4 w-4 cursor-pointer hover:text-primary/80" 
                     onClick={() => speakText(feature.title)}
                   />
                 </h3>
                 <p className="text-gray-600 flex items-center gap-2">
                   {feature.description}
-                  <Speaker 
+                  <SoundWave 
                     className="h-4 w-4 cursor-pointer hover:text-primary/80" 
                     onClick={() => speakText(feature.description)}
                   />
