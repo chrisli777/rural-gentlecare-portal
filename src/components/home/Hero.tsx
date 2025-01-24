@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Video, BookOpen, MessageSquare, AudioWaveform, PhoneCall } from "lucide-react";
+import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall } from "lucide-react";
 
 export const Hero = () => {
   const speakText = (text: string) => {
@@ -63,7 +63,7 @@ export const Hero = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-16">
             <div
               className="p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 hover:border-primary/20 transition-all duration-300 hover:scale-105 animate-fade-in"
               style={{ animationDelay: '1s' }}
@@ -86,16 +86,10 @@ export const Hero = () => {
                 delay: "1.2s"
               },
               {
-                icon: Video,
-                title: "Telehealth Services",
-                description: "Connect with doctors from the comfort of home",
-                delay: "1.4s"
-              },
-              {
                 icon: BookOpen,
                 title: "Health Resources",
                 description: "Access educational materials about geriatric care",
-                delay: "1.6s"
+                delay: "1.4s"
               },
             ].map((feature, index) => (
               <div
