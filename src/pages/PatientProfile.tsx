@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, AudioWaveform } from "lucide-react";
+import { ArrowLeft, AudioWaveform, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const PatientProfile = () => {
   const navigate = useNavigate();
@@ -32,12 +33,25 @@ const PatientProfile = () => {
 
       {/* Main Content with proper spacing from header */}
       <div className="container mx-auto px-4 pt-24">
-        <div className="flex items-center gap-2 mb-8">
-          <h1 className="text-3xl font-bold">My Profile</h1>
-          <AudioWaveform
-            className="h-6 w-6 cursor-pointer hover:text-primary/80"
-            onClick={() => speakText("My Profile")}
-          />
+        {/* Avatar and Patient Info Section */}
+        <div className="flex flex-col items-center mb-8 space-y-4">
+          <Avatar className="h-24 w-24">
+            <AvatarImage src="/placeholder.svg" alt="Patient" />
+            <AvatarFallback>
+              <UserRound className="h-12 w-12" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-center space-y-1">
+            <div className="flex items-center justify-center gap-2">
+              <h1 className="text-3xl font-bold">John Doe</h1>
+              <AudioWaveform
+                className="h-6 w-6 cursor-pointer hover:text-primary/80"
+                onClick={() => speakText("John Doe")}
+              />
+            </div>
+            <p className="text-muted-foreground">Patient ID: #12345678</p>
+            <p className="text-muted-foreground">Date of Birth: 01/15/1952</p>
+          </div>
         </div>
 
         <Tabs defaultValue="basic" className="space-y-6">
