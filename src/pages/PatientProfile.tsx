@@ -1,139 +1,102 @@
-import { useState } from "react";
-import { Header } from "@/components/layout/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, FileText, AlertCircle, Pill, Info, AudioWaveform } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, AudioWaveform } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PatientProfile = () => {
-  const [activeTab, setActiveTab] = useState("basic");
-
+  const navigate = useNavigate();
+  
   const speakText = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(utterance);
   };
 
   return (
-    <div className="min-h-screen bg-secondary/30">
-      <Header />
-      <main className="container py-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Avatar className="h-20 w-20">
-            <AvatarImage src="/placeholder.svg" alt="Profile picture" />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold">John Doe</h1>
-              <AudioWaveform
-                className="h-5 w-5 cursor-pointer hover:text-primary/80"
-                onClick={() => speakText("John Doe's Profile")}
-              />
-            </div>
-            <p className="text-muted-foreground">Patient ID: 123456</p>
+    <div className="min-h-screen bg-background">
+      {/* Header with Back Button */}
+      <div className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center h-16">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
           </div>
         </div>
+      </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-4">
-            <TabsTrigger value="basic" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Basic Info
-            </TabsTrigger>
-            <TabsTrigger value="records" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Medical Records
-            </TabsTrigger>
-            <TabsTrigger value="risks" className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
-              Health Risks
-            </TabsTrigger>
-            <TabsTrigger value="medications" className="flex items-center gap-2">
-              <Pill className="h-4 w-4" />
-              Medications
-            </TabsTrigger>
-            <TabsTrigger value="other" className="flex items-center gap-2">
-              <Info className="h-4 w-4" />
-              Other Info
-            </TabsTrigger>
+      {/* Main Content with proper spacing from header */}
+      <div className="container mx-auto px-4 pt-24">
+        <div className="flex items-center gap-2 mb-8">
+          <h1 className="text-3xl font-bold">My Profile</h1>
+          <AudioWaveform
+            className="h-6 w-6 cursor-pointer hover:text-primary/80"
+            onClick={() => speakText("My Profile")}
+          />
+        </div>
+
+        <Tabs defaultValue="basic" className="space-y-6">
+          <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <TabsTrigger value="basic">Basic Info</TabsTrigger>
+            <TabsTrigger value="medical">Medical Records</TabsTrigger>
+            <TabsTrigger value="risks">Health Risks</TabsTrigger>
+            <TabsTrigger value="medications">Medications</TabsTrigger>
+            <TabsTrigger value="additional">Additional Info</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic">
             <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CardTitle>Basic Information</CardTitle>
-                  <AudioWaveform
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80"
-                    onClick={() => speakText("Basic Information")}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="font-medium text-muted-foreground">Full Name</p>
-                    <p>John Doe</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-muted-foreground">Date of Birth</p>
-                    <p>January 1, 1960</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-muted-foreground">Contact Number</p>
-                    <p>(555) 123-4567</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-muted-foreground">Email</p>
-                    <p>john.doe@example.com</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-muted-foreground">Emergency Contact</p>
-                    <p>Jane Doe - (555) 987-6543</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-muted-foreground">Blood Type</p>
-                    <p>O+</p>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="font-semibold mb-2">Personal Information</h3>
+                      <p>Name: John Doe</p>
+                      <p>Age: 72</p>
+                      <p>Date of Birth: 01/15/1952</p>
+                      <p>Gender: Male</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Contact Information</h3>
+                      <p>Phone: (509) 555-0123</p>
+                      <p>Email: john.doe@example.com</p>
+                      <p>Address: 123 Farm Road, Ritzville, WA 99169</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="records">
+          <TabsContent value="medical">
             <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CardTitle>Medical Records</CardTitle>
-                  <AudioWaveform
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80"
-                    onClick={() => speakText("Medical Records")}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-semibold mb-2">Recent Visits</h3>
-                    <ul className="list-disc pl-4 space-y-2">
-                      <li>Annual Checkup - December 15, 2023</li>
-                      <li>Flu Shot - October 1, 2023</li>
-                      <li>Blood Pressure Check - September 15, 2023</li>
+                    <h3 className="font-semibold mb-2">Current Conditions</h3>
+                    <ul className="list-disc pl-5">
+                      <li>Type 2 Diabetes</li>
+                      <li>Hypertension</li>
+                      <li>Osteoarthritis</li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Vaccinations</h3>
-                    <ul className="list-disc pl-4 space-y-2">
-                      <li>COVID-19 Booster - March 2023</li>
-                      <li>Flu Shot - October 2023</li>
-                      <li>Pneumonia - January 2022</li>
+                    <h3 className="font-semibold mb-2">Past Surgeries</h3>
+                    <ul className="list-disc pl-5">
+                      <li>Knee Replacement (2019)</li>
+                      <li>Appendectomy (1985)</li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Surgeries</h3>
-                    <ul className="list-disc pl-4 space-y-2">
-                      <li>Knee Replacement - 2020</li>
-                      <li>Appendectomy - 1985</li>
+                    <h3 className="font-semibold mb-2">Allergies</h3>
+                    <ul className="list-disc pl-5">
+                      <li>Penicillin</li>
+                      <li>Shellfish</li>
                     </ul>
                   </div>
                 </div>
@@ -143,29 +106,23 @@ const PatientProfile = () => {
 
           <TabsContent value="risks">
             <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CardTitle>Health Risks</CardTitle>
-                  <AudioWaveform
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80"
-                    onClick={() => speakText("Health Risks")}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-destructive/10 rounded-lg">
-                    <h3 className="font-semibold text-destructive mb-2">High Priority</h3>
-                    <ul className="list-disc pl-4 space-y-2">
-                      <li>High Blood Pressure</li>
-                      <li>Type 2 Diabetes Risk</li>
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2">Current Health Risks</h3>
+                    <ul className="list-disc pl-5">
+                      <li>High risk of falls due to mobility issues</li>
+                      <li>Cardiovascular complications due to hypertension</li>
+                      <li>Diabetic complications</li>
                     </ul>
                   </div>
-                  <div className="p-4 bg-yellow-100 rounded-lg">
-                    <h3 className="font-semibold text-yellow-700 mb-2">Moderate Risk</h3>
-                    <ul className="list-disc pl-4 space-y-2">
-                      <li>Family History of Heart Disease</li>
-                      <li>Elevated Cholesterol</li>
+                  <div>
+                    <h3 className="font-semibold mb-2">Preventive Measures</h3>
+                    <ul className="list-disc pl-5">
+                      <li>Regular blood pressure monitoring</li>
+                      <li>Daily blood sugar checks</li>
+                      <li>Physical therapy exercises</li>
+                      <li>Regular eye examinations</li>
                     </ul>
                   </div>
                 </div>
@@ -175,43 +132,33 @@ const PatientProfile = () => {
 
           <TabsContent value="medications">
             <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CardTitle>Current Medications</CardTitle>
-                  <AudioWaveform
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80"
-                    onClick={() => speakText("Current Medications")}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-4 border rounded-lg">
-                      <h3 className="font-semibold mb-2">Lisinopril</h3>
-                      <p className="text-sm text-muted-foreground mb-2">For Blood Pressure</p>
-                      <ul className="text-sm space-y-1">
-                        <li>Dosage: 10mg</li>
-                        <li>Frequency: Once daily</li>
-                        <li>Time: Morning</li>
-                      </ul>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h3 className="font-semibold mb-2">Metformin</h3>
-                      <p className="text-sm text-muted-foreground mb-2">For Blood Sugar</p>
-                      <ul className="text-sm space-y-1">
-                        <li>Dosage: 500mg</li>
-                        <li>Frequency: Twice daily</li>
-                        <li>Time: Morning and Evening</li>
-                      </ul>
+                  <div>
+                    <h3 className="font-semibold mb-2">Current Medications</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="font-medium mb-2">Morning</h4>
+                        <ul className="list-disc pl-5">
+                          <li>Metformin 500mg</li>
+                          <li>Lisinopril 10mg</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2">Evening</h4>
+                        <ul className="list-disc pl-5">
+                          <li>Metformin 500mg</li>
+                          <li>Aspirin 81mg</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2">Supplements</h3>
-                    <ul className="list-disc pl-4 space-y-2">
-                      <li>Vitamin D - 1000 IU daily</li>
-                      <li>Calcium - 500mg daily</li>
-                      <li>Fish Oil - 1000mg daily</li>
+                    <ul className="list-disc pl-5">
+                      <li>Vitamin D3</li>
+                      <li>Calcium</li>
+                      <li>B12</li>
                     </ul>
                   </div>
                 </div>
@@ -219,62 +166,45 @@ const PatientProfile = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="other">
+          <TabsContent value="additional">
             <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CardTitle>Additional Information</CardTitle>
-                  <AudioWaveform
-                    className="h-4 w-4 cursor-pointer hover:text-primary/80"
-                    onClick={() => speakText("Additional Information")}
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Lifestyle</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="font-medium text-muted-foreground">Exercise Routine</p>
-                      <p>30 minutes walking, 3 times per week</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Diet Restrictions</p>
-                      <p>Low sodium, No added sugars</p>
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2">Insurance Information</h3>
+                    <p>Provider: Medicare</p>
+                    <p>Policy Number: XXX-XX-1234</p>
+                    <p>Group Number: 987654</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Emergency Contacts</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="font-medium">Primary Contact</p>
+                        <p>Mary Doe (Daughter)</p>
+                        <p>(509) 555-4567</p>
+                      </div>
+                      <div>
+                        <p className="font-medium">Secondary Contact</p>
+                        <p>James Doe (Son)</p>
+                        <p>(509) 555-7890</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Insurance Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="font-medium text-muted-foreground">Provider</p>
-                      <p>HealthCare Plus</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Policy Number</p>
-                      <p>HCP123456789</p>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Preferences</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="font-medium text-muted-foreground">Preferred Contact Method</p>
-                      <p>Phone Call</p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-muted-foreground">Language</p>
-                      <p>English</p>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Lifestyle Information</h3>
+                    <ul className="list-disc pl-5">
+                      <li>Diet: Low sodium, diabetic</li>
+                      <li>Exercise: Daily 30-minute walks</li>
+                      <li>Occupation: Retired farmer</li>
+                    </ul>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
+      </div>
     </div>
   );
 };
