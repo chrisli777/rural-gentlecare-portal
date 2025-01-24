@@ -1,10 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, AudioWaveform } from "lucide-react";
+import { SoundBar } from "@/components/ui/sound-bar";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const speakText = (text: string) => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to play speech. Please try again.",
+      });
+    };
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary/50 via-white to-white">
@@ -15,6 +41,17 @@ const Index = () => {
             <div className="flex items-center space-x-2">
               <Heart className="w-6 h-6 text-primary" />
               <span className="text-xl font-semibold">Adams Rural Care</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => speakText("Welcome to Adams Rural Care. Please select your role to continue.")}
+              >
+                <AudioWaveform className="h-6 w-6" />
+                <SoundBar isPlaying={isSpeaking} className="absolute -bottom-4 left-1/2 -translate-x-1/2" />
+              </Button>
             </div>
           </div>
         </div>

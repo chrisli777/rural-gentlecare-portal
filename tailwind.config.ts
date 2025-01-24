@@ -64,6 +64,11 @@ export default {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(0)" },
         },
+        "soundbar": {
+          "0%": { height: "0.5rem" },
+          "50%": { height: "1rem" },
+          "100%": { height: "0.5rem" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.5s ease-out",
