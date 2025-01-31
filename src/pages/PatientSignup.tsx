@@ -21,7 +21,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { AudioWaveform } from "lucide-react";
+import { AudioWaveform, BrainCog } from "lucide-react";
 
 interface SignupFormData {
   email: string;
@@ -102,7 +102,7 @@ const PatientSignup = () => {
   return (
     <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4 py-12">
       <div className="max-w-2xl w-full space-y-8 bg-white p-8 rounded-lg shadow-lg animate-fade-in">
-        <div className="text-center">
+        <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
             Patient Registration
             <AudioWaveform
@@ -118,6 +118,18 @@ const PatientSignup = () => {
           <p className="text-muted-foreground">
             {step === 1 ? "Create your account" : "Medical Information Form"}
           </p>
+          {step === 1 && (
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => {
+                toast.info("AI assistance activated to help with form completion");
+              }}
+            >
+              <BrainCog className="h-4 w-4" />
+              Intelligent Discernment
+            </Button>
+          )}
         </div>
 
         <Form {...form}>
