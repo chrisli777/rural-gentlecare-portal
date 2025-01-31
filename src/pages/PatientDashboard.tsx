@@ -10,66 +10,60 @@ const PatientDashboard = () => {
       <Header />
       <Hero />
       
-      {/* Main Dashboard Container */}
+      {/* Main Dashboard Blocks */}
       <div className="container mx-auto px-4 py-6">
-        {/* Quick Actions Section */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4 text-left">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  Upcoming Appointments
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Next appointment: Dr. Smith on March 15, 2024</p>
-              </CardContent>
-            </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Upcoming Appointments
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Next appointment: Dr. Smith on March 15, 2024</p>
+            </CardContent>
+          </Card>
 
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Pill className="h-5 w-5 text-primary" />
-                  Medications
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>3 medications due today</p>
-              </CardContent>
-            </Card>
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Pill className="h-5 w-5 text-primary" />
+                Medications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>3 medications due today</p>
+            </CardContent>
+          </Card>
 
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-primary" />
-                  Health Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Blood pressure: 120/80</p>
-              </CardContent>
-            </Card>
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-primary" />
+                Health Metrics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Blood pressure: 120/80</p>
+            </CardContent>
+          </Card>
 
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-primary" />
-                  Notifications
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>2 new messages from your healthcare team</p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+          <Card className="shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-primary" />
+                Notifications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>2 new messages from your healthcare team</p>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Additional Information Section */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-semibold mb-4 text-left">Health Information</h2>
-          
+        {/* Additional Information Blocks */}
+        <div className="space-y-6">
           {/* Medical Suggestions */}
           <Card className="shadow-md bg-accent/10">
             <CardHeader>
@@ -119,7 +113,7 @@ const PatientDashboard = () => {
               </Alert>
             </CardContent>
           </Card>
-        </section>
+        </div>
       </div>
     </div>
   );
