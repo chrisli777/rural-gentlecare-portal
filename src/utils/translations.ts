@@ -36,6 +36,20 @@ export const translations = {
       doctorsMessages: "Doctor's Messages",
       generalNotifications: "General Notifications",
       back: "Back"
+    },
+    aiAssistant: {
+      title: "AI Health Assistant",
+      chat: "Chat",
+      analysis: "Analysis",
+      reports: "Reports",
+      inputPlaceholder: "Type your health-related question...",
+      monthlyReport: "Monthly Health Summary",
+      recommendations: "Recommendations",
+      metrics: {
+        bloodPressure: "Blood Pressure",
+        bloodSugar: "Blood Sugar",
+        weight: "Weight"
+      }
     }
   },
   es: {
@@ -75,8 +89,22 @@ export const translations = {
       doctorsMessages: "Mensajes del Doctor",
       generalNotifications: "Notificaciones Generales",
       back: "Volver"
+    },
+    aiAssistant: {
+      title: "Asistente de Salud IA",
+      chat: "Chat",
+      analysis: "Análisis",
+      reports: "Informes",
+      inputPlaceholder: "Escribe tu pregunta relacionada con la salud...",
+      monthlyReport: "Resumen Mensual de Salud",
+      recommendations: "Recomendaciones",
+      metrics: {
+        bloodPressure: "Presión Arterial",
+        bloodSugar: "Azúcar en Sangre",
+        weight: "Peso"
+      }
     }
-  },
+  }
 };
 
 export type Language = 'en' | 'es';

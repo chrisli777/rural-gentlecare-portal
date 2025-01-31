@@ -12,6 +12,7 @@ import PatientSignup from "./pages/PatientSignup";
 import PatientProfile from "./pages/PatientProfile";
 import PatientMessages from "./pages/PatientMessages";
 import PatientAppointment from "./pages/PatientAppointment";
+import PatientAIAssistant from "./pages/PatientAIAssistant";
 import AboutUs from "./pages/AboutUs";
 import ProviderLogin from "./pages/ProviderLogin";
 import ProviderDashboard from "./pages/ProviderDashboard";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/patient/profile" element={<PatientProfile />} />
             <Route path="/patient/messages" element={<PatientMessages />} />
             <Route path="/patient/appointment" element={<PatientAppointment />} />
+            <Route path="/patient/ai-assistant" element={<PatientAIAssistant />} />
             <Route path="/about" element={<AboutUs />} />
             {/* Provider Routes */}
             <Route path="/provider/login" element={<ProviderLogin />} />
