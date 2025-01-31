@@ -10,9 +10,9 @@ const PatientDashboard = () => {
       <Header />
       <Hero />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
         {/* Main Blocks Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Appointments Block */}
           <Card>
             <CardHeader>
@@ -67,7 +67,7 @@ const PatientDashboard = () => {
         </div>
 
         {/* Alerts and Suggestions Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
