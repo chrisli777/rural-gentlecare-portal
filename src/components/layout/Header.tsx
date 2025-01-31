@@ -8,8 +8,8 @@ export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if we're on the provider dashboard
-  const isProviderDashboard = location.pathname === '/provider/dashboard';
+  // Check if we're on the provider or patient dashboard
+  const isDashboard = location.pathname === '/provider/dashboard' || location.pathname === '/patient/dashboard';
   // Check if we're on provider patients or analytics page
   const isProviderPatientsOrAnalytics = location.pathname === '/provider/patients' || location.pathname === '/provider/analytics';
   // Check if we're on appointment or messages page
@@ -47,7 +47,7 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {isProviderDashboard && (
+            {isDashboard && (
               <>
                 <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
                   About Us
@@ -60,7 +60,7 @@ export const Header = () => {
           </nav>
 
           {/* Mobile Menu Button */}
-          {isProviderDashboard && (
+          {isDashboard && (
             <button
               className="md:hidden p-2"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -71,7 +71,7 @@ export const Header = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && isProviderDashboard && (
+        {isMenuOpen && isDashboard && (
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
               <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
