@@ -1,11 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Users, Brain, Shield, AudioWaveform } from "lucide-react";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 export const Background = () => {
-  const { translate } = useAccessibility();
-  
   const speakText = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(utterance);
@@ -17,33 +14,33 @@ export const Background = () => {
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <h2 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
-              {translate("common.ourMission")}
+              Our Mission
               <AudioWaveform 
                 className="h-6 w-6 cursor-pointer hover:text-primary/80" 
-                onClick={() => speakText(translate("common.ourMission"))}
+                onClick={() => speakText("Our Mission")}
               />
             </h2>
             <p className="text-lg text-gray-600 flex items-center gap-2">
-              {translate("common.missionStatement")}
+              "Integrating artificial intelligence into rural healthcare systems in Adams County, Washington, can significantly improve service efficiency and patient outcomes by streamlining administrative processes and addressing the specific needs of geriatric care."
               <AudioWaveform 
                 className="h-5 w-5 cursor-pointer hover:text-primary/80 flex-shrink-0" 
-                onClick={() => speakText(translate("common.missionStatement"))}
+                onClick={() => speakText("Integrating artificial intelligence into rural healthcare systems in Adams County, Washington, can significantly improve service efficiency and patient outcomes by streamlining administrative processes and addressing the specific needs of geriatric care.")}
               />
             </p>
             <p className="text-primary font-medium flex items-center justify-center gap-2">
-              {translate("common.missionGoal")}
+              We aim to reduce administrative workload by 30% and increase patient satisfaction scores by 20% over six months through AI-driven healthcare solutions.
               <AudioWaveform 
                 className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                onClick={() => speakText(translate("common.missionGoal"))}
+                onClick={() => speakText("We aim to reduce administrative workload by 30% and increase patient satisfaction scores by 20% over six months through AI-driven healthcare solutions.")}
               />
             </p>
           </div>
 
           <Card className="bg-secondary/20 transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <CardContent className="pt-6">
-              <h3 className="text-2xl font-semibold mb-4">{translate("common.ruralHealthcare")}</h3>
+              <h3 className="text-2xl font-semibold mb-4">Rural Healthcare in Adams County</h3>
               <p className="text-gray-600 leading-relaxed">
-                {translate("common.ruralHealthcareDesc")}
+                Access to healthcare in rural areas of Washington State, particularly in Adams County, faces unique challenges including accessibility, affordability, and workforce shortages. East Adams Rural Healthcare in Ritzville serves as the primary healthcare provider, supporting agricultural workers and an growing elderly population with increasing healthcare demands.
               </p>
             </CardContent>
           </Card>
