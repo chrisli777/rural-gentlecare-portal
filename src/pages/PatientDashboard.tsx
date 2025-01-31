@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/home/Hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Bell, Heart, Pills, Calendar, ShieldAlert, Info, Activity } from "lucide-react";
+import { Bell, Heart, Pill, Calendar, ShieldAlert, Info, Activity } from "lucide-react";
 
 const PatientDashboard = () => {
   return (
@@ -28,7 +28,7 @@ const PatientDashboard = () => {
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Pills className="h-5 w-5 text-primary" />
+                <Pill className="h-5 w-5 text-primary" />
                 Medications
               </CardTitle>
             </CardHeader>
