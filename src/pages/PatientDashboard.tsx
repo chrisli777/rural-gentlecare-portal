@@ -1,68 +1,53 @@
 import { Header } from "@/components/layout/Header";
-import { Hero } from "@/components/home/Hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Bell, Heart, Pill, Calendar, ShieldAlert, Info, Activity } from "lucide-react";
+import { Calendar, MessageSquare, User, Bot, Bell, ShieldAlert, Info, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const PatientDashboard = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <Hero />
-      
-      {/* Main Dashboard Content */}
       <main className="container mx-auto px-4 py-6">
         {/* Quick Actions Section */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  Appointment Booking
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Next appointment: Dr. Smith on March 15, 2024</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Appointment Booking */}
+            <Link to="/patient/appointment" className="group">
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <Calendar className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Appointment Booking</h3>
+                <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
+              </div>
+            </Link>
 
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-primary" />
-                  Messages
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>2 new messages from your healthcare team</p>
-              </CardContent>
-            </Card>
+            {/* Messages & Notifications */}
+            <Link to="/patient/messages" className="group">
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <MessageSquare className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Messages & Notifications</h3>
+                <p className="text-gray-600">View your messages and important notifications.</p>
+              </div>
+            </Link>
 
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-primary" />
-                  My Profile
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>View and update your health information</p>
-              </CardContent>
-            </Card>
+            {/* My Profile */}
+            <Link to="/patient/profile" className="group">
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <User className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">My Profile</h3>
+                <p className="text-gray-600">Manage your personal information and preferences.</p>
+              </div>
+            </Link>
 
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary" />
-                  AI Health Assistant
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Get personalized health recommendations</p>
-              </CardContent>
-            </Card>
+            {/* AI Health Assistant */}
+            <Link to="/patient/ai-assistant" className="group">
+              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <Bot className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">AI Health Assistant</h3>
+                <p className="text-gray-600">Get personalized health guidance and support.</p>
+              </div>
+            </Link>
           </div>
         </section>
 
@@ -77,7 +62,7 @@ const PatientDashboard = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert>
-                <ShieldAlert className="h-4 w-4" />
+                <Activity className="h-4 w-4" />
                 <AlertTitle>Exercise Recommendation</AlertTitle>
                 <AlertDescription>
                   Consider a 30-minute daily walk to improve cardiovascular health.
