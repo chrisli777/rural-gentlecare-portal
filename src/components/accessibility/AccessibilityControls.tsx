@@ -37,6 +37,7 @@ export const AccessibilityControls = () => {
       title: "Font Size Changed",
       description: `Font size set to ${newSize}`,
       duration: 2000,
+      className: "left-0 right-auto",
     });
   };
 
@@ -47,6 +48,7 @@ export const AccessibilityControls = () => {
       title: "Language Changed",
       description: `Language set to ${newLanguage === 'en' ? 'English' : 'Spanish'}`,
       duration: 2000,
+      className: "left-0 right-auto",
     });
   };
 
@@ -56,6 +58,7 @@ export const AccessibilityControls = () => {
       title: "Voice Assist",
       description: voiceAssistEnabled ? "Voice assist disabled" : "Voice assist enabled",
       duration: 2000,
+      className: "left-0 right-auto",
     });
   };
 
@@ -66,6 +69,7 @@ export const AccessibilityControls = () => {
         title: "Voice Commands",
         description: "Voice commands stopped",
         duration: 2000,
+        className: "left-0 right-auto",
       });
     } else {
       startListening();
@@ -73,6 +77,7 @@ export const AccessibilityControls = () => {
         title: "Voice Commands",
         description: "Listening for voice commands...",
         duration: 2000,
+        className: "left-0 right-auto",
       });
     }
   };
@@ -83,6 +88,7 @@ export const AccessibilityControls = () => {
       title: "Messages",
       description: "Navigating to messages page",
       duration: 2000,
+      className: "left-0 right-auto",
     });
   };
 
