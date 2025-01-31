@@ -11,7 +11,7 @@ export const Hero = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Appointment Booking */}
-          <Link to="/patient/appointments" className="group">
+          <Link to="/patient/appointment" className="group">
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
               <Calendar className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-xl font-semibold mb-2">Appointment Booking</h3>
