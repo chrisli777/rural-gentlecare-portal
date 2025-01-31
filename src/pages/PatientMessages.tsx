@@ -20,7 +20,7 @@ const PatientMessages = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {translate("messages.back")}
+            Back
           </Button>
           <h1 className="text-3xl font-bold">{translate("messages.title")}</h1>
         </div>

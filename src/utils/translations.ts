@@ -34,7 +34,8 @@ export const translations = {
       medicationAlerts: "Medication Alerts",
       appointmentAlerts: "Appointment Alerts",
       doctorsMessages: "Doctor's Messages",
-      generalNotifications: "General Notifications"
+      generalNotifications: "General Notifications",
+      back: "Back"
     }
   },
   es: {
@@ -72,7 +73,8 @@ export const translations = {
       medicationAlerts: "Alertas de Medicamentos",
       appointmentAlerts: "Alertas de Citas",
       doctorsMessages: "Mensajes del Doctor",
-      generalNotifications: "Notificaciones Generales"
+      generalNotifications: "Notificaciones Generales",
+      back: "Volver"
     }
   },
 };

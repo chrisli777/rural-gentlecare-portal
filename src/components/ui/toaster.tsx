@@ -17,17 +17,15 @@ export function Toaster() {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
+              {title && title !== "Login Successful" && <ToastTitle>{title}</ToastTitle>}
+              {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
             <ToastClose />
           </Toast>
         )
       })}
-      <ToastViewport />
+      <ToastViewport className="fixed bottom-0 left-0 flex flex-col p-4 gap-2 w-full max-w-[420px] sm:max-w-[380px]" />
     </ToastProvider>
   )
 }
