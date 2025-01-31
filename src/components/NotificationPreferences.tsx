@@ -40,7 +40,7 @@ export const NotificationPreferences = ({
           Preferences
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-4">
+      <DropdownMenuContent className="w-56 p-4 bg-white border shadow-md">
         <div className="space-y-4">
           <Label className="text-base">Receive notifications via:</Label>
           <div className="space-y-2">
