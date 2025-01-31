@@ -5,9 +5,7 @@ import {
   Type, 
   Languages, 
   Mic, 
-  MicOff, 
-  VolumeX, 
-  Volume2,
+  MicOff,
   HelpCircle
 } from "lucide-react";
 
@@ -17,8 +15,6 @@ export const AccessibilityControls = () => {
     setFontSize,
     language,
     setLanguage,
-    voiceAssistEnabled,
-    setVoiceAssistEnabled,
     isListening,
     startListening,
     stopListening,
@@ -45,16 +41,6 @@ export const AccessibilityControls = () => {
     toast({
       title: "Language Changed",
       description: `Language set to ${newLanguage === 'en' ? 'English' : 'Spanish'}`,
-      duration: 2000,
-      className: "left-0 right-auto",
-    });
-  };
-
-  const handleVoiceAssist = () => {
-    setVoiceAssistEnabled(!voiceAssistEnabled);
-    toast({
-      title: "Voice Assist",
-      description: voiceAssistEnabled ? "Voice assist disabled" : "Voice assist enabled",
       duration: 2000,
       className: "left-0 right-auto",
     });
@@ -109,20 +95,6 @@ export const AccessibilityControls = () => {
         title={language === 'en' ? 'Switch to Spanish' : 'Switch to English'}
       >
         <Languages className="h-4 w-4" />
-      </Button>
-
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleVoiceAssist}
-        className="hover:bg-primary/20"
-        title={voiceAssistEnabled ? 'Disable Voice Assist' : 'Enable Voice Assist'}
-      >
-        {voiceAssistEnabled ? (
-          <Volume2 className="h-4 w-4" />
-        ) : (
-          <VolumeX className="h-4 w-4" />
-        )}
       </Button>
 
       <Button

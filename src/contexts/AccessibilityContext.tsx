@@ -7,9 +7,6 @@ interface AccessibilityContextType {
   setFontSize: (size: 'normal' | 'large' | 'extra-large') => void;
   language: 'en' | 'es';
   setLanguage: (lang: 'en' | 'es') => void;
-  voiceAssistEnabled: boolean;
-  setVoiceAssistEnabled: (enabled: boolean) => void;
-  speak: (text: string) => void;
   isListening: boolean;
   startListening: () => void;
   stopListening: () => void;
@@ -21,17 +18,8 @@ const AccessibilityContext = createContext<AccessibilityContextType | undefined>
 export const AccessibilityProvider = ({ children }: { children: React.ReactNode }) => {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'extra-large'>('normal');
   const [language, setLanguage] = useState<'en' | 'es'>('en');
-  const [voiceAssistEnabled, setVoiceAssistEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
-
-  const speak = (text: string) => {
-    if (!voiceAssistEnabled) return;
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language === 'en' ? 'en-US' : 'es-ES';
-    window.speechSynthesis.speak(utterance);
-  };
 
   const translate = (key: string): string => {
     const keys = key.split('.');
@@ -117,9 +105,6 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
         setFontSize,
         language,
         setLanguage,
-        voiceAssistEnabled,
-        setVoiceAssistEnabled,
-        speak,
         isListening,
         startListening,
         stopListening,
