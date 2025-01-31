@@ -1,5 +1,12 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Settings2 } from "lucide-react"
 
 const notificationMethods = [
   { id: "app", label: "App Notifications" },
@@ -26,22 +33,32 @@ export const NotificationPreferences = ({
   };
 
   return (
-    <div className="space-y-4">
-      <Label className="text-base">Receive notifications via:</Label>
-      <div className="grid grid-cols-2 gap-4">
-        {notificationMethods.map((method) => (
-          <div key={method.id} className="flex items-center space-x-2">
-            <Checkbox
-              id={method.id}
-              checked={selectedMethods.includes(method.id)}
-              onCheckedChange={() => toggleMethod(method.id)}
-            />
-            <Label htmlFor={method.id} className="text-sm font-normal">
-              {method.label}
-            </Label>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2">
+          <Settings2 className="h-4 w-4" />
+          Preferences
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-4">
+        <div className="space-y-4">
+          <Label className="text-base">Receive notifications via:</Label>
+          <div className="space-y-2">
+            {notificationMethods.map((method) => (
+              <div key={method.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={method.id}
+                  checked={selectedMethods.includes(method.id)}
+                  onCheckedChange={() => toggleMethod(method.id)}
+                />
+                <Label htmlFor={method.id} className="text-sm font-normal">
+                  {method.label}
+                </Label>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
