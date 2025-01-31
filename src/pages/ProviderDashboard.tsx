@@ -1,29 +1,22 @@
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartLegend,
-} from "@/components/ui/chart";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
-import { Users, Calendar, Activity, Brain } from "lucide-react";
+import { Users, Calendar, AlertTriangle, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-const mockData = [
-  { month: 'Jan', appointments: 65 },
-  { month: 'Feb', appointments: 59 },
-  { month: 'Mar', appointments: 80 },
-  { month: 'Apr', appointments: 81 },
-  { month: 'May', appointments: 56 },
-  { month: 'Jun', appointments: 55 },
+const mockAppointments = [
+  { patientName: "John Doe", time: "09:00 AM", type: "Follow-up" },
+  { patientName: "Jane Smith", time: "10:30 AM", type: "Check-up" },
+];
+
+const mockRiskAlerts = [
+  { patient: "Alice Johnson", risk: "Missed last 2 appointments" },
+  { patient: "Bob Wilson", risk: "Blood pressure trending high" },
+];
+
+const mockMessages = [
+  { from: "Mary Brown", preview: "Thank you for the follow-up..." },
+  { from: "James Davis", preview: "Questions about medication..." },
 ];
 
 const ProviderDashboard = () => {
@@ -58,21 +51,21 @@ const ProviderDashboard = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Active Treatment Plans</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Risk Alerts</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">156</div>
+              <div className="text-2xl font-bold">3</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">AI Insights</CardTitle>
-              <Brain className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Unread Messages</CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold">5</div>
             </CardContent>
           </Card>
         </div>
@@ -80,34 +73,87 @@ const ProviderDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card>
             <CardHeader>
-              <CardTitle>Appointment Trends</CardTitle>
+              <CardTitle>Today's Appointments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
-                <ChartContainer
-                  config={{
-                    appointments: {
-                      label: "Appointments",
-                      color: "hsl(var(--primary))",
-                    },
-                  }}
+              <div className="space-y-4">
+                {mockAppointments.map((appointment, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                    <div>
+                      <p className="font-medium">{appointment.patientName}</p>
+                      <p className="text-sm text-muted-foreground">{appointment.type}</p>
+                    </div>
+                    <p className="text-sm font-medium">{appointment.time}</p>
+                  </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate("/provider/appointments")}
                 >
-                  <BarChart data={mockData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <ChartTooltip />
-                    <ChartLegend />
-                    <Bar dataKey="appointments" fill="hsl(var(--primary))" />
-                  </BarChart>
-                </ChartContainer>
+                  View All Appointments
+                </Button>
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Patient Risk Alerts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockRiskAlerts.map((alert, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                    <div>
+                      <p className="font-medium">{alert.patient}</p>
+                      <p className="text-sm text-destructive">{alert.risk}</p>
+                    </div>
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                  </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate("/provider/patients")}
+                >
+                  View All Patients
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Messages</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockMessages.map((message, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                    <div>
+                      <p className="font-medium">{message.from}</p>
+                      <p className="text-sm text-muted-foreground truncate max-w-[300px]">
+                        {message.preview}
+                      </p>
+                    </div>
+                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate("/provider/messages")}
+                >
+                  View All Messages
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Navigation</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <Button
@@ -123,7 +169,7 @@ const ProviderDashboard = () => {
                 className="h-24 flex flex-col items-center justify-center gap-2"
                 onClick={() => navigate("/provider/analytics")}
               >
-                <Activity className="h-6 w-6" />
+                <Calendar className="h-6 w-6" />
                 <span>Analytics</span>
               </Button>
             </CardContent>
