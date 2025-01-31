@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { NotificationPreferences } from "@/components/NotificationPreferences";
 import {
   Select,
   SelectContent,
@@ -35,13 +36,14 @@ const PatientAppointment = () => {
   const [selectedTime, setSelectedTime] = useState("");
   const [appointmentType, setAppointmentType] = useState("");
   const [selectedClinic, setSelectedClinic] = useState("");
+  const [notificationMethods, setNotificationMethods] = useState<string[]>(["app"]);
   const { toast } = useToast();
 
   const handleBookAppointment = () => {
-    if (!date || !selectedDoctor || !selectedTime || !appointmentType) {
+    if (!date || !selectedDoctor || !selectedTime || !appointmentType || notificationMethods.length === 0) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields and select at least one notification method",
         variant: "destructive",
         className: "left-0 right-auto",
       });
@@ -151,6 +153,11 @@ const PatientAppointment = () => {
                 </Select>
               </div>
 
+              <NotificationPreferences
+                selectedMethods={notificationMethods}
+                onMethodsChange={setNotificationMethods}
+              />
+
               <Button
                 className="w-full"
                 onClick={handleBookAppointment}
@@ -192,6 +199,12 @@ const PatientAppointment = () => {
                 <p>
                   <span className="font-medium">Time: </span>
                   {selectedTime}
+                </p>
+              )}
+              {notificationMethods.length > 0 && (
+                <p>
+                  <span className="font-medium">Notifications: </span>
+                  {notificationMethods.join(", ")}
                 </p>
               )}
             </div>
