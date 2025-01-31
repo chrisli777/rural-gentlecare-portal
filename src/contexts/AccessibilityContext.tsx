@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
+import { translations } from "@/utils/translations";
 
 interface AccessibilityContextType {
   fontSize: 'normal' | 'large' | 'extra-large';
@@ -12,6 +13,7 @@ interface AccessibilityContextType {
   isListening: boolean;
   startListening: () => void;
   stopListening: () => void;
+  translate: (key: string) => string;
 }
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -29,6 +31,21 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = language === 'en' ? 'en-US' : 'es-ES';
     window.speechSynthesis.speak(utterance);
+  };
+
+  const translate = (key: string): string => {
+    const keys = key.split('.');
+    let translation: any = translations[language];
+    
+    for (const k of keys) {
+      if (translation && translation[k]) {
+        translation = translation[k];
+      } else {
+        return key; // Return the key if translation not found
+      }
+    }
+    
+    return translation;
   };
 
   const startListening = () => {
@@ -56,20 +73,10 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
     recognition.onresult = (event: any) => {
       const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
       
-      // Basic command handling
-      if (command.includes('schedule') || command.includes('appointment')) {
-        toast({
-          title: "Command Recognized",
-          description: "Opening appointment scheduler...",
-        });
-        // Add appointment scheduling logic here
-      } else if (command.includes('emergency')) {
-        toast({
-          title: "Emergency Command Recognized",
-          description: "Initiating emergency call...",
-          variant: "destructive"
-        });
-        // Add emergency call logic here
+      if (command.includes('profile')) {
+        window.location.href = '/patient/profile';
+      } else if (command.includes('dashboard')) {
+        window.location.href = '/patient/dashboard';
       }
     };
 
@@ -86,10 +93,24 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
 
   // Apply font size changes globally
   useEffect(() => {
-    document.documentElement.style.fontSize = 
-      fontSize === 'normal' ? '16px' : 
-      fontSize === 'large' ? '20px' : '24px';
+    const fontSizes = {
+      normal: '16px',
+      large: '20px',
+      'extra-large': '24px'
+    };
+    
+    document.documentElement.style.fontSize = fontSizes[fontSize];
+    document.documentElement.style.setProperty('--base-font-size', fontSizes[fontSize]);
+    
+    const htmlElement = document.documentElement;
+    htmlElement.classList.remove('text-normal', 'text-large', 'text-extra-large');
+    htmlElement.classList.add(`text-${fontSize}`);
   }, [fontSize]);
+
+  // Apply language changes
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   return (
     <AccessibilityContext.Provider
@@ -104,6 +125,7 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
         isListening,
         startListening,
         stopListening,
+        translate,
       }}
     >
       {children}

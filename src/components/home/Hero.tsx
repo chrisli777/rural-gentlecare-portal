@@ -1,13 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, BookOpen, MessageSquare, AudioWaveform, PhoneCall, Bell, Heart, Activity, Pill, User } from "lucide-react";
+import { BookOpen, MessageSquare, AudioWaveform, Bell, Heart, Activity, Pill, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 export const Hero = () => {
-  const speakText = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.speak(utterance);
-  };
+  const { speak } = useAccessibility();
 
   return (
     <section className="pt-24 pb-24 px-4 min-h-screen flex items-center bg-gradient-to-b from-secondary/50 via-white to-white overflow-hidden relative">
@@ -49,7 +47,7 @@ export const Hero = () => {
             Virtual Rural Healthcare
             <AudioWaveform 
               className="absolute -right-2 top-1/2 -translate-y-1/2 h-6 w-6 cursor-pointer hover:text-primary/80" 
-              onClick={() => speakText("Virtual Rural Healthcare")}
+              onClick={() => speak("Virtual Rural Healthcare")}
             />
           </motion.h1>
           
@@ -62,7 +60,7 @@ export const Hero = () => {
             Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.
             <AudioWaveform 
               className="absolute -right-2 top-1/2 -translate-y-1/2 h-5 w-5 cursor-pointer hover:text-primary/80" 
-              onClick={() => speakText("Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.")}
+              onClick={() => speak("Providing comprehensive healthcare services tailored to the unique needs of our elderly community members, right here in Adams County.")}
             />
           </motion.p>
 
@@ -72,37 +70,21 @@ export const Hero = () => {
             transition={{ duration: 0.4, delay: 0.2 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in"
           >
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <Link to="/patient/profile">
                 <Button 
                   size="lg" 
-                  variant="destructive"
+                  variant="outline"
                   className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
                 >
-                  <PhoneCall className="w-6 h-6" />
-                  Emergency Call
+                  <User className="w-6 h-6" />
+                  My Profile
                 </Button>
-                <AudioWaveform 
-                  className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                  onClick={() => speakText("Emergency Call")}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Link to="/patient/profile">
-                  <Button 
-                    size="lg" 
-                    variant="outline"
-                    className="w-full sm:w-auto text-xl py-6 px-8 flex items-center gap-2"
-                  >
-                    <User className="w-6 h-6" />
-                    My Profile
-                  </Button>
-                </Link>
-                <AudioWaveform 
-                  className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                  onClick={() => speakText("My Profile")}
-                />
-              </div>
+              </Link>
+              <AudioWaveform 
+                className="h-5 w-5 cursor-pointer hover:text-primary/80" 
+                onClick={() => speak("My Profile")}
+              />
             </div>
           </motion.div>
 
@@ -123,16 +105,16 @@ export const Hero = () => {
                 iconColor: "text-purple-500"
               },
               {
-                icon: Calendar,
-                title: "Easy Scheduling",
-                description: "Book appointments online with our caring providers",
+                icon: BookOpen,
+                title: "Health Resources",
+                description: "Access educational materials about geriatric care",
                 color: "bg-green-50",
                 iconColor: "text-green-500"
               },
               {
-                icon: BookOpen,
-                title: "Health Resources",
-                description: "Access educational materials about geriatric care",
+                icon: Activity,
+                title: "Health Monitoring",
+                description: "Track your vital signs and health progress",
                 color: "bg-orange-50",
                 iconColor: "text-orange-500"
               }
@@ -148,7 +130,7 @@ export const Hero = () => {
                 <feature.icon className={`w-12 h-12 ${feature.iconColor} mb-4`} />
                 <AudioWaveform 
                   className="absolute top-4 right-4 h-5 w-5 cursor-pointer hover:text-primary/80" 
-                  onClick={() => speakText(`${feature.title}. ${feature.description}`)}
+                  onClick={() => speak(`${feature.title}. ${feature.description}`)}
                 />
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
