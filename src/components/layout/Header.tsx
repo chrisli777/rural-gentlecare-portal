@@ -9,9 +9,10 @@ export const Header = () => {
   const navigate = useNavigate();
   const isPatientRoute = location.pathname.startsWith('/patient');
   const isMessagesPage = location.pathname === '/patient/messages';
+  const isAppointmentPage = location.pathname === '/patient/appointment';
   const showBackButton = location.pathname !== '/patient/dashboard';
 
-  if (isMessagesPage) {
+  if (isMessagesPage || isAppointmentPage) {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="container mx-auto px-4">
