@@ -9,17 +9,17 @@ export const Hero = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold text-gray-900 mb-6">
-            {translate("common.welcome")}
+            Welcome to Adams Rural Care
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            {translate("common.selectRole")}
+            Providing quality healthcare services to our rural community
           </p>
           <div className="space-x-4">
             <Button variant="default" size="lg">
-              {translate("common.learnMore")}
+              Learn More
             </Button>
             <Button variant="outline" size="lg">
-              {translate("common.contactUs")}
+              Contact Us
             </Button>
           </div>
         </div>

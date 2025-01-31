@@ -2,16 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Heart, ArrowLeft, Menu } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { translate } = useAccessibility();
   
+  // Check if we're on the provider or patient dashboard
   const isDashboard = location.pathname === '/provider/dashboard' || location.pathname === '/patient/dashboard';
+  // Check if we're on provider patients or analytics page
   const isProviderPatientsOrAnalytics = location.pathname === '/provider/patients' || location.pathname === '/provider/analytics';
+  // Check if we're on appointment or messages page
   const isAppointmentOrMessages = location.pathname === '/patient/appointment' || location.pathname === '/patient/messages';
   
   if (isProviderPatientsOrAnalytics || isAppointmentOrMessages) {
@@ -25,7 +26,7 @@ export const Header = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              {translate("common.back")}
+              Back
             </Button>
           </div>
         </div>
@@ -44,19 +45,21 @@ export const Header = () => {
             </Link>
           </div>
 
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {isDashboard && (
               <>
                 <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
-                  {translate("aboutUs.title")}
+                  About Us
                 </Link>
                 <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
-                  {translate("common.contactUs")}
+                  Contact Us
                 </a>
               </>
             )}
           </nav>
 
+          {/* Mobile Menu Button */}
           {isDashboard && (
             <button
               className="md:hidden p-2"
@@ -67,14 +70,15 @@ export const Header = () => {
           )}
         </div>
 
+        {/* Mobile Navigation */}
         {isMenuOpen && isDashboard && (
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
               <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
-                {translate("aboutUs.title")}
+                About Us
               </Link>
               <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
-                {translate("common.contactUs")}
+                Contact Us
               </a>
             </div>
           </nav>
