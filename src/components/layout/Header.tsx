@@ -51,12 +51,12 @@ export const Header = () => {
               </>
             ) : (
               <>
-                <Link to="/patient/dashboard" className="text-gray-600 hover:text-primary transition-colors">
-                  Dashboard
+                <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
+                  About Us
                 </Link>
-                <Link to="/patient/profile" className="text-gray-600 hover:text-primary transition-colors">
-                  Profile
-                </Link>
+                <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
+                  Contact Us
+                </a>
               </>
             )}
           </nav>
@@ -92,12 +92,12 @@ export const Header = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/patient/dashboard" className="text-gray-600 hover:text-primary transition-colors">
-                    Dashboard
+                  <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
+                    About Us
                   </Link>
-                  <Link to="/patient/profile" className="text-gray-600 hover:text-primary transition-colors">
-                    Profile
-                  </Link>
+                  <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
+                    Contact Us
+                  </a>
                 </>
               )}
             </div>
