@@ -57,7 +57,7 @@ const PatientAppointment = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header showMessagesHeader={true} />
+      <Header />
       <main className="container mx-auto px-4 pt-24 pb-12">
         <h1 className="text-3xl font-bold mb-8">Book an Appointment</h1>
         
