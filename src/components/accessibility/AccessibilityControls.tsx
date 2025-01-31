@@ -7,7 +7,8 @@ import {
   Mic, 
   MicOff, 
   VolumeX, 
-  Volume2
+  Volume2,
+  HelpCircle
 } from "lucide-react";
 
 export const AccessibilityControls = () => {
@@ -79,6 +80,15 @@ export const AccessibilityControls = () => {
     }
   };
 
+  const handleRequestAssistance = () => {
+    toast({
+      title: "Assistance Requested",
+      description: "A healthcare provider will assist you shortly",
+      duration: 3000,
+      className: "left-0 right-auto",
+    });
+  };
+
   return (
     <div className="fixed bottom-4 right-4 flex flex-col gap-2 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 z-50">
       <Button
@@ -127,6 +137,16 @@ export const AccessibilityControls = () => {
         ) : (
           <Mic className="h-4 w-4" />
         )}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={handleRequestAssistance}
+        className="hover:bg-primary/20"
+        title="Request Assistance"
+      >
+        <HelpCircle className="h-4 w-4" />
       </Button>
     </div>
   );
