@@ -11,7 +11,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "sonner";
 import { AudioWaveform } from "lucide-react";
 
 interface LoginFormData {
@@ -35,10 +34,9 @@ const PatientLogin = () => {
     try {
       // TODO: Implement actual login logic
       console.log("Login attempt with:", data);
-      toast.success("Login successful!");
       navigate("/patient/dashboard");
     } catch (error) {
-      toast.error("Login failed. Please try again.");
+      console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
     }
