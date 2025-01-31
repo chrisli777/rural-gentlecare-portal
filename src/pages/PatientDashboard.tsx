@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/home/Hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Bell, Calendar, Pills } from "lucide-react";
+import { Info, Bell, Calendar, Pill } from "lucide-react";
 
 const PatientDashboard = () => {
   return (
@@ -22,7 +22,6 @@ const PatientDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Existing code for Appointments */}
                 <p>You have 2 upcoming appointments.</p>
               </CardContent>
             </Card>
@@ -39,12 +38,11 @@ const PatientDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Pills className="h-5 w-5" />
+                  <Pill className="h-5 w-5" />
                   Medications
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Existing code for Medications */}
                 <p>You have 3 medications to take today.</p>
               </CardContent>
             </Card>
@@ -66,7 +64,6 @@ const PatientDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Existing code for Health Records */}
                 <p>Your last visit was on March 15, 2023.</p>
               </CardContent>
             </Card>
@@ -88,7 +85,6 @@ const PatientDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Existing code for Educational Resources */}
                 <p>Check out the latest articles on health and wellness.</p>
               </CardContent>
             </Card>
