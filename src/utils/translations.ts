@@ -28,6 +28,14 @@ export const translations = {
       healthMetrics: "Health Metrics",
       notifications: "Notifications",
     },
+    messages: {
+      title: "Messages & Notifications",
+      noMessages: "No messages to display",
+      medicationAlerts: "Medication Alerts",
+      appointmentAlerts: "Appointment Alerts",
+      doctorsMessages: "Doctor's Messages",
+      generalNotifications: "General Notifications"
+    }
   },
   es: {
     common: {
@@ -58,6 +66,14 @@ export const translations = {
       healthMetrics: "Métricas de Salud",
       notifications: "Notificaciones",
     },
+    messages: {
+      title: "Mensajes y Notificaciones",
+      noMessages: "No hay mensajes para mostrar",
+      medicationAlerts: "Alertas de Medicamentos",
+      appointmentAlerts: "Alertas de Citas",
+      doctorsMessages: "Mensajes del Doctor",
+      generalNotifications: "Notificaciones Generales"
+    }
   },
 };
 
