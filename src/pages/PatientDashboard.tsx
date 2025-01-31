@@ -3,23 +3,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Calendar, MessageSquare, User, Bot, Bell, ShieldAlert, Info, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 const PatientDashboard = () => {
+  const { translate } = useAccessibility();
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <main className="container mx-auto px-4 pt-20">
         {/* Quick Actions Section */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Quick Actions</h2>
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">{translate("dashboard.quickActions")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Appointment Booking */}
             <Link to="/patient/appointment" className="group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Calendar className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Appointment Booking</h3>
-                  <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
+                  <h3 className="text-xl font-semibold mb-2">{translate("dashboard.appointmentBooking")}</h3>
+                  <p className="text-gray-600">{translate("dashboard.scheduleVisit")}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -29,8 +32,8 @@ const PatientDashboard = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <MessageSquare className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Messages & Notifications</h3>
-                  <p className="text-gray-600">View your messages and important notifications.</p>
+                  <h3 className="text-xl font-semibold mb-2">{translate("dashboard.messages")}</h3>
+                  <p className="text-gray-600">{translate("dashboard.viewMessages")}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -40,8 +43,8 @@ const PatientDashboard = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <User className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">My Profile</h3>
-                  <p className="text-gray-600">Manage your personal information and preferences.</p>
+                  <h3 className="text-xl font-semibold mb-2">{translate("dashboard.profile")}</h3>
+                  <p className="text-gray-600">{translate("dashboard.manageProfile")}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -51,8 +54,8 @@ const PatientDashboard = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Bot className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">AI Health Assistant</h3>
-                  <p className="text-gray-600">Get personalized health guidance and support.</p>
+                  <h3 className="text-xl font-semibold mb-2">{translate("dashboard.aiAssistant")}</h3>
+                  <p className="text-gray-600">{translate("dashboard.aiGuidance")}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -65,22 +68,22 @@ const PatientDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Info className="h-5 w-5 text-accent" />
-                Medical Suggestions
+                {translate("dashboard.medicalSuggestions")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert>
                 <Activity className="h-4 w-4" />
-                <AlertTitle>Exercise Recommendation</AlertTitle>
+                <AlertTitle>{translate("dashboard.exerciseTitle")}</AlertTitle>
                 <AlertDescription>
-                  Consider a 30-minute daily walk to improve cardiovascular health.
+                  {translate("dashboard.exerciseDesc")}
                 </AlertDescription>
               </Alert>
               <Alert>
                 <Activity className="h-4 w-4" />
-                <AlertTitle>Diet Suggestion</AlertTitle>
+                <AlertTitle>{translate("dashboard.dietTitle")}</AlertTitle>
                 <AlertDescription>
-                  Increase your daily water intake to 8 glasses for better hydration.
+                  {translate("dashboard.dietDesc")}
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -93,20 +96,20 @@ const PatientDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldAlert className="h-5 w-5 text-destructive" />
-                Important Health Alerts
+                {translate("dashboard.healthAlerts")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert variant="destructive">
-                <AlertTitle>Medication Reminder</AlertTitle>
+                <AlertTitle>{translate("dashboard.medicationReminder")}</AlertTitle>
                 <AlertDescription>
-                  Don't forget to take your evening medication at 8:00 PM
+                  {translate("dashboard.medicationDesc")}
                 </AlertDescription>
               </Alert>
               <Alert>
-                <AlertTitle>Upcoming Lab Work</AlertTitle>
+                <AlertTitle>{translate("dashboard.labWork")}</AlertTitle>
                 <AlertDescription>
-                  Schedule your quarterly blood work before March 30, 2024
+                  {translate("dashboard.labWorkDesc")}
                 </AlertDescription>
               </Alert>
             </CardContent>
