@@ -19,9 +19,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AccessibilityProvider>
       <TooltipProvider>
+        <Toaster />
+        <Sonner />
         <BrowserRouter>
-          <Toaster />
-          <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/patient/login" element={<PatientLogin />} />
