@@ -20,7 +20,7 @@ const PatientMessages = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {translate("messages.back")}
+            Back
           </Button>
           <h1 className="text-3xl font-bold">{translate("messages.title")}</h1>
         </div>
@@ -34,14 +34,9 @@ const PatientMessages = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Time to take Blood Pressure medication</p>
-                  <p className="text-xs text-muted-foreground">Today, 2:00 PM</p>
-                </div>
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Refill reminder: Diabetes medication</p>
-                  <p className="text-xs text-muted-foreground">Tomorrow</p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {translate("messages.noMessages")}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -54,14 +49,9 @@ const PatientMessages = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Upcoming: Dr. Smith - Regular Checkup</p>
-                  <p className="text-xs text-muted-foreground">March 15, 10:00 AM</p>
-                </div>
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Telehealth appointment confirmation needed</p>
-                  <p className="text-xs text-muted-foreground">March 20, 2:30 PM</p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {translate("messages.noMessages")}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -74,14 +64,9 @@ const PatientMessages = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Lab results review</p>
-                  <p className="text-xs text-muted-foreground">From: Dr. Smith - 2 hours ago</p>
-                </div>
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Treatment plan update</p>
-                  <p className="text-xs text-muted-foreground">From: Dr. Johnson - Yesterday</p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {translate("messages.noMessages")}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -94,14 +79,9 @@ const PatientMessages = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">Insurance coverage update</p>
-                  <p className="text-xs text-muted-foreground">1 day ago</p>
-                </div>
-                <div className="p-3 bg-secondary/50 rounded-lg">
-                  <p className="text-sm font-medium">New health resources available</p>
-                  <p className="text-xs text-muted-foreground">2 days ago</p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {translate("messages.noMessages")}
+                </p>
               </div>
             </CardContent>
           </Card>
