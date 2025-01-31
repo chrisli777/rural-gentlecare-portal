@@ -8,7 +8,27 @@ export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isPatientRoute = location.pathname.startsWith('/patient');
+  const isMessagesPage = location.pathname === '/patient/messages';
   const showBackButton = location.pathname !== '/patient/dashboard';
+
+  if (isMessagesPage) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center h-16">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
