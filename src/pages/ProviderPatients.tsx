@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const mockPatients = [
   {
@@ -32,6 +33,8 @@ const mockPatients = [
 ];
 
 const ProviderPatients = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -75,7 +78,11 @@ const ProviderPatients = () => {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => navigate(`/provider/patients/${patient.id}`)}
+                    >
                       View Details
                     </Button>
                   </TableCell>
