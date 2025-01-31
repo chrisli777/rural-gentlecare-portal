@@ -13,7 +13,7 @@ const PatientDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Appointments Block */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -34,7 +34,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Medications Block */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -55,7 +55,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Health Records Block */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -76,7 +76,7 @@ const PatientDashboard = () => {
           </div>
 
           {/* Educational Resources Block */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
