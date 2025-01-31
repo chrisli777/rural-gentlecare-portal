@@ -1,21 +1,35 @@
 import { Button } from "@/components/ui/button";
-import { Heart, User, Menu, MessageSquare } from "lucide-react";
+import { Heart, User, Menu, ArrowLeft } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isPatientRoute = location.pathname.startsWith('/patient');
+  const showBackButton = location.pathname !== '/patient/dashboard';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <Heart className="w-6 h-6 text-primary" />
-            <span className="text-xl font-semibold">Adams Rural Care</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            {showBackButton && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(-1)}
+                className="mr-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <Link to="/" className="flex items-center space-x-2">
+              <Heart className="w-6 h-6 text-primary" />
+              <span className="text-xl font-semibold">Adams Rural Care</span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -39,10 +53,6 @@ export const Header = () => {
               <>
                 <Link to="/patient/dashboard" className="text-gray-600 hover:text-primary transition-colors">
                   Dashboard
-                </Link>
-                <Link to="/patient/messages" className="text-gray-600 hover:text-primary transition-colors flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Messages & Notifications</span>
                 </Link>
                 <Link to="/patient/profile" className="text-gray-600 hover:text-primary transition-colors">
                   Profile
@@ -84,10 +94,6 @@ export const Header = () => {
                 <>
                   <Link to="/patient/dashboard" className="text-gray-600 hover:text-primary transition-colors">
                     Dashboard
-                  </Link>
-                  <Link to="/patient/messages" className="text-gray-600 hover:text-primary transition-colors flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Messages & Notifications</span>
                   </Link>
                   <Link to="/patient/profile" className="text-gray-600 hover:text-primary transition-colors">
                     Profile
