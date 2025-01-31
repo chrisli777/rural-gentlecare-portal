@@ -11,6 +11,7 @@ import PatientLogin from "./pages/PatientLogin";
 import PatientSignup from "./pages/PatientSignup";
 import PatientProfile from "./pages/PatientProfile";
 import PatientMessages from "./pages/PatientMessages";
+import PatientAppointment from "./pages/PatientAppointment";
 import AboutUs from "./pages/AboutUs";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
             <Route path="/patient/profile" element={<PatientProfile />} />
             <Route path="/patient/messages" element={<PatientMessages />} />
+            <Route path="/patient/appointment" element={<PatientAppointment />} />
             <Route path="/about" element={<AboutUs />} />
           </Routes>
           <AccessibilityControls />
