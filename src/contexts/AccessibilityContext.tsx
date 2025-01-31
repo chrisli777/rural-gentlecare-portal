@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { translations } from "@/utils/translations";
 
 interface AccessibilityContextType {
@@ -53,7 +53,8 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
       toast({
         title: "Voice Recognition Not Available",
         description: "Your browser doesn't support voice recognition.",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 2000,
       });
       return;
     }
@@ -64,10 +65,6 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
 
     recognition.onstart = () => {
       setIsListening(true);
-      toast({
-        title: "Voice Assistant Active",
-        description: "Listening for commands...",
-      });
     };
 
     recognition.onresult = (event: any) => {
@@ -100,7 +97,7 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
     };
     
     document.documentElement.style.fontSize = fontSizes[fontSize];
-    document.documentElement.style.setProperty('--base-font-size', fontSizes[fontSize]);
+    document.body.style.fontSize = fontSizes[fontSize];
     
     const htmlElement = document.documentElement;
     htmlElement.classList.remove('text-normal', 'text-large', 'text-extra-large');
@@ -110,6 +107,7 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
   // Apply language changes
   useEffect(() => {
     document.documentElement.lang = language;
+    document.body.setAttribute('data-language', language);
   }, [language]);
 
   return (

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Type, 
   Languages, 
@@ -33,6 +33,7 @@ export const AccessibilityControls = () => {
     toast({
       title: "Font Size Changed",
       description: `Font size set to ${newSize}`,
+      duration: 2000,
     });
   };
 
@@ -42,6 +43,7 @@ export const AccessibilityControls = () => {
     toast({
       title: "Language Changed",
       description: `Language set to ${newLanguage === 'en' ? 'English' : 'Spanish'}`,
+      duration: 2000,
     });
   };
 
@@ -50,6 +52,7 @@ export const AccessibilityControls = () => {
     toast({
       title: "Voice Assist",
       description: voiceAssistEnabled ? "Voice assist disabled" : "Voice assist enabled",
+      duration: 2000,
     });
   };
 
@@ -59,22 +62,25 @@ export const AccessibilityControls = () => {
       toast({
         title: "Voice Commands",
         description: "Voice commands stopped",
+        duration: 2000,
       });
     } else {
       startListening();
       toast({
         title: "Voice Commands",
         description: "Listening for voice commands...",
+        duration: 2000,
       });
     }
   };
 
   return (
-    <div className="fixed bottom-4 right-4 flex flex-col gap-2 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200">
+    <div className="fixed bottom-4 right-4 flex flex-col gap-2 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 z-50">
       <Button
         variant="outline"
         size="icon"
         onClick={handleFontSizeChange}
+        className="hover:bg-primary/20"
         title="Change Font Size"
       >
         <Type className="h-4 w-4" />
@@ -84,6 +90,7 @@ export const AccessibilityControls = () => {
         variant="outline"
         size="icon"
         onClick={handleLanguageChange}
+        className="hover:bg-primary/20"
         title={language === 'en' ? 'Switch to Spanish' : 'Switch to English'}
       >
         <Languages className="h-4 w-4" />
@@ -93,6 +100,7 @@ export const AccessibilityControls = () => {
         variant="outline"
         size="icon"
         onClick={handleVoiceAssist}
+        className="hover:bg-primary/20"
         title={voiceAssistEnabled ? 'Disable Voice Assist' : 'Enable Voice Assist'}
       >
         {voiceAssistEnabled ? (
@@ -106,6 +114,7 @@ export const AccessibilityControls = () => {
         variant={isListening ? "destructive" : "outline"}
         size="icon"
         onClick={handleVoiceCommand}
+        className={isListening ? "" : "hover:bg-primary/20"}
         title={isListening ? 'Stop Listening' : 'Start Voice Commands'}
       >
         {isListening ? (
