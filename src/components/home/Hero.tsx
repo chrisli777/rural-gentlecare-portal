@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { Calendar, MessageSquare, User, FileText } from "lucide-react";
+import { Calendar, MessageSquare, User, Bot } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Hero = () => {
@@ -37,12 +37,12 @@ export const Hero = () => {
             </div>
           </Link>
 
-          {/* Medical Records */}
-          <Link to="/patient/records" className="group">
+          {/* AI Health Assistant */}
+          <Link to="/patient/ai-assistant" className="group">
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-              <FileText className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Medical Records</h3>
-              <p className="text-gray-600">Access your medical history and test results.</p>
+              <Bot className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">AI Health Assistant</h3>
+              <p className="text-gray-600">Get personalized health guidance and support.</p>
             </div>
           </Link>
         </div>
