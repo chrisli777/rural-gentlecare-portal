@@ -15,38 +15,46 @@ const PatientDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Appointment Booking */}
             <Link to="/patient/appointment" className="group">
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <Calendar className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Appointment Booking</h3>
-                <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
-              </div>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <Calendar className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Appointment Booking</h3>
+                  <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
+                </CardContent>
+              </Card>
             </Link>
 
             {/* Messages & Notifications */}
             <Link to="/patient/messages" className="group">
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <MessageSquare className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Messages & Notifications</h3>
-                <p className="text-gray-600">View your messages and important notifications.</p>
-              </div>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <MessageSquare className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Messages & Notifications</h3>
+                  <p className="text-gray-600">View your messages and important notifications.</p>
+                </CardContent>
+              </Card>
             </Link>
 
             {/* My Profile */}
             <Link to="/patient/profile" className="group">
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <User className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">My Profile</h3>
-                <p className="text-gray-600">Manage your personal information and preferences.</p>
-              </div>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <User className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">My Profile</h3>
+                  <p className="text-gray-600">Manage your personal information and preferences.</p>
+                </CardContent>
+              </Card>
             </Link>
 
             {/* AI Health Assistant */}
             <Link to="/patient/ai-assistant" className="group">
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <Bot className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">AI Health Assistant</h3>
-                <p className="text-gray-600">Get personalized health guidance and support.</p>
-              </div>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <Bot className="w-12 h-12 text-primary mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">AI Health Assistant</h3>
+                  <p className="text-gray-600">Get personalized health guidance and support.</p>
+                </CardContent>
+              </Card>
             </Link>
           </div>
         </section>
