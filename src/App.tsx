@@ -40,6 +40,7 @@ const App = () => (
             <Route path="/provider/login" element={<ProviderLogin />} />
             <Route path="/provider/dashboard" element={<ProviderDashboard />} />
             <Route path="/provider/patients" element={<ProviderPatients />} />
+            <Route path="/provider/patients/:id" element={<PatientProfile />} />
             <Route path="/provider/analytics" element={<ProviderAnalytics />} />
           </Routes>
           <AccessibilityControls />
