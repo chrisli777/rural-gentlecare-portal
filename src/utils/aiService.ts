@@ -1,41 +1,32 @@
-import { useToast } from "@/hooks/use-toast";
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export const processVoiceCommand = async (command: string) => {
   try {
-    const response = await fetch('/api/process-voice', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ command }),
+    const { data, error } = await supabase.functions.invoke('process-voice-command', {
+      body: { command }
     });
-    
-    if (!response.ok) {
-      throw new Error('Failed to process voice command');
-    }
-    
-    return await response.json();
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error('Error processing voice command:', error);
     throw error;
   }
 };
 
-export const getFormAssistance = async (context: string, question: string) => {
+export const getFormAssistance = async (context: string, userInput: string) => {
   try {
-    const response = await fetch('/api/form-assistance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ context, question }),
+    const { data, error } = await supabase.functions.invoke('form-assistance', {
+      body: { context, userInput }
     });
-    
-    if (!response.ok) {
-      throw new Error('Failed to get form assistance');
-    }
-    
-    return await response.json();
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error('Error getting form assistance:', error);
     throw error;
