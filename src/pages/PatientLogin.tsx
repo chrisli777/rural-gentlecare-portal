@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,31 +13,88 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AudioWaveform } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { toast } from "@/hooks/use-toast";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+const phoneSchema = z.object({
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+});
+
+const verificationSchema = z.object({
+  code: z.string().length(6, "Verification code must be 6 digits"),
+});
 
 const PatientLogin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
-  const form = useForm<LoginFormData>({
+  const phoneForm = useForm<z.infer<typeof phoneSchema>>({
+    resolver: zodResolver(phoneSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      phone: "",
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const verificationForm = useForm<z.infer<typeof verificationSchema>>({
+    resolver: zodResolver(verificationSchema),
+    defaultValues: {
+      code: "",
+    },
+  });
+
+  const onPhoneSubmit = async (data: z.infer<typeof phoneSchema>) => {
     setIsLoading(true);
     try {
-      // TODO: Implement actual login logic
-      console.log("Login attempt with:", data);
+      const formattedPhone = data.phone.startsWith('+') ? data.phone : `+1${data.phone}`;
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+      });
+
+      if (error) throw error;
+
+      setPhoneNumber(formattedPhone);
+      setShowVerification(true);
+      toast({
+        title: "Verification code sent",
+        description: "Please check your phone for the verification code",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onVerificationSubmit = async (data: z.infer<typeof verificationSchema>) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: data.code,
+        type: 'sms',
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Successfully logged in",
+      });
       navigate("/patient/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -52,80 +110,106 @@ const PatientLogin = () => {
           </p>
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="your.email@example.com"
-                      type="email"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {!showVerification ? (
+          <Form {...phoneForm}>
+            <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-6">
+              <FormField
+                control={phoneForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your phone number"
+                        type="tel"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your password"
-                      type="password"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing in..." : "Sign in"}
-              </Button>
-
-              <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <Link
-                    to="/patient/signup"
-                    className="text-primary hover:underline"
-                  >
-                    Sign up
-                  </Link>
-                </p>
-                <Link
-                  to="/"
-                  className="text-sm text-primary hover:underline block"
+              <div className="space-y-4">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
                 >
-                  Back to role selection
-                </Link>
+                  {isLoading ? "Sending code..." : "Send verification code"}
+                </Button>
+
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Don't have an account?{" "}
+                    <Link
+                      to="/patient/signup"
+                      className="text-primary hover:underline"
+                    >
+                      Sign up
+                    </Link>
+                  </p>
+                  <Link
+                    to="/"
+                    className="text-sm text-primary hover:underline block"
+                  >
+                    Back to role selection
+                  </Link>
+                </div>
               </div>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        ) : (
+          <Form {...verificationForm}>
+            <form onSubmit={verificationForm.handleSubmit(onVerificationSubmit)} className="space-y-6">
+              <FormField
+                control={verificationForm.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Verification Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter 6-digit code"
+                        type="text"
+                        maxLength={6}
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-4">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Verifying..." : "Verify and Login"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowVerification(false)}
+                  disabled={isLoading}
+                >
+                  Back to phone number
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
 
         <button
           className="fixed top-4 right-4 p-2 text-primary hover:text-primary/80"
           onClick={() => {
-            // TODO: Implement text-to-speech functionality
             console.log("Text-to-speech activated");
           }}
           aria-label="Read page content"
