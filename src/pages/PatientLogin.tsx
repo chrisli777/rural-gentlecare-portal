@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -14,84 +12,31 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AudioWaveform } from "lucide-react";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { supabase } from "@/integrations/supabase/client";
 
 interface LoginFormData {
-  phoneNumber: string;
+  email: string;
+  password: string;
 }
 
 const PatientLogin = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
-  const [otp, setOtp] = useState("");
 
   const form = useForm<LoginFormData>({
     defaultValues: {
-      phoneNumber: "",
+      email: "",
+      password: "",
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      // Format phone number to include country code if not provided
-      const phoneNumber = data.phoneNumber.startsWith('+') 
-        ? data.phoneNumber 
-        : `+1${data.phoneNumber}`; // Assuming US numbers
-
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phoneNumber,
-      });
-
-      if (error) throw error;
-
-      setShowOTP(true);
-      toast({
-        title: "Verification code sent",
-        description: "Please check your phone for the verification code.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to send verification code. Please try again.",
-      });
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyOTP = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: form.getValues("phoneNumber"),
-        token: otp,
-        type: "sms",
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Phone number verified successfully!",
-      });
+      // TODO: Implement actual login logic
+      console.log("Login attempt with:", data);
       navigate("/patient/dashboard");
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Invalid verification code. Please try again.",
-      });
-      console.error("OTP verification failed:", error);
+      console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -107,96 +52,75 @@ const PatientLogin = () => {
           </p>
         </div>
 
-        {!showOTP ? (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="phoneNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="(555) 555-5555"
-                        type="tel"
-                        disabled={isLoading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="your.email@example.com"
+                      type="email"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <div className="space-y-4">
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending code..." : "Send verification code"}
-                </Button>
-
-                <div className="text-center space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Don't have an account?{" "}
-                    <Link
-                      to="/patient/signup"
-                      className="text-primary hover:underline"
-                    >
-                      Sign up
-                    </Link>
-                  </p>
-                  <Link
-                    to="/"
-                    className="text-sm text-primary hover:underline block"
-                  >
-                    Back to role selection
-                  </Link>
-                </div>
-              </div>
-            </form>
-          </Form>
-        ) : (
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <FormLabel>Enter verification code</FormLabel>
-              <InputOTP
-                value={otp}
-                onChange={(value) => setOtp(value)}
-                maxLength={6}
-                render={({ slots }) => (
-                  <InputOTPGroup>
-                    {slots.map((slot, idx) => (
-                      <InputOTPSlot key={idx} {...slot} index={idx} />
-                    ))}
-                  </InputOTPGroup>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your password"
+                      type="password"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="space-y-4">
               <Button
-                onClick={verifyOTP}
+                type="submit"
                 className="w-full"
-                disabled={isLoading || otp.length !== 6}
-              >
-                {isLoading ? "Verifying..." : "Verify code"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={() => setShowOTP(false)}
                 disabled={isLoading}
               >
-                Back to phone number
+                {isLoading ? "Signing in..." : "Sign in"}
               </Button>
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Don't have an account?{" "}
+                  <Link
+                    to="/patient/signup"
+                    className="text-primary hover:underline"
+                  >
+                    Sign up
+                  </Link>
+                </p>
+                <Link
+                  to="/"
+                  className="text-sm text-primary hover:underline block"
+                >
+                  Back to role selection
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
+          </form>
+        </Form>
 
         <button
           className="fixed top-4 right-4 p-2 text-primary hover:text-primary/80"
