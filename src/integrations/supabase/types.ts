@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          address: string | null
+          allergies: string | null
+          blood_type: string | null
+          chronic_conditions: string | null
+          created_at: string | null
+          current_medications: string | null
+          date_of_birth: string | null
+          emergency_contact: string | null
+          emergency_phone: string | null
+          first_name: string | null
+          id: string
+          insurance_number: string | null
+          insurance_provider: string | null
+          last_name: string | null
+          phone_number: string
+          primary_physician: string | null
+          smoker: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string | null
+          current_medications?: string | null
+          date_of_birth?: string | null
+          emergency_contact?: string | null
+          emergency_phone?: string | null
+          first_name?: string | null
+          id: string
+          insurance_number?: string | null
+          insurance_provider?: string | null
+          last_name?: string | null
+          phone_number: string
+          primary_physician?: string | null
+          smoker?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string | null
+          current_medications?: string | null
+          date_of_birth?: string | null
+          emergency_contact?: string | null
+          emergency_phone?: string | null
+          first_name?: string | null
+          id?: string
+          insurance_number?: string | null
+          insurance_provider?: string | null
+          last_name?: string | null
+          phone_number?: string
+          primary_physician?: string | null
+          smoker?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       users_id: {
         Row: {
           created_at: string
