@@ -6,8 +6,11 @@ import {
   Languages, 
   Mic, 
   MicOff,
-  HelpCircle
+  HelpCircle,
+  MessageSquare
 } from "lucide-react";
+import { useState } from "react";
+import { processVoiceCommand, getFormAssistance } from "@/utils/aiService";
 
 export const AccessibilityControls = () => {
   const {
@@ -21,6 +24,7 @@ export const AccessibilityControls = () => {
   } = useAccessibility();
   
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFontSizeChange = () => {
     const sizes: ('normal' | 'large' | 'extra-large')[] = ['normal', 'large', 'extra-large'];
@@ -46,9 +50,10 @@ export const AccessibilityControls = () => {
     });
   };
 
-  const handleVoiceCommand = () => {
+  const handleVoiceCommand = async () => {
     if (isListening) {
       stopListening();
+      setIsProcessing(false);
       toast({
         title: "Voice Commands",
         description: "Voice commands stopped",
@@ -56,13 +61,26 @@ export const AccessibilityControls = () => {
         className: "left-0 right-auto",
       });
     } else {
-      startListening();
-      toast({
-        title: "Voice Commands",
-        description: "Listening for voice commands...",
-        duration: 2000,
-        className: "left-0 right-auto",
-      });
+      try {
+        setIsProcessing(true);
+        startListening();
+        toast({
+          title: "Voice Commands",
+          description: "Listening for voice commands...",
+          duration: 2000,
+          className: "left-0 right-auto",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to start voice commands. Please try again.",
+          variant: "destructive",
+          duration: 3000,
+          className: "left-0 right-auto",
+        });
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -73,6 +91,31 @@ export const AccessibilityControls = () => {
       duration: 3000,
       className: "left-0 right-auto",
     });
+  };
+
+  const handleFormAssistance = async () => {
+    try {
+      setIsProcessing(true);
+      const context = "form_filling";
+      const result = await getFormAssistance(context, "How can I help you with the form?");
+      
+      toast({
+        title: "AI Form Assistant",
+        description: "AI assistant is ready to help you fill out forms",
+        duration: 3000,
+        className: "left-0 right-auto",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start form assistance. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+        className: "left-0 right-auto",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -101,6 +144,7 @@ export const AccessibilityControls = () => {
         variant={isListening ? "destructive" : "outline"}
         size="icon"
         onClick={handleVoiceCommand}
+        disabled={isProcessing}
         className={isListening ? "" : "hover:bg-primary/20"}
         title={isListening ? 'Stop Listening' : 'Start Voice Commands'}
       >
@@ -109,6 +153,17 @@ export const AccessibilityControls = () => {
         ) : (
           <Mic className="h-4 w-4" />
         )}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={handleFormAssistance}
+        disabled={isProcessing}
+        className="hover:bg-primary/20"
+        title="Get AI Form Assistance"
+      >
+        <MessageSquare className="h-4 w-4" />
       </Button>
 
       <Button
