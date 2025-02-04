@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { translations } from "@/utils/translations";
-import { processVoiceCommand } from "@/utils/aiService";
 
 interface AccessibilityContextType {
   fontSize: 'normal' | 'large' | 'extra-large';
@@ -30,7 +29,7 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
       if (translation && translation[k]) {
         translation = translation[k];
       } else {
-        return key;
+        return key; // Return the key if translation not found
       }
     }
     
@@ -56,23 +55,13 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
       setIsListening(true);
     };
 
-    recognition.onresult = async (event: any) => {
+    recognition.onresult = (event: any) => {
       const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
       
-      try {
-        const response = await processVoiceCommand(command);
-        
-        if (command.includes('profile')) {
-          window.location.href = '/patient/profile';
-        } else if (command.includes('dashboard')) {
-          window.location.href = '/patient/dashboard';
-        } else if (command.includes('appointments')) {
-          window.location.href = '/patient/appointment';
-        } else if (command.includes('messages')) {
-          window.location.href = '/patient/messages';
-        }
-      } catch (error) {
-        console.error('Error processing voice command:', error);
+      if (command.includes('profile')) {
+        window.location.href = '/patient/profile';
+      } else if (command.includes('dashboard')) {
+        window.location.href = '/patient/dashboard';
       }
     };
 
@@ -87,6 +76,7 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
     }
   };
 
+  // Apply font size changes globally
   useEffect(() => {
     const fontSizes = {
       normal: '16px',
@@ -102,6 +92,7 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
     htmlElement.classList.add(`text-${fontSize}`);
   }, [fontSize]);
 
+  // Apply language changes
   useEffect(() => {
     document.documentElement.lang = language;
     document.body.setAttribute('data-language', language);

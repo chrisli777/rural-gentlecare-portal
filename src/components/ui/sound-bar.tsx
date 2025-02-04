@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from "@/lib/utils";
 
@@ -16,12 +15,13 @@ export const SoundBar = ({ isPlaying, className }: SoundBarProps) => {
           className={cn(
             "w-1 bg-primary rounded-full transition-all duration-300",
             isPlaying ? "animate-[soundbar_1s_ease-in-out_infinite]" : "h-2",
-            {
-              'animation-delay-200': i === 1,
-              'animation-delay-300': i === 2,
-              'animation-delay-400': i === 3
-            }
+            i === 1 && "delay-[0.2s]",
+            i === 2 && "delay-[0.3s]",
+            i === 3 && "delay-[0.4s]"
           )}
+          style={{
+            animationDelay: `${i * 0.2}s`
+          }}
         />
       ))}
     </div>
