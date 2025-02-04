@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -19,7 +18,11 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const phoneSchema = z.object({
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z.string()
+    .min(10, "Phone number must be at least 10 digits")
+    .refine((val) => /^\+?[1-9]\d{1,14}$/.test(val.replace(/\D/g, '')), {
+      message: "Please enter a valid phone number",
+    }),
 });
 
 const verificationSchema = z.object({
@@ -46,15 +49,27 @@ const PatientLogin = () => {
     },
   });
 
+  const formatPhoneNumber = (phone: string) => {
+    // Remove all non-digit characters
+    const cleaned = phone.replace(/\D/g, '');
+    // Ensure it starts with +1 for US numbers
+    return cleaned.startsWith('1') ? `+${cleaned}` : `+1${cleaned}`;
+  };
+
   const onPhoneSubmit = async (data: z.infer<typeof phoneSchema>) => {
     setIsLoading(true);
     try {
-      const formattedPhone = data.phone.startsWith('+') ? data.phone : `+1${data.phone}`;
+      const formattedPhone = formatPhoneNumber(data.phone);
+      console.log("Attempting login with phone:", formattedPhone);
+      
       const { error } = await supabase.auth.signInWithOtp({
         phone: formattedPhone,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Login failed:", error);
+        throw error;
+      }
 
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
@@ -63,9 +78,10 @@ const PatientLogin = () => {
         description: "Please check your phone for the verification code",
       });
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to send verification code",
         variant: "destructive",
       });
     } finally {
@@ -76,13 +92,17 @@ const PatientLogin = () => {
   const onVerificationSubmit = async (data: z.infer<typeof verificationSchema>) => {
     setIsLoading(true);
     try {
+      console.log("Verifying code for phone:", phoneNumber);
       const { error } = await supabase.auth.verifyOtp({
         phone: phoneNumber,
         token: data.code,
         type: 'sms',
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Verification failed:", error);
+        throw error;
+      }
 
       toast({
         title: "Success",
@@ -90,9 +110,10 @@ const PatientLogin = () => {
       });
       navigate("/patient/dashboard");
     } catch (error: any) {
+      console.error("Verification error:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to verify code",
         variant: "destructive",
       });
     } finally {
