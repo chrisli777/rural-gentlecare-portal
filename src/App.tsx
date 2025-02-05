@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AccessibilityControls } from "@/components/accessibility/AccessibilityControls";
-import { ConversationProvider } from "@11labs/react";
+import { ElevenLabsProvider } from "@11labs/react";
 import Index from "./pages/Index";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientLogin from "./pages/PatientLogin";
@@ -24,7 +24,7 @@ import ProviderAnalytics from "./pages/ProviderAnalytics";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <ConversationProvider apiKey={import.meta.env.VITE_ELEVEN_LABS_API_KEY}>
+  <ElevenLabsProvider apiKey={import.meta.env.VITE_ELEVEN_LABS_API_KEY}>
     <QueryClientProvider client={queryClient}>
       <AccessibilityProvider>
         <TooltipProvider>
@@ -53,7 +53,7 @@ const App = () => (
         </TooltipProvider>
       </AccessibilityProvider>
     </QueryClientProvider>
-  </ConversationProvider>
+  </ElevenLabsProvider>
 );
 
 export default App;
