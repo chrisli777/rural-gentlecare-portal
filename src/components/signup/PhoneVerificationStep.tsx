@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,6 +60,7 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
     setIsLoading(true);
     try {
       const formattedPhone = formatPhoneNumber(data.phone);
+      console.log("Sending verification code to:", formattedPhone);
       const { error } = await supabase.auth.signInWithOtp({
         phone: formattedPhone,
       });
@@ -67,6 +69,8 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
 
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
+      // Reset verification form when showing it
+      verificationForm.reset();
       toast({
         title: "Verification code sent",
         description: "Please check your phone for the verification code",
@@ -85,6 +89,7 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
   const onVerificationSubmit = async (data: z.infer<typeof verificationSchema>) => {
     setIsLoading(true);
     try {
+      console.log("Verifying code for phone:", phoneNumber);
       const { error } = await supabase.auth.verifyOtp({
         phone: phoneNumber,
         token: data.code,
@@ -157,6 +162,10 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
                       maxLength={6}
                       disabled={isLoading}
                       {...field}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        field.onChange(value);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -175,7 +184,10 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
                 type="button"
                 variant="outline"
                 className="w-full"
-                onClick={() => setShowVerification(false)}
+                onClick={() => {
+                  setShowVerification(false);
+                  verificationForm.reset();
+                }}
                 disabled={isLoading}
               >
                 Back to phone number
