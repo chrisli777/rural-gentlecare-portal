@@ -72,6 +72,8 @@ const PatientLogin = () => {
 
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
+      // Reset verification form when showing it
+      verificationForm.reset();
       toast({
         title: "Verification code sent",
         description: "Please check your phone for the verification code",
@@ -221,7 +223,10 @@ const PatientLogin = () => {
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => setShowVerification(false)}
+                  onClick={() => {
+                    setShowVerification(false);
+                    verificationForm.reset();
+                  }}
                   disabled={isLoading}
                 >
                   Back to phone number
