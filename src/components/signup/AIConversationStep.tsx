@@ -46,24 +46,43 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Initialize voice conversation
+  // Initialize voice conversation with enhanced configuration
   const conversation = useConversation({
     clientTools: {
       updateProfile: async (parameters: { field: keyof ProfileData; value: string }) => {
         const updatedProfile = { ...profileData };
         updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
+        await updateProfile(updatedProfile);
         return "Profile updated successfully";
       }
     },
     overrides: {
       agent: {
         prompt: {
-          prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time.",
+          prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Start with basic details like name and date of birth, then move on to medical history, allergies, and current medications. Be friendly but professional.",
         },
-        firstMessage: "Hi! I'll help you complete your profile. Let's start with your name. What's your first name?",
+        firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?",
         language: "en",
+      },
+      tts: {
+        voiceId: "EXAVITQu4vr4xnSDxMaL" // Using Sarah's voice ID for a professional medical context
       }
+    },
+    onMessage: (message) => {
+      console.log("Received message:", message);
+      if (message.content) {
+        setMessages(prev => [...prev, { role: message.role, content: message.content }]);
+      }
+    },
+    onError: (error) => {
+      console.error("Conversation error:", error);
+      toast({
+        title: "Error",
+        description: "There was an error with the voice conversation. Please try again.",
+        variant: "destructive",
+      });
+      setIsRecording(false);
     }
   });
 
@@ -71,7 +90,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     // Start the conversation
     const initialMessage: Message = {
       role: 'assistant',
-      content: "Hi! I'll help you complete your profile. Let's start with your name. What's your first name?"
+      content: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?"
     };
     setMessages([initialMessage]);
   }, []);
@@ -100,7 +119,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setSelectedImage(file);
     setPreviewUrl(URL.createObjectURL(file));
 
-    // Upload to Supabase Storage
     try {
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) throw new Error('User not authenticated');
@@ -133,10 +151,11 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         const conversationId = await conversation.startSession({
-          agentId: "default" // Replace with your actual agent ID from ElevenLabs
+          agentId: "medical_assistant", // Use your actual agent ID from ElevenLabs
         });
         console.log("Started conversation:", conversationId);
       } catch (error) {
+        console.error("Error starting voice recording:", error);
         toast({
           title: "Error",
           description: "Could not access microphone",
