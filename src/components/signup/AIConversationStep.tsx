@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,12 +62,14 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
       agent: {
         prompt: {
           prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Start with basic details like name and date of birth, then move on to medical history, allergies, and current medications. Be friendly but professional.",
+          model: "eleven_turbo_v2" // Using the faster model for better response times
         },
         firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?",
         language: "en",
       },
       tts: {
-        voiceId: "EXAVITQu4vr4xnSDxMaL"
+        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah's voice ID
+        model: "eleven_turbo_v2"
       }
     },
     onMessage: (message) => {
@@ -179,16 +180,17 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         setIsRecording(true);
         setHasPermission(true);
         
-        const conversationId = await conversation.startSession({
-          agentId: "medical_assistant", // Use your actual agent ID from ElevenLabs
+        // Start the conversation session
+        await conversation.startSession({
+          // No need to specify agentId here as it's handled by the conversation config
         });
-        console.log("Started conversation:", conversationId);
+        
       } catch (error: any) {
         console.error("Error starting voice recording:", error);
         setHasPermission(false);
         toast({
-          title: "Microphone Access Required",
-          description: "Please allow microphone access in your browser settings to use voice chat.",
+          title: "Voice Chat Error",
+          description: "There was an error starting the voice conversation. Please try again.",
           variant: "destructive",
         });
       }
