@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 const PatientDashboard = () => {
   const [message, setMessage] = useState("");
@@ -25,18 +26,32 @@ const PatientDashboard = () => {
 
     setIsLoading(true);
     const userMessage = { role: "user", content: message };
-    setConversation([...conversation, userMessage]);
+    setConversation(prev => [...prev, userMessage]);
+    setMessage("");
 
-    // Simulate AI response - In a real implementation, this would call your AI service
-    setTimeout(() => {
-      const aiResponse = {
+    try {
+      const { data, error } = await supabase.functions.invoke('healthcare-chat', {
+        body: { message: message }
+      });
+
+      if (error) throw error;
+
+      const aiMessage = {
         role: "assistant",
-        content: "I understand your concern. How else can I assist you with your healthcare needs today?",
+        content: data.response
       };
-      setConversation([...conversation, userMessage, aiResponse]);
+
+      setConversation(prev => [...prev, aiMessage]);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to get response from AI assistant. Please try again.",
+        variant: "destructive",
+      });
+      console.error("AI Chat Error:", error);
+    } finally {
       setIsLoading(false);
-      setMessage("");
-    }, 1000);
+    }
   };
 
   return (
