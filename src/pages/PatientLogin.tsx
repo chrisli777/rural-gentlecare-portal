@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -50,9 +51,7 @@ const PatientLogin = () => {
   });
 
   const formatPhoneNumber = (phone: string) => {
-    // Remove all non-digit characters
     const cleaned = phone.replace(/\D/g, '');
-    // Ensure it starts with +1 for US numbers
     return cleaned.startsWith('1') ? `+${cleaned}` : `+1${cleaned}`;
   };
 
@@ -198,6 +197,10 @@ const PatientLogin = () => {
                         maxLength={6}
                         disabled={isLoading}
                         {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
