@@ -67,9 +67,11 @@ const PatientLogin = () => {
       }
 
       toast({
-        title: "Success",
-        description: "Successfully logged in",
+        title: "Login Successful",
+        description: "Welcome to Adams County Rural Health Clinic",
+        variant: "default",
       });
+      
       navigate("/patient/dashboard");
     } catch (error: any) {
       console.error("Verification error:", error);
