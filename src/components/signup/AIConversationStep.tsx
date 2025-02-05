@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Send, Mic, MicOff, Camera, ImagePlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { useConversation } from "@11labs/react";
 
 interface Message {
   role: 'assistant' | 'user';
   content: string;
 }
+
+type ProfileFieldValue = string | boolean | Record<string, any> | null;
 
 interface ProfileData {
   first_name?: string;
@@ -46,10 +48,9 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Initialize voice conversation with enhanced configuration
   const conversation = useConversation({
     clientTools: {
-      updateProfile: async (parameters: { field: keyof ProfileData; value: any }) => {
+      updateProfile: async (parameters: { field: keyof ProfileData; value: ProfileFieldValue }) => {
         const updatedProfile = { ...profileData };
         updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
@@ -66,7 +67,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         language: "en",
       },
       tts: {
-        voiceId: "EXAVITQu4vr4xnSDxMaL" // Using Sarah's voice ID for a professional medical context
+        voiceId: "EXAVITQu4vr4xnSDxMaL"
       }
     },
     onMessage: (message) => {
