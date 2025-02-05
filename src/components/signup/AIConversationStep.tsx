@@ -47,6 +47,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   const conversation = useConversation({
     clientTools: {
@@ -94,7 +95,21 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
       content: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?"
     };
     setMessages([initialMessage]);
+
+    // Check for microphone permission
+    checkMicrophonePermission();
   }, []);
+
+  const checkMicrophonePermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop()); // Stop the stream after checking
+      setHasPermission(true);
+    } catch (error) {
+      console.error("Error checking microphone permission:", error);
+      setHasPermission(false);
+    }
+  };
 
   const updateProfile = async (data: ProfileData) => {
     try {
@@ -149,17 +164,31 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const toggleVoiceRecording = async () => {
     if (!isRecording) {
       try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Request microphone permission
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        
+        // Stop the stream immediately as ElevenLabs will handle the recording
+        stream.getTracks().forEach(track => track.stop());
+        
         setIsRecording(true);
+        setHasPermission(true);
+        
         const conversationId = await conversation.startSession({
           agentId: "medical_assistant", // Use your actual agent ID from ElevenLabs
         });
         console.log("Started conversation:", conversationId);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error starting voice recording:", error);
+        setHasPermission(false);
         toast({
-          title: "Error",
-          description: "Could not access microphone",
+          title: "Microphone Access Required",
+          description: "Please allow microphone access in your browser settings to use voice chat.",
           variant: "destructive",
         });
       }
@@ -271,11 +300,12 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
           size="icon"
           onClick={toggleVoiceRecording}
           className={isRecording ? 'bg-red-100' : ''}
+          title={hasPermission === false ? "Microphone access denied" : "Toggle voice chat"}
         >
           {isRecording ? (
             <MicOff className="h-4 w-4" />
           ) : (
-            <Mic className="h-4 w-4" />
+            <Mic className={`h-4 w-4 ${hasPermission === false ? 'text-red-500' : ''}`} />
           )}
         </Button>
         <Input
