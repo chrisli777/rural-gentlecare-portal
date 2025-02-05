@@ -132,109 +132,93 @@ const PatientLogin = () => {
           </p>
         </div>
 
-        {!showVerification ? (
-          <Form {...phoneForm}>
-            <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-6">
-              <FormField
-                control={phoneForm.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your phone number"
-                        type="tel"
-                        disabled={isLoading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <Form {...phoneForm}>
+          <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-6">
+            <FormField
+              control={phoneForm.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your phone number"
+                      type="tel"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <div className="space-y-4">
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending code..." : "Send verification code"}
-                </Button>
-
-                <div className="text-center space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Don't have an account?{" "}
-                    <Link
-                      to="/patient/signup"
-                      className="text-primary hover:underline"
-                    >
-                      Sign up
-                    </Link>
-                  </p>
-                  <Link
-                    to="/"
-                    className="text-sm text-primary hover:underline block"
+            {showVerification && (
+              <Form {...verificationForm}>
+                <form onSubmit={verificationForm.handleSubmit(onVerificationSubmit)} className="space-y-4">
+                  <FormField
+                    control={verificationForm.control}
+                    name="code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Verification Code</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter 6-digit code"
+                            type="text"
+                            maxLength={6}
+                            disabled={isLoading}
+                            {...field}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                              field.onChange(value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
                   >
-                    Back to role selection
-                  </Link>
-                </div>
-              </div>
-            </form>
-          </Form>
-        ) : (
-          <Form {...verificationForm}>
-            <form onSubmit={verificationForm.handleSubmit(onVerificationSubmit)} className="space-y-6">
-              <FormField
-                control={verificationForm.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Verification Code</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter 6-digit code"
-                        type="text"
-                        maxLength={6}
-                        disabled={isLoading}
-                        {...field}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                          field.onChange(value);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    {isLoading ? "Verifying..." : "Verify Code"}
+                  </Button>
+                </form>
+              </Form>
+            )}
 
-              <div className="space-y-4">
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Verifying..." : "Verify and Login"}
-                </Button>
+            {!showVerification && (
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Sending code..." : "Send verification code"}
+              </Button>
+            )}
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    setShowVerification(false);
-                    verificationForm.reset();
-                  }}
-                  disabled={isLoading}
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link
+                  to="/patient/signup"
+                  className="text-primary hover:underline"
                 >
-                  Back to phone number
-                </Button>
-              </div>
-            </form>
-          </Form>
-        )}
+                  Sign up
+                </Link>
+              </p>
+              <Link
+                to="/"
+                className="text-sm text-primary hover:underline block"
+              >
+                Back to role selection
+              </Link>
+            </div>
+          </form>
+        </Form>
 
         <button
           className="fixed top-4 right-4 p-2 text-primary hover:text-primary/80"
