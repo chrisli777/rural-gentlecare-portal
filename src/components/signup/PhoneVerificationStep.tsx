@@ -69,8 +69,7 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
 
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
-      // Reset verification form when showing it
-      verificationForm.reset();
+      verificationForm.reset({ code: "" }); // Explicitly reset the verification form with empty code
       toast({
         title: "Verification code sent",
         description: "Please check your phone for the verification code",
@@ -157,11 +156,13 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
                   <FormLabel>Verification Code</FormLabel>
                   <FormControl>
                     <Input
+                      key="verification-code-input" // Add key to force re-render
                       placeholder="Enter 6-digit code"
                       type="text"
                       maxLength={6}
                       disabled={isLoading}
                       {...field}
+                      value={field.value || ""} // Ensure value is never undefined
                       onChange={(e) => {
                         const value = e.target.value.replace(/\D/g, '').slice(0, 6);
                         field.onChange(value);
@@ -186,7 +187,7 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
                 className="w-full"
                 onClick={() => {
                   setShowVerification(false);
-                  verificationForm.reset();
+                  verificationForm.reset({ code: "" }); // Explicitly reset with empty code
                 }}
                 disabled={isLoading}
               >
@@ -199,3 +200,4 @@ export const PhoneVerificationStep = ({ onVerificationComplete }: PhoneVerificat
     </div>
   );
 };
+
