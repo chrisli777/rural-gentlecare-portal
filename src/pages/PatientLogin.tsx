@@ -31,6 +31,7 @@ const PatientLogin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [showVerificationCode, setShowVerificationCode] = useState(false);
 
   const form = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
@@ -82,6 +83,7 @@ const PatientLogin = () => {
 
         setPhoneNumber(formattedPhone);
         form.setValue("code", ""); // Clear verification code field
+        setShowVerificationCode(true); // Show verification code input
         toast({
           title: "Verification code sent",
           description: "Please check your phone for the verification code",
@@ -130,29 +132,31 @@ const PatientLogin = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Verification Code</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter 6-digit code"
-                      type="text"
-                      maxLength={6}
-                      disabled={isLoading}
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                        field.onChange(value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {showVerificationCode && (
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Verification Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter 6-digit code"
+                        type="text"
+                        maxLength={6}
+                        disabled={isLoading}
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                          field.onChange(value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <div className="space-y-4">
               <Button
@@ -160,7 +164,7 @@ const PatientLogin = () => {
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? "Processing..." : form.getValues("code") ? "Verify and Login" : "Send verification code"}
+                {isLoading ? "Processing..." : showVerificationCode ? "Verify and Login" : "Send verification code"}
               </Button>
 
               <div className="text-center space-y-2">
