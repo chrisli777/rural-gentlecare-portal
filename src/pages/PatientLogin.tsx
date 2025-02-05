@@ -63,7 +63,16 @@ const PatientLogin = () => {
 
       if (error) {
         console.error("Verification failed:", error);
-        throw error;
+        if (error.message.includes("expired")) {
+          toast({
+            title: "Code Expired",
+            description: "The verification code has expired. Please request a new one.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        return;
       }
 
       toast({
@@ -82,6 +91,27 @@ const PatientLogin = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phoneNumber,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Code Resent",
+        description: "A new verification code has been sent to your phone",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to resend code",
+        variant: "destructive",
+      });
     }
   };
 
@@ -104,6 +134,7 @@ const PatientLogin = () => {
             <VerificationForm
               onSubmit={handleVerificationSubmit}
               onBack={handleBack}
+              onResend={handleResendCode}
               isLoading={isLoading}
             />
           ) : (
