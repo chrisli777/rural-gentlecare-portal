@@ -73,7 +73,7 @@ const PatientLogin = () => {
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
       // Reset verification form when showing it
-      verificationForm.reset();
+      verificationForm.reset({ code: "" });
       toast({
         title: "Verification code sent",
         description: "Please check your phone for the verification code",
