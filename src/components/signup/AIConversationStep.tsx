@@ -48,27 +48,29 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
+  const updateProfileField = async (field: keyof ProfileData, value: ProfileFieldValue) => {
+    const updatedProfile = { ...profileData };
+    updatedProfile[field] = value;
+    setProfileData(updatedProfile);
+    await updateProfile(updatedProfile);
+    return "Profile updated successfully";
+  };
+
   const conversation = useConversation({
     clientTools: {
-      updateProfile: async (parameters: { field: keyof ProfileData; value: ProfileFieldValue }) => {
-        const updatedProfile = { ...profileData };
-        updatedProfile[parameters.field] = parameters.value;
-        setProfileData(updatedProfile);
-        await updateProfile(updatedProfile);
-        return "Profile updated successfully";
-      }
+      updateProfile: updateProfileField
     },
     overrides: {
       agent: {
         prompt: {
           prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Start with basic details like name and date of birth, then move on to medical history, allergies, and current medications. Be friendly but professional.",
-          model: "eleven_turbo_v2" // Using the faster model for better response times
+          model: "eleven_turbo_v2"
         },
         firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?",
         language: "en",
       },
       tts: {
-        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah's voice ID
+        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah's voice
         model: "eleven_turbo_v2"
       }
     },
@@ -165,7 +167,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const toggleVoiceRecording = async () => {
     if (!isRecording) {
       try {
-        // Request microphone permission
         const stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
             echoCancellation: true,
@@ -174,16 +175,11 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
           }
         });
         
-        // Stop the stream immediately as ElevenLabs will handle the recording
         stream.getTracks().forEach(track => track.stop());
-        
         setIsRecording(true);
         setHasPermission(true);
         
-        // Start the conversation session
-        await conversation.startSession({
-          // No need to specify agentId here as it's handled by the conversation config
-        });
+        await conversation.startSession();
         
       } catch (error: any) {
         console.error("Error starting voice recording:", error);
