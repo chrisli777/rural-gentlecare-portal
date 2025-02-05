@@ -1,18 +1,52 @@
+
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Calendar, MessageSquare, User, Bot, Bell, ShieldAlert, Info, Activity } from "lucide-react";
+import { Calendar, MessageSquare, User, Bot, Send, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const PatientDashboard = () => {
+  const [message, setMessage] = useState("");
+  const [conversation, setConversation] = useState<{ role: string; content: string }[]>([
+    {
+      role: "assistant",
+      content: "Hello! I'm your healthcare assistant. How can I help you today?",
+    },
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSendMessage = async () => {
+    if (!message.trim()) return;
+
+    setIsLoading(true);
+    const userMessage = { role: "user", content: message };
+    setConversation([...conversation, userMessage]);
+
+    // Simulate AI response - In a real implementation, this would call your AI service
+    setTimeout(() => {
+      const aiResponse = {
+        role: "assistant",
+        content: "I understand your concern. How else can I assist you with your healthcare needs today?",
+      };
+      setConversation([...conversation, userMessage, aiResponse]);
+      setIsLoading(false);
+      setMessage("");
+    }, 1000);
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-20">
         {/* Quick Actions Section */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Appointment Booking */}
             <Link to="/patient/appointment" className="group">
               <Card className="hover:shadow-lg transition-shadow">
@@ -29,7 +63,7 @@ const PatientDashboard = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <MessageSquare className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Messages & Notifications</h3>
+                  <h3 className="text-xl font-semibold mb-2">Messages</h3>
                   <p className="text-gray-600">View your messages and important notifications.</p>
                 </CardContent>
               </Card>
@@ -45,70 +79,54 @@ const PatientDashboard = () => {
                 </CardContent>
               </Card>
             </Link>
-
-            {/* AI Health Assistant */}
-            <Link to="/patient/ai-assistant" className="group">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <Bot className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">AI Health Assistant</h3>
-                  <p className="text-gray-600">Get personalized health guidance and support.</p>
-                </CardContent>
-              </Card>
-            </Link>
           </div>
         </section>
 
-        {/* Medical Suggestions Section */}
+        {/* Chatbot Section */}
         <section className="mb-8">
-          <Card className="shadow-md bg-accent/10">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Info className="h-5 w-5 text-accent" />
-                Medical Suggestions
+                <Bot className="h-5 w-5" />
+                Healthcare Assistant
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert>
-                <Activity className="h-4 w-4" />
-                <AlertTitle>Exercise Recommendation</AlertTitle>
-                <AlertDescription>
-                  Consider a 30-minute daily walk to improve cardiovascular health.
-                </AlertDescription>
-              </Alert>
-              <Alert>
-                <Activity className="h-4 w-4" />
-                <AlertTitle>Diet Suggestion</AlertTitle>
-                <AlertDescription>
-                  Increase your daily water intake to 8 glasses for better hydration.
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Health Alerts Section */}
-        <section>
-          <Card className="shadow-md bg-muted/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShieldAlert className="h-5 w-5 text-destructive" />
-                Important Health Alerts
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert variant="destructive">
-                <AlertTitle>Medication Reminder</AlertTitle>
-                <AlertDescription>
-                  Don't forget to take your evening medication at 8:00 PM
-                </AlertDescription>
-              </Alert>
-              <Alert>
-                <AlertTitle>Upcoming Lab Work</AlertTitle>
-                <AlertDescription>
-                  Schedule your quarterly blood work before March 30, 2024
-                </AlertDescription>
-              </Alert>
+            <CardContent>
+              <div className="h-[400px] overflow-y-auto space-y-4 mb-4">
+                {conversation.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${
+                      msg.role === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[80%] p-3 rounded-lg ${
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                />
+                <Button onClick={handleSendMessage} disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </section>
