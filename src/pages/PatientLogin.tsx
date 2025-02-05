@@ -24,18 +24,28 @@ const phoneSchema = z.object({
     .refine((val) => /^\+?[1-9]\d{1,14}$/.test(val.replace(/\D/g, '')), {
       message: "Please enter a valid phone number",
     }),
-  code: z.string().length(6, "Verification code must be 6 digits").optional(),
+});
+
+const verificationSchema = z.object({
+  code: z.string().length(6, "Verification code must be 6 digits"),
 });
 
 const PatientLogin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  const form = useForm<z.infer<typeof phoneSchema>>({
+  const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
     defaultValues: {
       phone: "",
+    },
+  });
+
+  const verificationForm = useForm<z.infer<typeof verificationSchema>>({
+    resolver: zodResolver(verificationSchema),
+    defaultValues: {
       code: "",
     },
   });
@@ -51,47 +61,60 @@ const PatientLogin = () => {
       const formattedPhone = formatPhoneNumber(data.phone);
       console.log("Attempting login with phone:", formattedPhone);
       
-      if (data.code) {
-        // Verify the code
-        const { error } = await supabase.auth.verifyOtp({
-          phone: formattedPhone,
-          token: data.code,
-          type: 'sms',
-        });
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+      });
 
-        if (error) {
-          console.error("Verification failed:", error);
-          throw error;
-        }
-
-        toast({
-          title: "Success",
-          description: "Successfully logged in",
-        });
-        navigate("/patient/dashboard");
-      } else {
-        // Send verification code
-        const { error } = await supabase.auth.signInWithOtp({
-          phone: formattedPhone,
-        });
-
-        if (error) {
-          console.error("Login failed:", error);
-          throw error;
-        }
-
-        setPhoneNumber(formattedPhone);
-        form.setValue("code", ""); // Clear verification code field
-        toast({
-          title: "Verification code sent",
-          description: "Please check your phone for the verification code",
-        });
+      if (error) {
+        console.error("Login failed:", error);
+        throw error;
       }
+
+      setPhoneNumber(formattedPhone);
+      setShowVerification(true);
+      // Reset verification form when showing it
+      verificationForm.reset({ code: "" });
+      toast({
+        title: "Verification code sent",
+        description: "Please check your phone for the verification code",
+      });
     } catch (error: any) {
-      console.error("Error:", error);
+      console.error("Login error:", error);
       toast({
         title: "Error",
-        description: error.message || "An error occurred",
+        description: error.message || "Failed to send verification code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onVerificationSubmit = async (data: z.infer<typeof verificationSchema>) => {
+    setIsLoading(true);
+    try {
+      console.log("Verifying code for phone:", phoneNumber);
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: data.code,
+        type: 'sms',
+      });
+
+      if (error) {
+        console.error("Verification failed:", error);
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Successfully logged in",
+      });
+      navigate("/patient/dashboard");
+    } catch (error: any) {
+      console.error("Verification error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to verify code",
         variant: "destructive",
       });
     } finally {
@@ -109,80 +132,109 @@ const PatientLogin = () => {
           </p>
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onPhoneSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your phone number"
-                      type="tel"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {!showVerification ? (
+          <Form {...phoneForm}>
+            <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-6">
+              <FormField
+                control={phoneForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your phone number"
+                        type="tel"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Verification Code</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter 6-digit code"
-                      type="text"
-                      maxLength={6}
-                      disabled={isLoading}
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                        field.onChange(value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? "Processing..." : form.getValues("code") ? "Verify and Login" : "Send verification code"}
-              </Button>
-
-              <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <Link
-                    to="/patient/signup"
-                    className="text-primary hover:underline"
-                  >
-                    Sign up
-                  </Link>
-                </p>
-                <Link
-                  to="/"
-                  className="text-sm text-primary hover:underline block"
+              <div className="space-y-4">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
                 >
-                  Back to role selection
-                </Link>
+                  {isLoading ? "Sending code..." : "Send verification code"}
+                </Button>
+
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Don't have an account?{" "}
+                    <Link
+                      to="/patient/signup"
+                      className="text-primary hover:underline"
+                    >
+                      Sign up
+                    </Link>
+                  </p>
+                  <Link
+                    to="/"
+                    className="text-sm text-primary hover:underline block"
+                  >
+                    Back to role selection
+                  </Link>
+                </div>
               </div>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        ) : (
+          <Form {...verificationForm}>
+            <form onSubmit={verificationForm.handleSubmit(onVerificationSubmit)} className="space-y-6">
+              <FormField
+                control={verificationForm.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Verification Code</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter 6-digit code"
+                        type="text"
+                        maxLength={6}
+                        disabled={isLoading}
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                          field.onChange(value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-4">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Verifying..." : "Verify and Login"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setShowVerification(false);
+                    verificationForm.reset();
+                  }}
+                  disabled={isLoading}
+                >
+                  Back to phone number
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
 
         <button
           className="fixed top-4 right-4 p-2 text-primary hover:text-primary/80"
