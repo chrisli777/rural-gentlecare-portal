@@ -49,7 +49,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   // Initialize voice conversation with enhanced configuration
   const conversation = useConversation({
     clientTools: {
-      updateProfile: async (parameters: { field: keyof ProfileData; value: string }) => {
+      updateProfile: async (parameters: { field: keyof ProfileData; value: any }) => {
         const updatedProfile = { ...profileData };
         updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
