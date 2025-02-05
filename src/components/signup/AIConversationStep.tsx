@@ -49,8 +49,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   const updateProfileField = async (field: keyof ProfileData, value: ProfileFieldValue) => {
-    const updatedProfile = { ...profileData };
-    updatedProfile[field] = value;
+    const updatedProfile = { ...profileData, [field]: value };
     setProfileData(updatedProfile);
     await updateProfile(updatedProfile);
     return "Profile updated successfully";
@@ -167,23 +166,10 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const toggleVoiceRecording = async () => {
     if (!isRecording) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          }
-        });
-        
-        stream.getTracks().forEach(track => track.stop());
+        await conversation.startSession({ agentId: "eleven_labs_demo" });
         setIsRecording(true);
-        setHasPermission(true);
-        
-        await conversation.startSession();
-        
       } catch (error: any) {
         console.error("Error starting voice recording:", error);
-        setHasPermission(false);
         toast({
           title: "Voice Chat Error",
           description: "There was an error starting the voice conversation. Please try again.",
@@ -205,8 +191,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      // TODO: Replace with actual AI integration
-      // For now, using a simple mock response
       const lastAssistantMessage = messages[messages.length - 1];
       let response: Message = { role: 'assistant', content: '' };
       let updatedProfile = { ...profileData };
@@ -299,6 +283,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
           onClick={toggleVoiceRecording}
           className={isRecording ? 'bg-red-100' : ''}
           title={hasPermission === false ? "Microphone access denied" : "Toggle voice chat"}
+          disabled={hasPermission === false}
         >
           {isRecording ? (
             <MicOff className="h-4 w-4" />
