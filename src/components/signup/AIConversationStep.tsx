@@ -29,8 +29,8 @@ interface ProfileData {
   insurance_number?: string;
   smoker?: boolean;
   profile_photo?: string;
-  voice_preferences?: any;
-  ai_analyzed_data?: any;
+  voice_preferences?: Record<string, any>;
+  ai_analyzed_data?: Record<string, any>;
 }
 
 interface AIConversationStepProps {
@@ -49,9 +49,9 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   // Initialize voice conversation
   const conversation = useConversation({
     clientTools: {
-      updateProfile: async (parameters: { field: string; value: string }) => {
+      updateProfile: async (parameters: { field: keyof ProfileData; value: string }) => {
         const updatedProfile = { ...profileData };
-        updatedProfile[parameters.field as keyof ProfileData] = parameters.value;
+        updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
         return "Profile updated successfully";
       }
