@@ -12,6 +12,7 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          ai_analyzed_data: Json | null
           allergies: string | null
           blood_type: string | null
           chronic_conditions: string | null
@@ -27,11 +28,14 @@ export type Database = {
           last_name: string | null
           phone_number: string
           primary_physician: string | null
+          profile_photo: string | null
           smoker: boolean | null
           updated_at: string | null
+          voice_preferences: Json | null
         }
         Insert: {
           address?: string | null
+          ai_analyzed_data?: Json | null
           allergies?: string | null
           blood_type?: string | null
           chronic_conditions?: string | null
@@ -47,11 +51,14 @@ export type Database = {
           last_name?: string | null
           phone_number: string
           primary_physician?: string | null
+          profile_photo?: string | null
           smoker?: boolean | null
           updated_at?: string | null
+          voice_preferences?: Json | null
         }
         Update: {
           address?: string | null
+          ai_analyzed_data?: Json | null
           allergies?: string | null
           blood_type?: string | null
           chronic_conditions?: string | null
@@ -67,8 +74,10 @@ export type Database = {
           last_name?: string | null
           phone_number?: string
           primary_physician?: string | null
+          profile_photo?: string | null
           smoker?: boolean | null
           updated_at?: string | null
+          voice_preferences?: Json | null
         }
         Relationships: []
       }
