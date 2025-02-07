@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 
 export const useConversationSetup = (userId: string | null, onProfileComplete: () => void) => {
   const [profileData, setProfileData] = useState<ProfileData>({});
+  const [isConversationEnded, setIsConversationEnded] = useState(false);
 
   const conversation = useConversation({
     clientTools: {
@@ -49,6 +50,7 @@ export const useConversationSetup = (userId: string | null, onProfileComplete: (
             description: "Your medical profile has been saved successfully.",
           });
 
+          setIsConversationEnded(true);
           onProfileComplete();
           return "Profile completed successfully";
         } catch (error: any) {
@@ -83,7 +85,7 @@ Essential information to collect:
 - current_medications (if any)
 - chronic_conditions (if any)
 
-Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification.`,
+Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification. After collecting all information, tell the patient you're completing their profile and call the completeProfile function.`,
         },
         firstMessage: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
         language: "en",
@@ -99,5 +101,5 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     }
   });
 
-  return { conversation, profileData };
+  return { conversation, profileData, isConversationEnded };
 };

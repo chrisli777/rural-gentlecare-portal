@@ -52,7 +52,18 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     checkAuth();
   }, [navigate]);
 
-  const { conversation } = useConversationSetup(userId, onProfileComplete);
+  const { conversation, isConversationEnded } = useConversationSetup(userId, () => {
+    console.log("Profile complete, navigating to form");
+    onProfileComplete();
+  });
+
+  useEffect(() => {
+    if (isConversationEnded) {
+      console.log("Conversation ended, navigating to form");
+      onProfileComplete();
+    }
+  }, [isConversationEnded, onProfileComplete]);
+
   const audioContext = useAudioContext();
   const { isRecording, conversationStarted, toggleVoiceRecording, setConversationStarted } = 
     useVoiceRecording(userId, conversation);
@@ -116,7 +127,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         setConversationStarted(false);
       };
     }
-  }, [conversation]);
+  }, [conversation, setConversationStarted]);
 
   return (
     <Card className="p-4">
