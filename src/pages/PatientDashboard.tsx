@@ -32,8 +32,9 @@ const PatientDashboard = () => {
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
+          .gte('appointment_date', new Date().toISOString().split('T')[0])
           .order('appointment_date', { ascending: true })
-          .order('appointment_time', { ascending: true }); // Added secondary sort by time
+          .order('appointment_time', { ascending: true });
 
         if (error) {
           console.error('Error details:', error);
@@ -41,11 +42,18 @@ const PatientDashboard = () => {
         }
 
         if (appointments) {
-          console.log('Fetched appointments:', appointments); // Debug log
-          setRecentAppointments(appointments);
+          console.log('Fetched appointments:', appointments);
+          // Sort appointments by date and time
+          const sortedAppointments = appointments.sort((a, b) => {
+            const dateA = new Date(`${a.appointment_date} ${a.appointment_time}`);
+            const dateB = new Date(`${b.appointment_date} ${b.appointment_time}`);
+            return dateA.getTime() - dateB.getTime();
+          });
+          
+          setRecentAppointments(sortedAppointments);
           
           // Add appointment notifications to conversation
-          const appointmentMessages = appointments.map(apt => ({
+          const appointmentMessages = sortedAppointments.map(apt => ({
             role: "assistant",
             content: `You have an appointment scheduled for ${format(new Date(apt.appointment_date), 'PPP')} at ${apt.appointment_time}. Type: ${apt.appointment_type}`
           }));
@@ -66,6 +74,28 @@ const PatientDashboard = () => {
     };
 
     fetchAppointments();
+
+    // Set up real-time subscription for appointments
+    const appointmentsSubscription = supabase
+      .channel('appointments_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'appointments'
+        },
+        () => {
+          console.log('Appointment change detected, refreshing...');
+          fetchAppointments();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription
+    return () => {
+      appointmentsSubscription.unsubscribe();
+    };
   }, [toast]);
 
   const startRecording = async () => {
@@ -216,7 +246,7 @@ const PatientDashboard = () => {
                   {recentAppointments.length > 0 ? (
                     recentAppointments.map((appointment, index) => (
                       <div 
-                        key={index} 
+                        key={appointment.id}
                         className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
                       >
                         <div>
