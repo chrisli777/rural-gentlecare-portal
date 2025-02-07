@@ -23,7 +23,7 @@ serve(async (req) => {
     }
 
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/deepseek-ai/deepseek-coder-6.7b-instruct',
+      'https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf',
       {
         method: 'POST',
         headers: {
@@ -31,47 +31,4 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: `<|system|>You are a helpful and knowledgeable healthcare assistant. Provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. Use a professional but friendly tone.
-
-<|user|>${message}
-
-<|assistant|>`,
-          parameters: {
-            max_new_tokens: 500,
-            temperature: 0.7,
-            top_p: 0.95,
-            repetition_penalty: 1.15,
-          },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Hugging Face API error:', errorText);
-      throw new Error(`Hugging Face API error: ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log('Hugging Face API response:', data);
-
-    if (!data || !data[0] || !data[0].generated_text) {
-      console.error('Unexpected API response format:', data);
-      throw new Error('Invalid response format from Hugging Face API');
-    }
-
-    // Extract the assistant's response from the generated text
-    const generatedText = data[0].generated_text;
-    const aiResponse = generatedText.split('<|assistant|>')[1]?.trim() || generatedText;
-
-    return new Response(JSON.stringify({ response: aiResponse }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-});
+          inputs: `<s>[INST]You are a helpful and knowledgeable healthcare assistant. Provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. Use a professional but friendly tone.
