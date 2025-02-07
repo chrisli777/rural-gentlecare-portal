@@ -9,19 +9,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const { message } = await req.json();
-    console.log('Received message:', message);
-
-    if (!huggingFaceToken) {
-      throw new Error('Hugging Face API token not configured');
-    }
-
+async function queryHuggingFace(message: string, retries = 3): Promise<Response> {
+  for (let i = 0; i < retries; i++) {
     const response = await fetch(
       'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
       {
@@ -42,12 +31,40 @@ serve(async (req) => {
       }
     );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Hugging Face API error:', errorText);
-      throw new Error(`Hugging Face API error: ${errorText}`);
+    if (response.ok) {
+      return response;
     }
 
+    const error = await response.json();
+    console.log(`Attempt ${i + 1} failed:`, error);
+
+    if (error.error && error.error.includes("is currently loading")) {
+      // Wait for 5 seconds before retrying
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      continue;
+    }
+
+    // If it's not a loading error, throw it immediately
+    throw new Error(`Hugging Face API error: ${JSON.stringify(error)}`);
+  }
+
+  throw new Error('Maximum retries reached while waiting for model to load');
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { message } = await req.json();
+    console.log('Received message:', message);
+
+    if (!huggingFaceToken) {
+      throw new Error('Hugging Face API token not configured');
+    }
+
+    const response = await queryHuggingFace(message);
     const data = await response.json();
     console.log('Hugging Face API response:', data);
 
