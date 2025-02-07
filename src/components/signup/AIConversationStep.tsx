@@ -64,17 +64,50 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         setProfileData(updatedProfile);
         
         try {
-          await updateProfile(updatedProfile);
+          if (!userId) throw new Error('No user ID available');
+          
+          const { error } = await supabase
+            .from('profiles')
+            .update({ [parameters.field]: parameters.value })
+            .eq('id', userId);
+
+          if (error) throw error;
+          
           return "Profile updated successfully";
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error updating profile:", error);
           return "Failed to update profile";
         }
       },
       completeProfile: async () => {
         console.log("Profile complete, data:", profileData);
-        onProfileComplete();
-        return "Profile completed successfully";
+        try {
+          if (!userId) throw new Error('No user ID available');
+
+          const { error } = await supabase
+            .from('profiles')
+            .update(profileData)
+            .eq('id', userId);
+
+          if (error) throw error;
+
+          toast({
+            title: "Profile Complete",
+            description: "Your medical profile has been saved successfully.",
+          });
+
+          onProfileComplete();
+          navigate("/patient/dashboard");
+          return "Profile completed successfully";
+        } catch (error: any) {
+          console.error("Error completing profile:", error);
+          toast({
+            title: "Error",
+            description: "Failed to save profile. Please try again.",
+            variant: "destructive",
+          });
+          return "Failed to complete profile";
+        }
       }
     },
     overrides: {
@@ -155,33 +188,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       }
     };
   }, []);
-
-  const updateProfile = async (data: ProfileData) => {
-    if (!userId) {
-      console.error("No user ID available");
-      return "Failed to update profile: User not authenticated";
-    }
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(data)
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      console.log("Profile updated successfully with data:", data);
-      return "Profile updated successfully";
-    } catch (error: any) {
-      console.error("Error updating profile:", error);
-      toast({
-        title: "Error updating profile",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
-    }
-  };
 
   const toggleVoiceRecording = async () => {
     if (!userId) {
