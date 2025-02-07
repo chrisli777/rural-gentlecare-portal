@@ -2,7 +2,7 @@
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Calendar, MessageSquare, User, Bot, Send, Loader2 } from "lucide-react";
+import { Calendar, Bot, Send, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,7 @@ const PatientDashboard = () => {
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
-          .order('appointment_date', { ascending: true })
-          .limit(3);
+          .order('appointment_date', { ascending: true });
 
         if (error) throw error;
 
@@ -99,72 +98,50 @@ const PatientDashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-20">
-        {/* Quick Actions Section */}
+        {/* Appointments and Booking Section */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">Appointments</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Appointment Booking */}
             <Link to="/patient/appointment" className="group">
-              <Card className="hover:shadow-lg transition-shadow">
+              <Card className="hover:shadow-lg transition-shadow h-full">
                 <CardContent className="p-6">
                   <Calendar className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Appointment Booking</h3>
+                  <h3 className="text-xl font-semibold mb-2">Book an Appointment</h3>
                   <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
                 </CardContent>
               </Card>
             </Link>
 
-            {/* Messages & Notifications */}
-            <Link to="/patient/messages" className="group">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <MessageSquare className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Messages</h3>
-                  <p className="text-gray-600">View your messages and important notifications.</p>
-                </CardContent>
-              </Card>
-            </Link>
-
-            {/* My Profile */}
-            <Link to="/patient/profile" className="group">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <User className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">My Profile</h3>
-                  <p className="text-gray-600">Manage your personal information and preferences.</p>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        </section>
-
-        {/* Recent Appointments Section */}
-        {recentAppointments.length > 0 && (
-          <section className="mb-8">
-            <Card>
+            {/* Upcoming Appointments */}
+            <Card className="h-full">
               <CardHeader>
                 <CardTitle>Upcoming Appointments</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentAppointments.map((appointment, index) => (
-                    <div key={index} className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg">
-                      <div>
-                        <p className="font-medium">{appointment.appointment_type}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
-                        </p>
+                <div className="space-y-4 max-h-[300px] overflow-y-auto">
+                  {recentAppointments.length > 0 ? (
+                    recentAppointments.map((appointment, index) => (
+                      <div key={index} className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg">
+                        <div>
+                          <p className="font-medium">{appointment.appointment_type}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
+                          </p>
+                        </div>
+                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                          {appointment.status}
+                        </span>
                       </div>
-                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                        {appointment.status}
-                      </span>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground text-center py-4">No upcoming appointments</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Chatbot Section */}
         <section className="mb-8">
