@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -92,12 +93,9 @@ const Index = () => {
                     <h2 className="text-2xl font-semibold mb-4 text-primary">Patient Portal</h2>
                     <AudioWaveform 
                       className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                      onClick={() => speakText("Patient Portal. Access your health records, appointments, and medical resources")}
+                      onClick={() => speakText("Patient Portal")}
                     />
                   </div>
-                  <p className="text-gray-600 mb-6">
-                    Access your health records, appointments, and medical resources
-                  </p>
                   <div className="flex items-center gap-2">
                     <Button 
                       onClick={() => navigate("/patient/login")} 
@@ -122,12 +120,9 @@ const Index = () => {
                     <h2 className="text-2xl font-semibold mb-4 text-primary">Provider Portal</h2>
                     <AudioWaveform 
                       className="h-5 w-5 cursor-pointer hover:text-primary/80" 
-                      onClick={() => speakText("Provider Portal. Access patient records, schedules, and clinical tools")}
+                      onClick={() => speakText("Provider Portal")}
                     />
                   </div>
-                  <p className="text-gray-600 mb-6">
-                    Access patient records, schedules, and clinical tools
-                  </p>
                   <div className="flex items-center gap-2">
                     <Button 
                       onClick={() => navigate("/provider/login")} 
