@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -11,9 +12,10 @@ import { Button } from "@/components/ui/button";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
+  onProfileUpdate: (data: ProfileData) => void;
 }
 
-export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProps) => {
+export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AIConversationStepProps) => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = useState("");
@@ -62,6 +64,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         const updatedProfile = { ...profileData };
         updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
+        onProfileUpdate(updatedProfile);
         
         try {
           if (!userId) throw new Error('No user ID available');
@@ -144,22 +147,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         style: 0.0,
         useSSML: false
       }
-    },
-    onMessage: (message) => {
-      console.log("Received message:", message);
-      if (message.content) {
-        setMessages(prev => [...prev, { role: message.role, content: message.content }]);
-      }
-    },
-    onError: (error) => {
-      console.error("Conversation error:", error);
-      toast({
-        title: "Error",
-        description: "There was an error with the voice conversation. Please try again.",
-        variant: "destructive",
-      });
-      setIsRecording(false);
-      setConversationStarted(false);
     }
   });
 

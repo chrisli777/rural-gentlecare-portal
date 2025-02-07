@@ -7,6 +7,7 @@ import { FileUploadStep } from "@/components/signup/FileUploadStep";
 import { BasicMedicalForm } from "@/components/signup/BasicMedicalForm";
 import { AudioWaveform, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProfileData } from "@/types/conversation";
 
 type SignupStep = 'phone' | 'method' | 'upload' | 'ai' | 'form';
 
@@ -14,7 +15,7 @@ const PatientSignup = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<SignupStep>('phone');
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<ProfileData>({});
 
   const handleVerificationComplete = (phone: string) => {
     setPhoneNumber(phone);
@@ -23,6 +24,11 @@ const PatientSignup = () => {
 
   const handleUploadComplete = (data: any) => {
     setFormData(data);
+    setStep('form');
+  };
+
+  const handleAIProfileUpdate = (data: ProfileData) => {
+    setFormData(prev => ({ ...prev, ...data }));
     setStep('form');
   };
 
@@ -111,7 +117,10 @@ const PatientSignup = () => {
         )}
 
         {step === 'ai' && (
-          <AIConversationStep onProfileComplete={handleProfileComplete} />
+          <AIConversationStep 
+            onProfileComplete={handleProfileComplete}
+            onProfileUpdate={handleAIProfileUpdate}
+          />
         )}
 
         {step === 'form' && (
@@ -148,4 +157,3 @@ const PatientSignup = () => {
 };
 
 export default PatientSignup;
-
