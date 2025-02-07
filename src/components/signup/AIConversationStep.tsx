@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -27,7 +26,6 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check authentication status
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -292,7 +290,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       </Card>
       <Button 
         className="w-full"
-        onClick={() => navigate('/patient/form')}
+        onClick={() => onProfileUpdate(profileData)}
       >
         Continue to Form
       </Button>
