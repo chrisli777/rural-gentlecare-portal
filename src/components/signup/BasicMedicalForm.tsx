@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,16 +26,46 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
   });
 
   useEffect(() => {
-    // Update form data when initialData changes
-    if (Object.keys(initialData).length > 0) {
-      console.log("Received initial data:", initialData);
-      setFormData(prev => ({
-        ...prev,
-        ...initialData,
-        // Ensure the date is in the correct format for the input
-        date_of_birth: initialData.date_of_birth ? new Date(initialData.date_of_birth).toISOString().split('T')[0] : '',
-      }));
-    }
+    const loadFormData = async () => {
+      try {
+        if (Object.keys(initialData).length > 0) {
+          console.log("Using provided initial data:", initialData);
+          setFormData(prev => ({
+            ...prev,
+            ...initialData,
+            date_of_birth: initialData.date_of_birth ? new Date(initialData.date_of_birth).toISOString().split('T')[0] : '',
+          }));
+          return;
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) return;
+
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching profile:", error);
+          return;
+        }
+
+        if (profile) {
+          console.log("Loaded profile data from database:", profile);
+          setFormData(prev => ({
+            ...prev,
+            ...profile,
+            date_of_birth: profile.date_of_birth ? new Date(profile.date_of_birth).toISOString().split('T')[0] : '',
+          }));
+        }
+      } catch (error) {
+        console.error("Error loading form data:", error);
+      }
+    };
+
+    loadFormData();
   }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {

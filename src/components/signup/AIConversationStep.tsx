@@ -38,6 +38,19 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
         }
         console.log("User authenticated:", session.user.id);
         setUserId(session.user.id);
+        
+        // Fetch existing profile data if any
+        const { data: existingProfile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (!error && existingProfile) {
+          console.log("Found existing profile:", existingProfile);
+          setProfileData(existingProfile);
+          onProfileUpdate(existingProfile);
+        }
       } catch (error) {
         console.error("Auth check error:", error);
         toast({
@@ -50,7 +63,7 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
     };
     
     checkAuth();
-  }, [navigate]);
+  }, [navigate, onProfileUpdate]);
 
   const conversation = useConversation({
     clientTools: {
@@ -71,6 +84,7 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
 
           if (error) throw error;
           
+          console.log("Profile field updated successfully in database");
           return "Profile updated successfully";
         } catch (error: any) {
           console.error("Error updating profile:", error);
@@ -129,7 +143,9 @@ Essential information to collect:
 - current_medications (if any)
 - chronic_conditions (if any)
 
-Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification.`,
+Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification.
+
+IMPORTANT: After each piece of information is provided, immediately use updateProfile to save it to ensure it's captured in the form.`,
         },
         firstMessage: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
         language: "en",
