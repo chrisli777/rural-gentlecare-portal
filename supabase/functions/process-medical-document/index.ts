@@ -41,47 +41,86 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // First, process with Document OCR model
-    console.log('Sending file for OCR processing...');
-    const ocrResponse = await fetch('https://api-inference.huggingface.co/models/naver-clova-ix/donut-base-finetuned-cord-v2', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: base64File,
-      }),
-    });
+    // Try different OCR models in case of failure
+    const ocrModels = [
+      'microsoft/trocr-large-printed',
+      'naver-clova-ix/donut-base-finetuned-cord-v2',
+      'facebook/nougat-base'
+    ];
 
-    if (!ocrResponse.ok) {
-      throw new Error(`Hugging Face OCR API error: ${ocrResponse.statusText}`);
+    let ocrResult = null;
+    let usedModel = '';
+
+    for (const model of ocrModels) {
+      try {
+        console.log(`Attempting OCR with model: ${model}`);
+        const ocrResponse = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: base64File,
+          }),
+        });
+
+        if (ocrResponse.ok) {
+          ocrResult = await ocrResponse.json();
+          usedModel = model;
+          console.log(`Successfully processed with model: ${model}`);
+          break;
+        }
+      } catch (error) {
+        console.log(`Failed with model ${model}:`, error);
+        continue;
+      }
     }
 
-    const ocrResult = await ocrResponse.json();
-    console.log('OCR processing complete. Extracted text:', ocrResult);
+    if (!ocrResult) {
+      throw new Error('All OCR models failed to process the document');
+    }
 
-    // Now process with FLAN-T5 for structured data extraction
+    // Process with FLAN-T5 for structured data extraction
     console.log('Sending OCR text to FLAN-T5 for information extraction...');
-    const extractionResponse = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: `Extract the following information from this medical document in JSON format. Include these fields: first_name, last_name, date_of_birth (YYYY-MM-DD), allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. If any field is unclear or missing, use an empty string. Here's the document text: ${JSON.stringify(ocrResult)}`,
-      }),
-    });
+    const extractionModels = [
+      'google/flan-t5-large',
+      'google/flan-t5-xl',
+      'google/flan-t5-base'
+    ];
 
-    if (!extractionResponse.ok) {
-      throw new Error('Hugging Face Extraction API error');
+    let extractedData = null;
+    let extractionResult = null;
+
+    for (const model of extractionModels) {
+      try {
+        console.log(`Attempting extraction with model: ${model}`);
+        const extractionResponse = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: `Extract the following information from this medical document in JSON format. Include these fields: first_name, last_name, date_of_birth (YYYY-MM-DD), allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. If any field is unclear or missing, use an empty string. Here's the document text: ${JSON.stringify(ocrResult)}`,
+          }),
+        });
+
+        if (extractionResponse.ok) {
+          extractionResult = await extractionResponse.text();
+          console.log(`Successfully processed with model: ${model}`);
+          break;
+        }
+      } catch (error) {
+        console.log(`Failed with model ${model}:`, error);
+        continue;
+      }
     }
 
-    const extractionResult = await extractionResponse.text();
-    console.log('Raw extraction result:', extractionResult);
+    if (!extractionResult) {
+      throw new Error('All extraction models failed to process the document');
+    }
 
-    let extractedData;
     try {
       // Try to parse the response as JSON first
       extractedData = JSON.parse(extractionResult);
@@ -152,7 +191,13 @@ serve(async (req) => {
     // Update the processed_documents table with extracted data
     const { error: updateError } = await supabaseAdmin
       .from('processed_documents')
-      .update({ processed_data: extractedData })
+      .update({ 
+        processed_data: extractedData,
+        processing_metadata: {
+          ocr_model: usedModel,
+          processing_timestamp: new Date().toISOString()
+        }
+      })
       .eq('file_path', filePath);
 
     if (updateError) {
@@ -162,7 +207,10 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      data: extractedData 
+      data: extractedData,
+      metadata: {
+        ocr_model: usedModel
+      }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
