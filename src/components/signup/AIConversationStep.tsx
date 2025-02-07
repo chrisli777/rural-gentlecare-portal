@@ -7,12 +7,14 @@ import { useConversation } from "@11labs/react";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { Message, ProfileData } from "@/types/conversation";
+import { useNavigate } from "react-router-dom";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
 }
 
 export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProps) => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +22,24 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isRecording, setIsRecording] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to continue.",
+          variant: "destructive",
+        });
+        navigate("/patient/login");
+        return;
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   const conversation = useConversation({
     clientTools: {
@@ -124,10 +144,15 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
 
   const updateProfile = async (data: ProfileData) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update(data)
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('id', user.id);
 
       if (error) throw error;
       
@@ -145,6 +170,17 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
 
   const toggleVoiceRecording = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to continue.",
+          variant: "destructive",
+        });
+        navigate("/patient/login");
+        return;
+      }
+
       if (!audioContext) {
         console.error("AudioContext not initialized");
         toast({
@@ -163,10 +199,9 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         
         if (!conversationStarted) {
           console.log("Starting new conversation session");
-          const { data: { user } } = await supabase.auth.getUser();
           await conversation.startSession({
             agentId: "sg6ewalyElwtFCXBkUOk",
-            userId: user?.id,
+            userId: session.user.id,
           });
           console.log("Conversation session started");
           setConversationStarted(true);
@@ -209,18 +244,28 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
   const handleSendMessage = async () => {
     if (!currentMessage.trim()) return;
 
-    setIsLoading(true);
-    const userMessage: Message = { role: 'user', content: currentMessage };
-    setMessages(prev => [...prev, userMessage]);
-    setCurrentMessage("");
-
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to continue.",
+          variant: "destructive",
+        });
+        navigate("/patient/login");
+        return;
+      }
+
+      setIsLoading(true);
+      const userMessage: Message = { role: 'user', content: currentMessage };
+      setMessages(prev => [...prev, userMessage]);
+      setCurrentMessage("");
+
       if (!conversationStarted) {
         console.log("Starting new conversation session for text message");
-        const { data: { user } } = await supabase.auth.getUser();
         await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
-          userId: user?.id,
+          userId: session.user.id,
         });
         setConversationStarted(true);
       }
