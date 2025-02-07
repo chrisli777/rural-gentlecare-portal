@@ -18,6 +18,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [isRecording, setIsRecording] = useState(false);
+  const [conversationStarted, setConversationStarted] = useState(false);
 
   const conversation = useConversation({
     clientTools: {
@@ -93,14 +94,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     }
   });
 
-  useEffect(() => {
-    const initialMessage: Message = {
-      role: 'assistant',
-      content: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?"
-    };
-    setMessages([initialMessage]);
-  }, []);
-
   const updateProfile = async (data: ProfileData) => {
     try {
       const { error } = await supabase
@@ -127,14 +120,21 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       if (!isRecording) {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
-        const conversationId = await conversation.startSession({
-          agentId: "sg6ewalyElwtFCXBkUOk",
-        });
-        console.log("Started conversation with ID:", conversationId);
+        
+        if (!conversationStarted) {
+          const conversationId = await conversation.startSession({
+            agentId: "sg6ewalyElwtFCXBkUOk",
+          });
+          console.log("Started conversation with ID:", conversationId);
+          setConversationStarted(true);
+        }
       } else {
         setIsRecording(false);
-        await conversation.endSession();
-        console.log("Ended conversation");
+        if (conversationStarted) {
+          await conversation.endSession();
+          console.log("Ended conversation");
+          setConversationStarted(false);
+        }
       }
     } catch (error) {
       console.error("Error with voice recording:", error);
@@ -156,10 +156,13 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     setCurrentMessage("");
 
     try {
-      await conversation.startSession({
-        agentId: "sg6ewalyElwtFCXBkUOk",
-        messages: [...messages, userMessage]
-      });
+      if (!conversationStarted) {
+        await conversation.startSession({
+          agentId: "sg6ewalyElwtFCXBkUOk",
+          messages: [...messages, userMessage]
+        });
+        setConversationStarted(true);
+      }
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast({

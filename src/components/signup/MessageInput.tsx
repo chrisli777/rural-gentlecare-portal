@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Send, Mic, MicOff } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 
 interface MessageInputProps {
   currentMessage: string;
@@ -24,10 +23,10 @@ export const MessageInput = ({
   return (
     <div className="flex gap-2">
       <Button
-        variant="outline"
+        variant={isRecording ? "destructive" : "outline"}
         size="icon"
         onClick={toggleVoiceRecording}
-        className={isRecording ? 'bg-red-100' : ''}
+        className={isRecording ? 'animate-pulse' : ''}
       >
         {isRecording ? (
           <MicOff className="h-4 w-4" />
@@ -38,7 +37,7 @@ export const MessageInput = ({
       <Input
         value={currentMessage}
         onChange={(e) => setCurrentMessage(e.target.value)}
-        placeholder="Type your response..."
+        placeholder={isRecording ? "Recording..." : "Type your response..."}
         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
         disabled={isLoading || isRecording}
       />
