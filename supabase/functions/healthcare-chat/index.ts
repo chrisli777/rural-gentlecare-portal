@@ -12,7 +12,7 @@ const corsHeaders = {
 async function queryHuggingFace(message: string, retries = 3): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
+      'https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision',
       {
         method: 'POST',
         headers: {
