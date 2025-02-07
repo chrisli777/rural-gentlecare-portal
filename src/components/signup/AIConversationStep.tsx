@@ -1,38 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, Send, Mic, MicOff, Camera, ImagePlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useConversation } from "@11labs/react";
-
-interface Message {
-  role: 'assistant' | 'user';
-  content: string;
-}
-
-interface ProfileData {
-  [key: string]: string | boolean | Record<string, any> | null;
-  first_name?: string;
-  last_name?: string;
-  date_of_birth?: string;
-  address?: string;
-  emergency_contact?: string;
-  emergency_phone?: string;
-  blood_type?: string;
-  allergies?: string;
-  current_medications?: string;
-  chronic_conditions?: string;
-  primary_physician?: string;
-  insurance_provider?: string;
-  insurance_number?: string;
-  smoker?: boolean;
-  profile_photo?: string;
-  voice_preferences?: Record<string, any>;
-  ai_analyzed_data?: Record<string, any>;
-}
+import { ProfilePhotoUpload } from "./ProfilePhotoUpload";
+import { MessageList } from "./MessageList";
+import { MessageInput } from "./MessageInput";
+import { Message, ProfileData } from "@/types/conversation";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -44,7 +19,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const conversation = useConversation({
@@ -87,7 +61,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   });
 
   useEffect(() => {
-    // Start the conversation
     const initialMessage: Message = {
       role: 'assistant',
       content: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?"
@@ -106,39 +79,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     } catch (error: any) {
       toast({
         title: "Error updating profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setSelectedImage(file);
-    setPreviewUrl(URL.createObjectURL(file));
-
-    try {
-      const userId = (await supabase.auth.getUser()).data.user?.id;
-      if (!userId) throw new Error('User not authenticated');
-
-      const { data, error } = await supabase.storage
-        .from('profile-photos')
-        .upload(`${userId}/${file.name}`, file);
-
-      if (error) throw error;
-
-      const photoUrl = data.path;
-      await updateProfile({ ...profileData, profile_photo: photoUrl });
-
-      toast({
-        title: "Photo uploaded successfully",
-        description: "Your profile photo has been updated.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error uploading photo",
         description: error.message,
         variant: "destructive",
       });
@@ -209,87 +149,24 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   return (
     <Card className="p-4">
       <div className="mb-4 flex justify-center space-x-4">
-        <div className="relative">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-            id="profile-photo"
-          />
-          <label
-            htmlFor="profile-photo"
-            className="cursor-pointer flex flex-col items-center"
-          >
-            {previewUrl ? (
-              <div className="w-24 h-24 rounded-full overflow-hidden">
-                <img
-                  src={previewUrl}
-                  alt="Profile preview"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center">
-                <ImagePlus className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-            <span className="text-sm text-muted-foreground mt-2">
-              Upload Photo
-            </span>
-          </label>
-        </div>
-      </div>
-
-      <div className="h-[300px] overflow-y-auto mb-4 space-y-4">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}
-          >
-            <div
-              className={`max-w-[80%] p-3 rounded-lg ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
-              }`}
-            >
-              {message.content}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleVoiceRecording}
-          className={isRecording ? 'bg-red-100' : ''}
-        >
-          {isRecording ? (
-            <MicOff className="h-4 w-4" />
-          ) : (
-            <Mic className="h-4 w-4" />
-          )}
-        </Button>
-        <Input
-          value={currentMessage}
-          onChange={(e) => setCurrentMessage(e.target.value)}
-          placeholder="Type your response..."
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          disabled={isLoading || isRecording}
+        <ProfilePhotoUpload
+          profileData={profileData}
+          setProfileData={setProfileData}
+          previewUrl={previewUrl}
+          setPreviewUrl={setPreviewUrl}
         />
-        <Button onClick={handleSendMessage} disabled={isLoading || isRecording}>
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-        </Button>
       </div>
+
+      <MessageList messages={messages} />
+
+      <MessageInput
+        currentMessage={currentMessage}
+        setCurrentMessage={setCurrentMessage}
+        isLoading={isLoading}
+        isRecording={isRecording}
+        handleSendMessage={handleSendMessage}
+        toggleVoiceRecording={toggleVoiceRecording}
+      />
     </Card>
   );
 };
