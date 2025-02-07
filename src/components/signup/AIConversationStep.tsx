@@ -22,24 +22,54 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const conversation = useConversation({
     clientTools: {
       updateProfile: async (parameters: { field: string; value: any }) => {
+        console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
         const updatedProfile = { ...profileData };
         updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
-        await updateProfile(updatedProfile);
-        return "Profile updated successfully";
+        
+        try {
+          await updateProfile(updatedProfile);
+          return "Profile updated successfully";
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          return "Failed to update profile";
+        }
+      },
+      completeProfile: async () => {
+        console.log("Profile complete, data:", profileData);
+        onProfileComplete();
+        return "Profile completed successfully";
       }
     },
     overrides: {
       agent: {
         prompt: {
-          prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Focus on gathering: first name, last name, date of birth, emergency contact details, allergies, current medications, and chronic conditions. Be friendly but professional. After collecting basic information, ask about any specific health concerns or conditions they want to mention. Confirm information before moving to the next question.",
+          prompt: `You are Sarah, a friendly and professional medical assistant helping patients complete their medical profile. Your role is to:
+
+1. Gather essential medical information through natural conversation
+2. Ask one question at a time, waiting for the patient's response
+3. Confirm information before moving to the next question
+4. Use the updateProfile function to save each piece of information
+5. When all essential information is collected, use completeProfile function
+
+Essential information to collect:
+- first_name
+- last_name
+- date_of_birth (format: YYYY-MM-DD)
+- emergency_contact (full name)
+- emergency_phone
+- allergies (if any)
+- current_medications (if any)
+- chronic_conditions (if any)
+
+Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification.`,
         },
-        firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile using voice interaction. You can speak naturally, and I'll guide you through the process. Let's start with your name. What's your first name?",
+        firstMessage: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
         language: "en",
       },
       tts: {
         modelId: "eleven_multilingual_v2",
-        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah's voice - professional and friendly
+        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
         stability: 0.5,
         similarityBoost: 0.75,
         style: 0.0,
@@ -66,7 +96,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   useEffect(() => {
     const initialMessage: Message = {
       role: 'assistant',
-      content: "Hi! I'm your medical assistant, and I'll help you complete your profile using voice interaction. You can speak naturally, and I'll guide you through the process. Let's start with your name. What's your first name?"
+      content: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?"
     };
     setMessages([initialMessage]);
   }, []);
@@ -79,12 +109,16 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         .eq('id', (await supabase.auth.getUser()).data.user?.id);
 
       if (error) throw error;
+      
+      console.log("Profile updated successfully with data:", data);
     } catch (error: any) {
+      console.error("Error updating profile:", error);
       toast({
         title: "Error updating profile",
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     }
   };
 
@@ -96,16 +130,17 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         const conversationId = await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
         });
-        console.log("Started conversation:", conversationId);
+        console.log("Started conversation with ID:", conversationId);
       } else {
         setIsRecording(false);
         await conversation.endSession();
+        console.log("Ended conversation");
       }
     } catch (error) {
       console.error("Error with voice recording:", error);
       toast({
         title: "Error",
-        description: "Could not access microphone or start conversation",
+        description: "Could not access microphone or start conversation. Please check your microphone permissions.",
         variant: "destructive",
       });
       setIsRecording(false);
@@ -126,6 +161,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         messages: [...messages, userMessage]
       });
     } catch (error: any) {
+      console.error("Error sending message:", error);
       toast({
         title: "Error",
         description: "Failed to process message",
