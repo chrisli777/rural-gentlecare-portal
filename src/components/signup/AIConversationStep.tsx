@@ -205,7 +205,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         if (!conversationStarted) {
           console.log("Starting new conversation session");
           await conversation.startSession({
-            agentId: "sg6ewalyElwtFCXBkUOk",
+            agentId: "wMSrAmBurxqAvGQKpCgH", // Updated agent ID
             userId: userId,
           });
           console.log("Conversation session started");
@@ -258,7 +258,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       if (!conversationStarted) {
         console.log("Starting new conversation session for text message");
         await conversation.startSession({
-          agentId: "sg6ewalyElwtFCXBkUOk",
+          agentId: "wMSrAmBurxqAvGQKpCgH", // Updated agent ID
           userId: userId,
         });
         setConversationStarted(true);
