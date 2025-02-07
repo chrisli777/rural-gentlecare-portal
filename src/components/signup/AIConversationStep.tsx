@@ -34,17 +34,16 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     overrides: {
       agent: {
         prompt: {
-          prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Start with basic details like name and date of birth, then move on to medical history, allergies, and current medications. Be friendly but professional.",
+          prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Focus on gathering: first name, last name, date of birth, emergency contact details, allergies, current medications, and chronic conditions. Be friendly but professional. After collecting basic information, ask about any specific health concerns or conditions they want to mention. Confirm information before moving to the next question.",
         },
-        firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?",
+        firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile using voice interaction. You can speak naturally, and I'll guide you through the process. Let's start with your name. What's your first name?",
         language: "en",
       },
       tts: {
-        voiceId: "EXAVITQu4vr4xnSDxMaL"
+        voiceId: "EXAVITQu4vr4xnSDxMaL" // Sarah's voice - professional and friendly
       }
     },
     onMessage: (message) => {
-      console.log("Received message:", message);
       if (message.content) {
         setMessages(prev => [...prev, { role: message.role, content: message.content }]);
       }
@@ -63,7 +62,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   useEffect(() => {
     const initialMessage: Message = {
       role: 'assistant',
-      content: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?"
+      content: "Hi! I'm your medical assistant, and I'll help you complete your profile using voice interaction. You can speak naturally, and I'll guide you through the process. Let's start with your name. What's your first name?"
     };
     setMessages([initialMessage]);
   }, []);
@@ -91,7 +90,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         const conversationId = await conversation.startSession({
-          agentId: "medical_assistant",
+          agentId: "medical_assistant", // Replace with your actual agent ID from ElevenLabs
         });
         console.log("Started conversation:", conversationId);
       } catch (error) {
@@ -117,24 +116,9 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      const lastAssistantMessage = messages[messages.length - 1];
-      let response: Message = { role: 'assistant', content: '' };
-      let updatedProfile = { ...profileData };
-
-      if (lastAssistantMessage.content.includes("first name")) {
-        updatedProfile.first_name = currentMessage;
-        response.content = "Great! What's your last name?";
-      } else if (lastAssistantMessage.content.includes("last name")) {
-        updatedProfile.last_name = currentMessage;
-        response.content = "When is your date of birth? (MM/DD/YYYY)";
-      } else {
-        response.content = "Thank you! Your profile has been updated.";
-        await updateProfile(updatedProfile);
-        onProfileComplete();
-      }
-
-      setProfileData(updatedProfile);
-      setMessages(prev => [...prev, response]);
+      // Let the ElevenLabs agent handle the conversation flow
+      // The response will come through the onMessage callback
+      await conversation.sendMessage(currentMessage);
     } catch (error: any) {
       toast({
         title: "Error",
