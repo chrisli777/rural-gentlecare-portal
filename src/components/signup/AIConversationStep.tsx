@@ -90,7 +90,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         const conversationId = await conversation.startSession({
-          agentId: "medical_assistant", // Replace with your actual agent ID from ElevenLabs
+          agentId: "sg6ewalyElwtFCXBkUOk", // Using your provided agent ID
         });
         console.log("Started conversation:", conversationId);
       } catch (error) {
@@ -116,9 +116,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      // Let the ElevenLabs agent handle the conversation flow
-      // The response will come through the onMessage callback
-      await conversation.sendMessage(currentMessage);
+      await conversation.sendTextMessage(currentMessage);
     } catch (error: any) {
       toast({
         title: "Error",
