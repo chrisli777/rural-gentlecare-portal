@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { ProfileData } from "@/types/conversation";
+import { MessageList } from "./MessageList";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -22,6 +23,7 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
   const [conversationStarted, setConversationStarted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [showSavedInfo, setShowSavedInfo] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -59,7 +61,7 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
         console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
         setProfileData(prev => {
           const updatedData = { ...prev, [parameters.field]: parameters.value };
-          onProfileUpdate(updatedData); // Send updated data to parent component
+          onProfileUpdate(updatedData);
           return updatedData;
         });
         
@@ -91,12 +93,8 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
 
           if (error) throw error;
 
-          toast({
-            title: "Profile Complete",
-            description: "Your medical profile has been saved successfully.",
-          });
-
-          onProfileComplete();
+          setShowSavedInfo(true);
+          
           return "Profile completed successfully";
         } catch (error: any) {
           console.error("Error completing profile:", error);
@@ -241,6 +239,31 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       setConversationStarted(false);
     }
   };
+
+  if (showSavedInfo) {
+    return (
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Your Saved Information</h3>
+        <div className="space-y-2">
+          <p><strong>Name:</strong> {profileData.first_name} {profileData.last_name}</p>
+          <p><strong>Date of Birth:</strong> {profileData.date_of_birth}</p>
+          <p><strong>Emergency Contact:</strong> {profileData.emergency_contact}</p>
+          <p><strong>Emergency Phone:</strong> {profileData.emergency_phone}</p>
+          <p><strong>Allergies:</strong> {profileData.allergies || 'None'}</p>
+          <p><strong>Current Medications:</strong> {profileData.current_medications || 'None'}</p>
+          <p><strong>Chronic Conditions:</strong> {profileData.chronic_conditions || 'None'}</p>
+        </div>
+        <div className="mt-6 flex justify-end space-x-4">
+          <Button variant="outline" onClick={() => setShowSavedInfo(false)}>
+            Edit Information
+          </Button>
+          <Button onClick={() => onProfileComplete()}>
+            Continue
+          </Button>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-4">

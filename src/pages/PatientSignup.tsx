@@ -3,13 +3,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhoneVerificationStep } from "@/components/signup/PhoneVerificationStep";
 import { AIConversationStep } from "@/components/signup/AIConversationStep";
-import { FileUploadStep } from "@/components/signup/FileUploadStep";
 import { BasicMedicalForm } from "@/components/signup/BasicMedicalForm";
 import { AudioWaveform, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileData } from "@/types/conversation";
 
-type SignupStep = 'phone' | 'method' | 'upload' | 'ai' | 'form';
+type SignupStep = 'phone' | 'method' | 'ai' | 'form';
 
 const PatientSignup = () => {
   const navigate = useNavigate();
@@ -24,21 +23,15 @@ const PatientSignup = () => {
     setStep('method');
   };
 
-  const handleUploadComplete = (data: any) => {
-    setPreviousStep('upload');
-    setFormData(data);
-    setStep('form');
-  };
-
   const handleAIProfileUpdate = (data: ProfileData) => {
     setPreviousStep('ai');
     setFormData(prev => ({ ...prev, ...data }));
     setStep('form');
   };
 
-  const handleMethodChoice = (method: 'upload' | 'ai') => {
+  const handleMethodChoice = () => {
     setPreviousStep('method');
-    setStep(method);
+    setStep('ai');
   };
 
   const handleProfileComplete = () => {
@@ -50,7 +43,6 @@ const PatientSignup = () => {
       case 'form':
         setStep(previousStep);
         break;
-      case 'upload':
       case 'ai':
         setStep('method');
         break;
@@ -79,7 +71,6 @@ const PatientSignup = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             {step === 'phone' && 'Patient Signup'}
             {step === 'method' && 'Choose Profile Setup Method'}
-            {step === 'upload' && 'Upload Medical Documents'}
             {step === 'ai' && 'AI Assistant'}
             {step === 'form' && 'Complete Your Profile'}
           </h2>
@@ -100,25 +91,11 @@ const PatientSignup = () => {
           <div className="space-y-4">
             <Button
               className="w-full h-24 text-lg"
-              onClick={() => handleMethodChoice('upload')}
-            >
-              Upload Medical Documents
-            </Button>
-            <Button
-              className="w-full h-24 text-lg"
-              variant="outline"
-              onClick={() => handleMethodChoice('ai')}
+              onClick={handleMethodChoice}
             >
               Talk to AI Assistant
             </Button>
           </div>
-        )}
-
-        {step === 'upload' && (
-          <FileUploadStep
-            onUploadComplete={handleUploadComplete}
-            onSkip={() => setStep('form')}
-          />
         )}
 
         {step === 'ai' && (
