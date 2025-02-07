@@ -41,8 +41,8 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // Step 1: Process with Donut OCR model
-    console.log('Sending file to Donut OCR API...');
+    // Process with Document OCR model
+    console.log('Sending file for OCR processing...');
     const ocrResponse = await fetch('https://api-inference.huggingface.co/models/naver-clova-ix/donut-base-finetuned-cord-v2', {
       method: 'POST',
       headers: {
@@ -61,7 +61,7 @@ serve(async (req) => {
     const ocrResult = await ocrResponse.json();
     console.log('OCR processing complete. Extracted text:', ocrResult);
 
-    // Step 2: Process with GPT-4o-mini for structured data extraction
+    // Process with gpt-4o-mini for structured data extraction
     console.log('Sending OCR text to GPT for information extraction...');
     const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -74,7 +74,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a medical document analyzer. Extract patient information from the provided OCR text and return it in a structured format. Focus on extracting these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Make sure to format dates as YYYY-MM-DD and return data in JSON format. If a field cannot be found, leave it as an empty string.'
+            content: 'You are a medical document analyzer. Your task is to carefully extract patient information from OCR-processed medical documents. Pay special attention to these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Format dates as YYYY-MM-DD and return data in JSON format. If any field is unclear or missing, leave it as an empty string. Be thorough in your analysis to ensure accurate data extraction.'
           },
           {
             role: 'user',
@@ -98,7 +98,7 @@ serve(async (req) => {
     let extractedData;
     try {
       extractedData = JSON.parse(aiResponse.choices[0].message.content);
-      console.log('Successfully extracted structured data from document');
+      console.log('Successfully extracted structured data from document:', extractedData);
     } catch (e) {
       console.error('Error parsing AI response:', aiResponse.choices[0].message.content);
       throw new Error('Failed to parse AI response');
@@ -138,3 +138,4 @@ serve(async (req) => {
     });
   }
 });
+
