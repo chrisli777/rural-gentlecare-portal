@@ -32,3 +32,45 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           inputs: `<s>[INST]You are a helpful and knowledgeable healthcare assistant. Provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. Use a professional but friendly tone.
+
+${message}[/INST]</s>`,
+          parameters: {
+            max_new_tokens: 500,
+            temperature: 0.7,
+            top_p: 0.95,
+            repetition_penalty: 1.15,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Hugging Face API error:', errorText);
+      throw new Error(`Hugging Face API error: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Hugging Face API response:', data);
+
+    if (!data || !Array.isArray(data) || data.length === 0 || !data[0].generated_text) {
+      console.error('Unexpected API response format:', data);
+      throw new Error('Invalid response format from Hugging Face API');
+    }
+
+    // Extract the assistant's response from the generated text
+    const generatedText = data[0].generated_text;
+    // Remove the system prompt and user message to get only the AI's response
+    const aiResponse = generatedText.split('[/INST]')[1]?.trim() || generatedText;
+
+    return new Response(JSON.stringify({ response: aiResponse }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});
