@@ -5,7 +5,7 @@ import { PhoneVerificationStep } from "@/components/signup/PhoneVerificationStep
 import { AIConversationStep } from "@/components/signup/AIConversationStep";
 import { FileUploadStep } from "@/components/signup/FileUploadStep";
 import { BasicMedicalForm } from "@/components/signup/BasicMedicalForm";
-import { AudioWaveform } from "lucide-react";
+import { AudioWaveform, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type SignupStep = 'phone' | 'method' | 'upload' | 'ai' | 'form';
@@ -34,10 +34,37 @@ const PatientSignup = () => {
     navigate("/patient/dashboard");
   };
 
+  const handleBack = () => {
+    switch (step) {
+      case 'form':
+        setStep(formData ? 'upload' : 'method');
+        break;
+      case 'upload':
+      case 'ai':
+        setStep('method');
+        break;
+      case 'method':
+        setStep('phone');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg animate-fade-in">
-        <div className="text-center">
+        <div className="text-center relative">
+          {step !== 'phone' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute left-0 top-1/2 -translate-y-1/2"
+              onClick={handleBack}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             {step === 'phone' && 'Patient Signup'}
             {step === 'method' && 'Choose Profile Setup Method'}
@@ -121,3 +148,4 @@ const PatientSignup = () => {
 };
 
 export default PatientSignup;
+
