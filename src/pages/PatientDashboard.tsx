@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -191,6 +190,17 @@ const PatientDashboard = () => {
     }
   };
 
+  // Get the current user's ID
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        console.log('Current user ID:', session.user.id);
+      }
+    };
+    getCurrentUser();
+  }, []);
+
   const handleSendMessage = async (textMessage?: string) => {
     const messageToSend = textMessage || message;
     if (!messageToSend.trim()) return;
@@ -201,8 +211,16 @@ const PatientDashboard = () => {
     setMessage("");
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        throw new Error('No authenticated user found');
+      }
+
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { message: messageToSend }
+        body: { 
+          message: messageToSend,
+          userId: session.user.id
+        }
       });
 
       if (error) throw error;
