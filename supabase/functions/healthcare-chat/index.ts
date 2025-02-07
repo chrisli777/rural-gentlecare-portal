@@ -2,7 +2,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const huggingFaceToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,43 +18,51 @@ serve(async (req) => {
     const { message } = await req.json();
     console.log('Received message:', message);
 
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!huggingFaceToken) {
+      throw new Error('Hugging Face API token not configured');
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful and knowledgeable healthcare assistant. Provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. Use a professional but friendly tone.'
+    const response = await fetch(
+      'https://api-inference.huggingface.co/models/deepseek-ai/deepseek-coder-6.7b-instruct',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${huggingFaceToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: `<|system|>You are a helpful and knowledgeable healthcare assistant. Provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. Use a professional but friendly tone.
+
+<|user|>${message}
+
+<|assistant|>`,
+          parameters: {
+            max_new_tokens: 500,
+            temperature: 0.7,
+            top_p: 0.95,
+            repetition_penalty: 1.15,
           },
-          { role: 'user', content: message }
-        ],
-      }),
-    });
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${errorText}`);
+      console.error('Hugging Face API error:', errorText);
+      throw new Error(`Hugging Face API error: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('OpenAI API response:', data);
+    console.log('Hugging Face API response:', data);
 
-    if (!data.choices || !data.choices.length || !data.choices[0].message) {
+    if (!data || !data[0] || !data[0].generated_text) {
       console.error('Unexpected API response format:', data);
-      throw new Error('Invalid response format from OpenAI API');
+      throw new Error('Invalid response format from Hugging Face API');
     }
 
-    const aiResponse = data.choices[0].message.content;
+    // Extract the assistant's response from the generated text
+    const generatedText = data[0].generated_text;
+    const aiResponse = generatedText.split('<|assistant|>')[1]?.trim() || generatedText;
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
