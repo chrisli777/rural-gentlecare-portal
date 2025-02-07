@@ -19,6 +19,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [isRecording, setIsRecording] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
   const conversation = useConversation({
     clientTools: {
@@ -94,6 +95,29 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     }
   });
 
+  useEffect(() => {
+    // Initialize AudioContext
+    const initAudio = async () => {
+      try {
+        const context = new AudioContext({ sampleRate: 24000 });
+        await context.resume();
+        setAudioContext(context);
+        console.log("AudioContext initialized successfully");
+      } catch (error) {
+        console.error("Error initializing AudioContext:", error);
+      }
+    };
+    initAudio();
+
+    return () => {
+      // Cleanup
+      audioContext?.close();
+      if (conversationStarted) {
+        conversation.endSession().catch(console.error);
+      }
+    };
+  }, []);
+
   const updateProfile = async (data: ProfileData) => {
     try {
       const { error } = await supabase
@@ -117,11 +141,23 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
 
   const toggleVoiceRecording = async () => {
     try {
+      if (!audioContext) {
+        console.error("AudioContext not initialized");
+        toast({
+          title: "Error",
+          description: "Audio system not initialized. Please refresh the page.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (!isRecording) {
+        // Request microphone permission and start recording
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         
         if (!conversationStarted) {
+          console.log("Starting new conversation session");
           const conversationId = await conversation.startSession({
             agentId: "sg6ewalyElwtFCXBkUOk",
           });
@@ -131,16 +167,16 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       } else {
         setIsRecording(false);
         if (conversationStarted) {
+          console.log("Ending conversation session");
           await conversation.endSession();
-          console.log("Ended conversation");
           setConversationStarted(false);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error with voice recording:", error);
       toast({
         title: "Error",
-        description: "Could not access microphone or start conversation. Please check your microphone permissions.",
+        description: error.message || "Could not access microphone. Please check your permissions.",
         variant: "destructive",
       });
       setIsRecording(false);
@@ -157,6 +193,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
 
     try {
       if (!conversationStarted) {
+        console.log("Starting new conversation session for text message");
         await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
           messages: [...messages, userMessage]
