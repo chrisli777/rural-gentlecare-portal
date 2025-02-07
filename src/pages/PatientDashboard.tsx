@@ -1,8 +1,7 @@
-
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Calendar, Bot, Send, Loader2 } from "lucide-react";
+import { Calendar, Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -16,10 +15,12 @@ const PatientDashboard = () => {
   const [conversation, setConversation] = useState<{ role: string; content: string }[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your healthcare assistant. How can I help you today?",
+      content: "Hello! I'm your healthcare assistant. How can I help you today? You can type or click the microphone button to speak.",
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -61,17 +62,103 @@ const PatientDashboard = () => {
     fetchAppointments();
   }, [toast]);
 
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const audioChunks: BlobPart[] = [];
+
+      recorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+
+        reader.onload = async () => {
+          if (reader.result && typeof reader.result === 'string') {
+            const base64Audio = reader.result.split(',')[1];
+            
+            try {
+              setIsLoading(true);
+              const { data, error } = await supabase.functions.invoke('voice-to-text', {
+                body: { audio: base64Audio }
+              });
+
+              if (error) throw error;
+
+              if (data.text) {
+                setMessage(data.text);
+                await handleSendMessage(data.text);
+              }
+            } catch (error: any) {
+              console.error('Voice to text error:', error);
+              toast({
+                title: "Error",
+                description: "Failed to convert voice to text. Please try again.",
+                variant: "destructive",
+              });
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        };
+
+        reader.readAsDataURL(audioBlob);
+      };
+
+      setMediaRecorder(recorder);
+      recorder.start();
+      setIsRecording(true);
+
+      toast({
+        title: "Recording Started",
+        description: "Speak clearly into your microphone.",
+      });
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        title: "Error",
+        description: "Could not access microphone. Please check your permissions.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
+      
+      toast({
+        title: "Recording Stopped",
+        description: "Processing your message...",
+      });
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const handleSendMessage = async (textMessage?: string) => {
+    const messageToSend = textMessage || message;
+    if (!messageToSend.trim()) return;
 
     setIsLoading(true);
-    const userMessage = { role: "user", content: message };
+    const userMessage = { role: "user", content: messageToSend };
     setConversation(prev => [...prev, userMessage]);
     setMessage("");
 
     try {
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { message: message }
+        body: { message: messageToSend }
       });
 
       if (error) throw error;
@@ -174,13 +261,27 @@ const PatientDashboard = () => {
                 ))}
               </div>
               <div className="flex gap-2">
+                <Button
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="icon"
+                  onClick={toggleRecording}
+                  disabled={isLoading}
+                  className={isRecording ? 'animate-pulse' : ''}
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
                 <Input
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type your message..."
+                  placeholder={isRecording ? "Recording..." : "Type your message..."}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                  disabled={isLoading || isRecording}
                 />
-                <Button onClick={handleSendMessage} disabled={isLoading}>
+                <Button onClick={() => handleSendMessage()} disabled={isLoading || isRecording}>
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
