@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -200,16 +201,19 @@ const PatientDashboard = () => {
               </Card>
             </Link>
 
-            {/* Upcoming Appointments */}
+            {/* Upcoming Appointments - Modified for better scrolling */}
             <Card className="h-full">
               <CardHeader>
                 <CardTitle>Upcoming Appointments</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4 max-h-[300px] overflow-y-auto">
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {recentAppointments.length > 0 ? (
                     recentAppointments.map((appointment, index) => (
-                      <div key={index} className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg">
+                      <div 
+                        key={index} 
+                        className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
+                      >
                         <div>
                           <p className="font-medium">{appointment.appointment_type}</p>
                           <p className="text-sm text-muted-foreground">
@@ -240,7 +244,7 @@ const PatientDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px] overflow-y-auto space-y-4 mb-4">
+              <div className="h-[400px] overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 {conversation.map((msg, index) => (
                   <div
                     key={index}
