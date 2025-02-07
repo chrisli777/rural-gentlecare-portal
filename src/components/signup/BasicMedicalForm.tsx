@@ -29,9 +29,12 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
   useEffect(() => {
     // Update form data when initialData changes
     if (Object.keys(initialData).length > 0) {
+      console.log("Received initial data:", initialData);
       setFormData(prev => ({
         ...prev,
-        ...initialData
+        ...initialData,
+        // Ensure the date is in the correct format for the input
+        date_of_birth: initialData.date_of_birth ? new Date(initialData.date_of_birth).toISOString().split('T')[0] : '',
       }));
     }
   }, [initialData]);
@@ -79,7 +82,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Input
               id="first_name"
               name="first_name"
-              value={formData.first_name}
+              value={formData.first_name || ''}
               onChange={handleChange}
               required
             />
@@ -90,7 +93,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Input
               id="last_name"
               name="last_name"
-              value={formData.last_name}
+              value={formData.last_name || ''}
               onChange={handleChange}
               required
             />
@@ -102,7 +105,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
               id="date_of_birth"
               name="date_of_birth"
               type="date"
-              value={formData.date_of_birth}
+              value={formData.date_of_birth || ''}
               onChange={handleChange}
               required
             />
@@ -113,7 +116,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Input
               id="emergency_contact"
               name="emergency_contact"
-              value={formData.emergency_contact}
+              value={formData.emergency_contact || ''}
               onChange={handleChange}
               required
             />
@@ -125,7 +128,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
               id="emergency_phone"
               name="emergency_phone"
               type="tel"
-              value={formData.emergency_phone}
+              value={formData.emergency_phone || ''}
               onChange={handleChange}
               required
             />
@@ -138,7 +141,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Textarea
               id="allergies"
               name="allergies"
-              value={formData.allergies}
+              value={formData.allergies || ''}
               onChange={handleChange}
               placeholder="List any allergies..."
             />
@@ -149,7 +152,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Textarea
               id="current_medications"
               name="current_medications"
-              value={formData.current_medications}
+              value={formData.current_medications || ''}
               onChange={handleChange}
               placeholder="List any current medications..."
             />
@@ -160,7 +163,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Textarea
               id="chronic_conditions"
               name="chronic_conditions"
-              value={formData.chronic_conditions}
+              value={formData.chronic_conditions || ''}
               onChange={handleChange}
               placeholder="List any chronic conditions..."
             />
