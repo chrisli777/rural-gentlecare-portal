@@ -30,7 +30,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
@@ -41,10 +41,16 @@ serve(async (req) => {
       }),
     });
 
+    if (!response.ok) {
+      console.error('OpenAI API error:', await response.text());
+      throw new Error('Failed to get response from OpenAI API');
+    }
+
     const data = await response.json();
     console.log('OpenAI API response:', data);
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Invalid response structure from OpenAI:', data);
       throw new Error('Invalid response from OpenAI API');
     }
 
@@ -56,7 +62,8 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in healthcare-chat function:', error);
     return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'An unexpected error occurred'
+      error: error instanceof Error ? error.message : 'An unexpected error occurred',
+      details: error instanceof Error ? error.stack : undefined
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
