@@ -71,7 +71,10 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
       // Process the document with AI
       const { data: processedData, error: processError } = await supabase.functions
         .invoke('process-medical-document', {
-          body: { filePath }
+          body: { filePath },
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
         });
 
       if (processError) throw processError;
@@ -153,3 +156,4 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
     </Card>
   );
 };
+
