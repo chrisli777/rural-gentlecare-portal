@@ -34,8 +34,9 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // Process with Hugging Face OCR model
-    const response = await fetch('https://api-inference.huggingface.co/models/stepfun-ai/GOT-OCR-2.0-hf', {
+    // Step 1: Process with Hugging Face OCR model
+    console.log('Sending file to Hugging Face OCR API...');
+    const ocrResponse = await fetch('https://api-inference.huggingface.co/models/stepfun-ai/GOT-OCR-2.0-hf', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
@@ -46,14 +47,15 @@ serve(async (req) => {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Hugging Face API error: ${response.statusText}`);
+    if (!ocrResponse.ok) {
+      throw new Error(`Hugging Face API error: ${ocrResponse.statusText}`);
     }
 
-    const ocrResult = await response.json();
-    console.log('OCR Result:', ocrResult);
+    const ocrResult = await ocrResponse.json();
+    console.log('OCR processing complete. Extracted text length:', ocrResult.generated_text?.length);
 
-    // Process the OCR result with GPT to extract structured data
+    // Step 2: Use GPT to extract structured data from OCR text
+    console.log('Sending OCR text to GPT for information extraction...');
     const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -65,15 +67,20 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a medical document analyzer. Extract patient information from the provided OCR text and return it in a structured format. Focus on extracting these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Make sure to format dates as YYYY-MM-DD and return data in JSON format.'
+            content: 'You are a medical document analyzer. Extract patient information from the provided OCR text and return it in a structured format. Focus on extracting these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Make sure to format dates as YYYY-MM-DD and return data in JSON format. If a field cannot be found, leave it as an empty string.'
           },
           {
             role: 'user',
-            content: `Please analyze this medical document text and extract patient information in JSON format with the following fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone.\n\nDocument text:\n${ocrResult.generated_text}`
+            content: `Please analyze this medical document text and extract patient information in JSON format:\n\n${ocrResult.generated_text}`
           }
-        ]
+        ],
+        temperature: 0.3, // Lower temperature for more consistent output
       })
     });
+
+    if (!gptResponse.ok) {
+      throw new Error('OpenAI API error');
+    }
 
     const aiResponse = await gptResponse.json();
     
@@ -84,12 +91,13 @@ serve(async (req) => {
     let extractedData;
     try {
       extractedData = JSON.parse(aiResponse.choices[0].message.content);
+      console.log('Successfully extracted structured data from document');
     } catch (e) {
       console.error('Error parsing AI response:', aiResponse.choices[0].message.content);
       throw new Error('Failed to parse AI response');
     }
 
-    // Update the processed_documents table
+    // Update the processed_documents table with extracted data
     const { error: updateError } = await supabase
       .from('processed_documents')
       .update({ processed_data: extractedData })
