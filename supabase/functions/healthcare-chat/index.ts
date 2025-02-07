@@ -23,7 +23,7 @@ serve(async (req) => {
     }
 
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b-chat-hf',
+      'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
       {
         method: 'POST',
         headers: {
@@ -31,11 +31,9 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: `<s>[INST]You are a helpful and knowledgeable healthcare assistant. Provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. Use a professional but friendly tone.
-
-${message}[/INST]</s>`,
+          inputs: `You are a helpful and knowledgeable healthcare assistant. Please provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. User question: ${message}`,
           parameters: {
-            max_new_tokens: 500,
+            max_length: 1000,
             temperature: 0.7,
             top_p: 0.95,
             repetition_penalty: 1.15,
@@ -58,10 +56,7 @@ ${message}[/INST]</s>`,
       throw new Error('Invalid response format from Hugging Face API');
     }
 
-    // Extract the assistant's response from the generated text
-    const generatedText = data[0].generated_text;
-    // Remove the system prompt and user message to get only the AI's response
-    const aiResponse = generatedText.split('[/INST]')[1]?.trim() || generatedText;
+    const aiResponse = data[0].generated_text.trim();
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
