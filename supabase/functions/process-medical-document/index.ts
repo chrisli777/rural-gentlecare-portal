@@ -41,7 +41,7 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // Process with Document OCR model
+    // First, process with Document OCR model
     console.log('Sending file for OCR processing...');
     const ocrResponse = await fetch('https://api-inference.huggingface.co/models/naver-clova-ix/donut-base-finetuned-cord-v2', {
       method: 'POST',
@@ -55,54 +55,93 @@ serve(async (req) => {
     });
 
     if (!ocrResponse.ok) {
-      throw new Error(`Hugging Face API error: ${ocrResponse.statusText}`);
+      throw new Error(`Hugging Face OCR API error: ${ocrResponse.statusText}`);
     }
 
     const ocrResult = await ocrResponse.json();
     console.log('OCR processing complete. Extracted text:', ocrResult);
 
-    // Process with gpt-4o-mini for structured data extraction
-    console.log('Sending OCR text to GPT for information extraction...');
-    const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Now process with FLAN-T5 for structured data extraction
+    console.log('Sending OCR text to FLAN-T5 for information extraction...');
+    const extractionResponse = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a medical document analyzer. Your task is to carefully extract patient information from OCR-processed medical documents. Pay special attention to these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Format dates as YYYY-MM-DD and return data in JSON format. If any field is unclear or missing, leave it as an empty string. Be thorough in your analysis to ensure accurate data extraction.'
-          },
-          {
-            role: 'user',
-            content: `Please analyze this medical document text and extract patient information in JSON format:\n\n${JSON.stringify(ocrResult)}`
-          }
-        ],
-        temperature: 0.3,
+        inputs: `Extract the following information from this medical document in JSON format. Include these fields: first_name, last_name, date_of_birth (YYYY-MM-DD), allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. If any field is unclear or missing, use an empty string. Here's the document text: ${JSON.stringify(ocrResult)}`,
       }),
     });
 
-    if (!gptResponse.ok) {
-      throw new Error('OpenAI API error');
+    if (!extractionResponse.ok) {
+      throw new Error('Hugging Face Extraction API error');
     }
 
-    const aiResponse = await gptResponse.json();
-    
-    if (!aiResponse.choices?.[0]?.message?.content) {
-      throw new Error('No response from AI');
-    }
+    const extractionResult = await extractionResponse.text();
+    console.log('Raw extraction result:', extractionResult);
 
     let extractedData;
     try {
-      extractedData = JSON.parse(aiResponse.choices[0].message.content);
-      console.log('Successfully extracted structured data from document:', extractedData);
+      // Try to parse the response as JSON first
+      extractedData = JSON.parse(extractionResult);
     } catch (e) {
-      console.error('Error parsing AI response:', aiResponse.choices[0].message.content);
-      throw new Error('Failed to parse AI response');
+      // If parsing fails, try to convert the text response into a structured format
+      console.log('Parsing raw text response into structured format');
+      const lines = extractionResult.split('\n');
+      extractedData = {
+        first_name: '',
+        last_name: '',
+        date_of_birth: '',
+        allergies: '',
+        current_medications: '',
+        chronic_conditions: '',
+        emergency_contact: '',
+        emergency_phone: ''
+      };
+
+      lines.forEach(line => {
+        const [key, ...values] = line.split(':').map(s => s.trim());
+        const value = values.join(':').trim();
+        
+        switch (key.toLowerCase()) {
+          case 'first name':
+          case 'firstname':
+            extractedData.first_name = value;
+            break;
+          case 'last name':
+          case 'lastname':
+            extractedData.last_name = value;
+            break;
+          case 'date of birth':
+          case 'dob':
+            // Try to format the date as YYYY-MM-DD
+            const dateMatch = value.match(/\d{4}-\d{2}-\d{2}/);
+            extractedData.date_of_birth = dateMatch ? dateMatch[0] : value;
+            break;
+          case 'allergies':
+            extractedData.allergies = value;
+            break;
+          case 'medications':
+          case 'current medications':
+            extractedData.current_medications = value;
+            break;
+          case 'conditions':
+          case 'chronic conditions':
+            extractedData.chronic_conditions = value;
+            break;
+          case 'emergency contact':
+            extractedData.emergency_contact = value;
+            break;
+          case 'emergency phone':
+          case 'emergency contact phone':
+            extractedData.emergency_phone = value;
+            break;
+        }
+      });
     }
+
+    console.log('Successfully extracted structured data:', extractedData);
 
     // Get user ID from auth context
     const authHeader = req.headers.get('Authorization');
@@ -138,4 +177,3 @@ serve(async (req) => {
     });
   }
 });
-
