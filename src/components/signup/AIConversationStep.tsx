@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { Message } from "@/types/conversation";
@@ -58,7 +59,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   });
 
   useEffect(() => {
-    setMessages(aiMessages);
+    setMessages(aiMessages as Message[]);
   }, [aiMessages]);
 
   useEffect(() => {
@@ -110,7 +111,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   };
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 space-y-4">
       <MessageList messages={messages} />
       <MessageInput
         currentMessage={currentMessage}
@@ -120,6 +121,16 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         handleSendMessage={handleSendMessage}
         toggleVoiceRecording={toggleVoiceRecording}
       />
+      <div className="flex justify-center">
+        <Button 
+          onClick={onProfileComplete}
+          variant="outline"
+          className="w-full max-w-sm"
+        >
+          Continue to Form
+        </Button>
+      </div>
     </Card>
   );
 };
+
