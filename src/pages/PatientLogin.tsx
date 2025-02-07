@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { PhoneForm } from "@/components/login/PhoneForm";
 import { VerificationForm } from "@/components/login/VerificationForm";
+import { Button } from "@/components/ui/button";
 
 const PatientLogin = () => {
   const navigate = useNavigate();
@@ -115,6 +116,14 @@ const PatientLogin = () => {
     }
   };
 
+  const handleGuestLogin = () => {
+    toast({
+      title: "Guest Access",
+      description: "Accessing dashboard as a guest user",
+    });
+    navigate("/patient/dashboard");
+  };
+
   const handleBack = () => {
     setShowVerification(false);
   };
@@ -138,10 +147,29 @@ const PatientLogin = () => {
               isLoading={isLoading}
             />
           ) : (
-            <PhoneForm
-              onSubmit={handlePhoneSubmit}
-              isLoading={isLoading}
-            />
+            <>
+              <PhoneForm
+                onSubmit={handlePhoneSubmit}
+                isLoading={isLoading}
+              />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">
+                    Or continue as
+                  </span>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleGuestLogin}
+              >
+                Guest User
+              </Button>
+            </>
           )}
 
           <div className="text-center space-y-2">
