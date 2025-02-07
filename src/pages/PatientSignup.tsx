@@ -16,23 +16,28 @@ const PatientSignup = () => {
   const [step, setStep] = useState<SignupStep>('phone');
   const [phoneNumber, setPhoneNumber] = useState("");
   const [formData, setFormData] = useState<ProfileData>({});
+  const [previousStep, setPreviousStep] = useState<SignupStep>('method');
 
   const handleVerificationComplete = (phone: string) => {
+    setPreviousStep('phone');
     setPhoneNumber(phone);
     setStep('method');
   };
 
   const handleUploadComplete = (data: any) => {
+    setPreviousStep('upload');
     setFormData(data);
     setStep('form');
   };
 
   const handleAIProfileUpdate = (data: ProfileData) => {
+    setPreviousStep('ai');
     setFormData(prev => ({ ...prev, ...data }));
     setStep('form');
   };
 
   const handleMethodChoice = (method: 'upload' | 'ai') => {
+    setPreviousStep('method');
     setStep(method);
   };
 
@@ -43,7 +48,7 @@ const PatientSignup = () => {
   const handleBack = () => {
     switch (step) {
       case 'form':
-        setStep(formData ? 'upload' : 'method');
+        setStep(previousStep);
         break;
       case 'upload':
       case 'ai':
