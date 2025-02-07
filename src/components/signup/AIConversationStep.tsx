@@ -1,13 +1,13 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useConversation } from "@11labs/react";
-import { MessageList } from "./MessageList";
-import { MessageInput } from "./MessageInput";
-import { Message, ProfileData } from "@/types/conversation";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Mic, MicOff } from "lucide-react";
+import { ProfileData } from "@/types/conversation";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -16,8 +16,6 @@ interface AIConversationStepProps {
 
 export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AIConversationStepProps) => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [isRecording, setIsRecording] = useState(false);
@@ -197,7 +195,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       }
 
       if (!isRecording) {
-        // Start recording
         console.log("Starting voice recording...");
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         console.log("Microphone access granted");
@@ -205,7 +202,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         if (!conversationStarted) {
           console.log("Starting new conversation session");
           await conversation.startSession({
-            agentId: "wMSrAmBurxqAvGQKpCgH", // Updated agent ID
+            agentId: "wMSrAmBurxqAvGQKpCgH",
             userId: userId,
           });
           console.log("Conversation session started");
@@ -218,7 +215,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
           description: "You can now speak with Sarah",
         });
       } else {
-        // Stop recording
         console.log("Stopping voice recording...");
         setIsRecording(false);
         
@@ -246,48 +242,40 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!currentMessage.trim() || !userId) return;
-
-    try {
-      setIsLoading(true);
-      const userMessage: Message = { role: 'user', content: currentMessage };
-      setMessages(prev => [...prev, userMessage]);
-      setCurrentMessage("");
-
-      if (!conversationStarted) {
-        console.log("Starting new conversation session for text message");
-        await conversation.startSession({
-          agentId: "wMSrAmBurxqAvGQKpCgH", // Updated agent ID
-          userId: userId,
-        });
-        setConversationStarted(true);
-      }
-    } catch (error: any) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Error",
-        description: "Failed to process message",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-4">
-      <Card className="p-4">
-        <MessageList messages={messages} />
-        <MessageInput
-          currentMessage={currentMessage}
-          setCurrentMessage={setCurrentMessage}
-          isLoading={isLoading}
-          isRecording={isRecording}
-          handleSendMessage={handleSendMessage}
-          toggleVoiceRecording={toggleVoiceRecording}
-        />
+      <Card className="p-8 flex flex-col items-center justify-center min-h-[400px]">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-semibold mb-2">Talk to Sarah</h2>
+          <p className="text-muted-foreground">Click the button below to start speaking with your AI medical assistant</p>
+        </div>
+        
+        <button
+          onClick={toggleVoiceRecording}
+          className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${
+            isRecording 
+              ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
+              : 'bg-primary hover:bg-primary/90'
+          }`}
+          disabled={isLoading}
+        >
+          <div className="relative">
+            <img
+              src="https://deepinfra.com/elevenlabs/eleven-english-v2/avatar.jpg"
+              alt="Sarah AI Assistant"
+              className="w-full h-full rounded-full object-cover"
+            />
+            <div className={`absolute inset-0 flex items-center justify-center bg-black/40 rounded-full`}>
+              {isRecording ? (
+                <MicOff className="h-12 w-12 text-white" />
+              ) : (
+                <Mic className="h-12 w-12 text-white" />
+              )}
+            </div>
+          </div>
+        </button>
       </Card>
+      
       <Button 
         className="w-full"
         onClick={() => onProfileUpdate(profileData)}
