@@ -16,13 +16,20 @@ serve(async (req) => {
   try {
     const { filePath } = await req.json();
 
-    const supabase = createClient(
+    // Create Supabase client with service role key
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     );
 
     // Get the file from storage
-    const { data: fileData, error: downloadError } = await supabase.storage
+    const { data: fileData, error: downloadError } = await supabaseAdmin.storage
       .from('medical-documents')
       .download(filePath);
 
@@ -74,8 +81,8 @@ serve(async (req) => {
             content: `Please analyze this medical document text and extract patient information in JSON format:\n\n${ocrResult.generated_text}`
           }
         ],
-        temperature: 0.3, // Lower temperature for more consistent output
-      })
+        temperature: 0.3,
+      }),
     });
 
     if (!gptResponse.ok) {
@@ -98,7 +105,7 @@ serve(async (req) => {
     }
 
     // Update the processed_documents table with extracted data
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('processed_documents')
       .update({ processed_data: extractedData })
       .eq('file_path', filePath);
