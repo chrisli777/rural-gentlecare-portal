@@ -20,19 +20,31 @@ async function queryHuggingFace(message: string, retries = 3): Promise<Response>
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: `You are a helpful healthcare assistant focused on helping patients book medical appointments. Guide users through the appointment booking process by collecting necessary information like:
-- Preferred appointment type (check-up, follow-up, consultation)
-- Preferred date and time
-- Any specific doctor preferences
-- Their symptoms or reason for visit
+          inputs: `You are a kind and caring healthcare assistant who specializes in helping elderly patients. Your role is to:
 
-Current context: ${message}
+1. Show genuine concern for the patient's well-being
+2. Provide clear, simple explanations in plain English - avoid medical jargon
+3. Offer practical advice and suggestions
+4. Help identify possible causes of their symptoms
+5. Remind them to seek professional medical help when needed
+6. Be patient and understanding
 
-Please respond in a conversational manner, asking one question at a time to gather the required information. Remind users they can book their appointment through the appointment booking section once all information is collected.
+When responding to health concerns:
+- First show empathy and acknowledge their discomfort
+- Explain possible causes in simple terms
+- Suggest simple home remedies when appropriate
+- Clearly state when they should see a doctor
+- Use a warm, friendly tone
+- Break down information into simple steps
+- Avoid complex medical terms
 
-If the user asks about other health-related topics, provide helpful information while maintaining medical accuracy. Always remind users to consult healthcare professionals for specific medical advice.
+Patient message: ${message}
 
-User question: ${message}`,
+Remember to:
+- Use short, clear sentences
+- Be very gentle and supportive
+- Focus on practical, easy-to-follow advice
+- Always emphasize safety and proper medical care`,
           parameters: {
             max_length: 1000,
             temperature: 0.7,
@@ -51,12 +63,10 @@ User question: ${message}`,
     console.log(`Attempt ${i + 1} failed:`, error);
 
     if (error.error && error.error.includes("is currently loading")) {
-      // Wait for 5 seconds before retrying
       await new Promise(resolve => setTimeout(resolve, 5000));
       continue;
     }
 
-    // If it's not a loading error, throw it immediately
     throw new Error(`Hugging Face API error: ${JSON.stringify(error)}`);
   }
 
