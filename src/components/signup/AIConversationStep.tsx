@@ -91,7 +91,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const toggleVoiceRecording = async () => {
     try {
       if (!isRecording) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         const conversationId = await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
