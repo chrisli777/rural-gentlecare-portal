@@ -85,25 +85,26 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   };
 
   const toggleVoiceRecording = async () => {
-    if (!isRecording) {
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
+    try {
+      if (!isRecording) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         const conversationId = await conversation.startSession({
-          agentId: "sg6ewalyElwtFCXBkUOk", // Using your provided agent ID
+          agentId: "sg6ewalyElwtFCXBkUOk",
         });
         console.log("Started conversation:", conversationId);
-      } catch (error) {
-        console.error("Error starting voice recording:", error);
-        toast({
-          title: "Error",
-          description: "Could not access microphone",
-          variant: "destructive",
-        });
+      } else {
+        setIsRecording(false);
+        await conversation.endSession();
       }
-    } else {
+    } catch (error) {
+      console.error("Error with voice recording:", error);
+      toast({
+        title: "Error",
+        description: "Could not access microphone or start conversation",
+        variant: "destructive",
+      });
       setIsRecording(false);
-      await conversation.endSession();
     }
   };
 
@@ -116,7 +117,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      await conversation.sendTextMessage(currentMessage);
+      await conversation.sendMessage(currentMessage);
     } catch (error: any) {
       toast({
         title: "Error",
