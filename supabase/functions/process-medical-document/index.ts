@@ -41,9 +41,9 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // Step 1: Process with Hugging Face OCR model
-    console.log('Sending file to Hugging Face OCR API...');
-    const ocrResponse = await fetch('https://api-inference.huggingface.co/models/stepfun-ai/GOT-OCR-2.0-hf', {
+    // Step 1: Process with Donut OCR model
+    console.log('Sending file to Donut OCR API...');
+    const ocrResponse = await fetch('https://api-inference.huggingface.co/models/naver-clova-ix/donut-base-finetuned-cord-v2', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
@@ -59,7 +59,7 @@ serve(async (req) => {
     }
 
     const ocrResult = await ocrResponse.json();
-    console.log('OCR processing complete. Extracted text length:', ocrResult.generated_text?.length);
+    console.log('OCR processing complete. Extracted text:', ocrResult);
 
     // Step 2: Process with GPT-4o-mini for structured data extraction
     console.log('Sending OCR text to GPT for information extraction...');
@@ -78,7 +78,7 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: `Please analyze this medical document text and extract patient information in JSON format:\n\n${ocrResult.generated_text}`
+            content: `Please analyze this medical document text and extract patient information in JSON format:\n\n${JSON.stringify(ocrResult)}`
           }
         ],
         temperature: 0.3,
