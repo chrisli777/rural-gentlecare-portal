@@ -7,8 +7,6 @@ import { useConversation } from "@11labs/react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
-import { ProfileData } from "@/types/conversation";
-import { ProfileReview } from "./ProfileReview";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -17,13 +15,11 @@ interface AIConversationStepProps {
 export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [profileData, setProfileData] = useState<ProfileData>({});
   const [isRecording, setIsRecording] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
+  const [conversationEnded, setConversationEnded] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [showReview, setShowReview] = useState(false);
-  const [conversationTranscript, setConversationTranscript] = useState<string[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -57,16 +53,9 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
 
   const conversation = useConversation({
     clientTools: {
-      updateProfile: async (parameters: { field: string; value: any }) => {
-        console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
-        setProfileData(prev => {
-          const updatedData = { ...prev, [parameters.field]: parameters.value };
-          return updatedData;
-        });
-        return "Profile updated successfully";
-      },
       completeProfile: async () => {
-        console.log("Profile complete, data:", profileData);
+        console.log("Profile conversation completed");
+        setConversationEnded(true);
         return "Profile completed successfully";
       }
     },
@@ -77,9 +66,8 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
 
 1. Have a natural conversation to gather basic medical information
 2. Pay attention to what the patient says and extract relevant information
-3. Use the updateProfile function to save information as you understand it
-4. Be flexible and understanding - it's okay if you don't get every detail
-5. When you feel you have enough basic information, let the patient know they can review it
+3. Be flexible and understanding - it's okay if you don't get every detail
+4. When you feel you have enough basic information, let the patient know they can continue to the dashboard
 
 Focus on getting these key details in a conversational way:
 - first_name
@@ -100,9 +88,6 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
         modelId: "eleven_multilingual_v2",
         voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
       }
-    },
-    onMessage: (message) => {
-      setConversationTranscript(prev => [...prev, message.content]);
     }
   });
 
@@ -182,6 +167,7 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
           console.log("Ending conversation session");
           await conversation.endSession();
           setConversationStarted(false);
+          setConversationEnded(true);
           console.log("Conversation session ended");
         }
         
@@ -201,63 +187,6 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
       setConversationStarted(false);
     }
   };
-
-  const handleReviewProfile = async () => {
-    try {
-      if (!userId) throw new Error('No user ID available');
-      setIsLoading(true);
-
-      // Extract information from conversation transcript
-      const fullTranscript = conversationTranscript.join('\n');
-      const { data: extractedData, error: extractionError } = await supabase
-        .rpc('extract_profile_info', {
-          conversation_text: fullTranscript
-        });
-
-      if (extractionError) {
-        console.error("Error extracting profile info:", extractionError);
-        throw extractionError;
-      }
-
-      console.log("Extracted profile data:", extractedData);
-
-      // Merge extracted data with existing profile data
-      const mergedData = {
-        ...profileData,
-        ...extractedData
-      };
-      
-      // Save current data to database before showing review
-      const { error: saveError } = await supabase
-        .from('profiles')
-        .update(mergedData)
-        .eq('id', userId);
-
-      if (saveError) throw saveError;
-      
-      setProfileData(mergedData);
-      setShowReview(true);
-    } catch (error: any) {
-      console.error("Error saving profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save profile. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (showReview) {
-    return (
-      <ProfileReview 
-        initialData={profileData}
-        userId={userId!}
-        onComplete={onProfileComplete}
-      />
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -283,15 +212,17 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
           )}
         </button>
 
-        <Button 
-          onClick={handleReviewProfile}
-          className="mt-8"
-          variant="outline"
-          disabled={isLoading}
-        >
-          {isLoading ? "Processing..." : "Review Your Information"}
-        </Button>
+        {conversationEnded && (
+          <Button 
+            onClick={onProfileComplete}
+            className="mt-8"
+            variant="default"
+          >
+            Continue to Dashboard
+          </Button>
+        )}
       </Card>
     </div>
   );
 };
+
