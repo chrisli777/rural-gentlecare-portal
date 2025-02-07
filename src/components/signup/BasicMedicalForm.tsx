@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,15 +16,25 @@ interface BasicMedicalFormProps {
 
 export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalFormProps) => {
   const [formData, setFormData] = useState<ProfileData>({
-    first_name: initialData.first_name || '',
-    last_name: initialData.last_name || '',
-    date_of_birth: initialData.date_of_birth || '',
-    emergency_contact: initialData.emergency_contact || '',
-    emergency_phone: initialData.emergency_phone || '',
-    allergies: initialData.allergies || '',
-    current_medications: initialData.current_medications || '',
-    chronic_conditions: initialData.chronic_conditions || '',
+    first_name: '',
+    last_name: '',
+    date_of_birth: '',
+    emergency_contact: '',
+    emergency_phone: '',
+    allergies: '',
+    current_medications: '',
+    chronic_conditions: '',
   });
+
+  useEffect(() => {
+    // Update form data when initialData changes
+    if (Object.keys(initialData).length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        ...initialData
+      }));
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +79,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Input
               id="first_name"
               name="first_name"
-              value={formData.first_name as string}
+              value={formData.first_name}
               onChange={handleChange}
               required
             />
@@ -80,7 +90,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Input
               id="last_name"
               name="last_name"
-              value={formData.last_name as string}
+              value={formData.last_name}
               onChange={handleChange}
               required
             />
@@ -92,7 +102,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
               id="date_of_birth"
               name="date_of_birth"
               type="date"
-              value={formData.date_of_birth as string}
+              value={formData.date_of_birth}
               onChange={handleChange}
               required
             />
@@ -103,7 +113,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Input
               id="emergency_contact"
               name="emergency_contact"
-              value={formData.emergency_contact as string}
+              value={formData.emergency_contact}
               onChange={handleChange}
               required
             />
@@ -115,7 +125,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
               id="emergency_phone"
               name="emergency_phone"
               type="tel"
-              value={formData.emergency_phone as string}
+              value={formData.emergency_phone}
               onChange={handleChange}
               required
             />
@@ -128,7 +138,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Textarea
               id="allergies"
               name="allergies"
-              value={formData.allergies as string}
+              value={formData.allergies}
               onChange={handleChange}
               placeholder="List any allergies..."
             />
@@ -139,7 +149,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Textarea
               id="current_medications"
               name="current_medications"
-              value={formData.current_medications as string}
+              value={formData.current_medications}
               onChange={handleChange}
               placeholder="List any current medications..."
             />
@@ -150,7 +160,7 @@ export const BasicMedicalForm = ({ initialData = {}, onComplete }: BasicMedicalF
             <Textarea
               id="chronic_conditions"
               name="chronic_conditions"
-              value={formData.chronic_conditions as string}
+              value={formData.chronic_conditions}
               onChange={handleChange}
               placeholder="List any chronic conditions..."
             />

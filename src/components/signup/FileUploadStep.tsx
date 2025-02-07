@@ -53,6 +53,18 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
 
       if (processError) throw processError;
 
+      if (!processedData?.data) {
+        throw new Error('No data extracted from document');
+      }
+
+      // Update processed_documents record with extracted data
+      const { error: updateError } = await supabase
+        .from('processed_documents')
+        .update({ processed_data: processedData.data })
+        .eq('file_path', filePath);
+
+      if (updateError) throw updateError;
+
       toast({
         title: "Document processed successfully",
         description: "Your medical information has been extracted.",
@@ -60,6 +72,7 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
 
       onUploadComplete(processedData.data);
     } catch (error: any) {
+      console.error('Error processing document:', error);
       toast({
         title: "Processing failed",
         description: error.message,
