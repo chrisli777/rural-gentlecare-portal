@@ -72,8 +72,8 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       tts: {
         modelId: "eleven_multilingual_v2",
         voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
-        stability: 0.5,
-        similarityBoost: 0.75,
+        stability: 0.75,
+        similarityBoost: 0.85,
         style: 0.0,
         useSSML: false
       }
