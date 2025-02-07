@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,19 +14,42 @@ interface FileUploadStepProps {
 
 export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (!session?.user) {
+      toast({
+        title: "Authentication required",
+        description: "Please ensure you are logged in before uploading documents.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
     try {
-      const user = await supabase.auth.getUser();
-      if (!user.data.user) throw new Error('Not authenticated');
-
       // Upload file to storage
       const fileExt = file.name.split('.').pop();
-      const filePath = `${user.data.user.id}/${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `${session.user.id}/${crypto.randomUUID()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('medical-documents')
@@ -38,7 +61,7 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
       const { error: dbError } = await supabase
         .from('processed_documents')
         .insert({
-          user_id: user.data.user.id,
+          user_id: session.user.id,
           file_path: filePath,
           processed_data: {} // This will be populated by the processing function
         });

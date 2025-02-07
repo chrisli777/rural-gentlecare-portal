@@ -115,7 +115,10 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      await conversation.sendTextMessage(currentMessage);
+      await conversation.startSession({
+        agentId: "sg6ewalyElwtFCXBkUOk",
+        messages: [...messages, userMessage]
+      });
     } catch (error: any) {
       toast({
         title: "Error",
