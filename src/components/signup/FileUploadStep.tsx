@@ -40,25 +40,32 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
         .insert({
           user_id: user.data.user.id,
           file_path: filePath,
-          processed_data: {} // This would be populated by a backend process
+          processed_data: {} // This will be populated by the processing function
         });
 
       if (dbError) throw dbError;
 
+      // Process the document with AI
+      const { data: processedData, error: processError } = await supabase.functions
+        .invoke('process-medical-document', {
+          body: { filePath }
+        });
+
+      if (processError) throw processError;
+
       toast({
-        title: "File uploaded successfully",
-        description: "Your medical document has been uploaded and is being processed.",
+        title: "Document processed successfully",
+        description: "Your medical information has been extracted.",
       });
 
-      // For now, we'll just move to the next step
-      // In a real implementation, we'd wait for the document to be processed
-      onUploadComplete({});
+      onUploadComplete(processedData.data);
     } catch (error: any) {
       toast({
-        title: "Upload failed",
+        title: "Processing failed",
         description: error.message,
         variant: "destructive",
       });
+      onSkip(); // Fall back to manual form
     } finally {
       setIsUploading(false);
     }
@@ -89,7 +96,7 @@ export const FileUploadStep = ({ onUploadComplete, onSkip }: FileUploadStepProps
           >
             <Upload className="h-8 w-8 text-gray-400" />
             <span className="text-sm font-medium">
-              {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
+              {isUploading ? "Processing..." : "Click to upload or drag and drop"}
             </span>
             <span className="text-xs text-muted-foreground">
               PDF, DOC, DOCX, JPG, JPEG, PNG (max. 10MB)
