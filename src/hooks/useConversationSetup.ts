@@ -8,8 +8,26 @@ import { toast } from "@/hooks/use-toast";
 export const useConversationSetup = (userId: string | null, onProfileComplete: () => void) => {
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [isConversationEnded, setIsConversationEnded] = useState(false);
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
 
   const conversation = useConversation({
+    onMessage: (message) => {
+      console.log("Received message:", message);
+      if (message.content) {
+        setMessages(prev => [...prev, { 
+          role: message.role, 
+          content: message.content 
+        }]);
+      }
+    },
+    onError: (error) => {
+      console.error("Conversation error:", error);
+      toast({
+        title: "Error",
+        description: "There was an error with the voice conversation. Please try again.",
+        variant: "destructive",
+      });
+    },
     clientTools: {
       updateProfile: async (parameters: { field: string; value: any }) => {
         console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
@@ -101,5 +119,5 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     }
   });
 
-  return { conversation, profileData, isConversationEnded };
+  return { conversation, profileData, isConversationEnded, messages };
 };

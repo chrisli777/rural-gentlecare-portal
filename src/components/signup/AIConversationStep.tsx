@@ -52,10 +52,14 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     checkAuth();
   }, [navigate]);
 
-  const { conversation, isConversationEnded } = useConversationSetup(userId, () => {
+  const { conversation, isConversationEnded, messages: aiMessages } = useConversationSetup(userId, () => {
     console.log("Profile complete, navigating to form");
     onProfileComplete();
   });
+
+  useEffect(() => {
+    setMessages(aiMessages);
+  }, [aiMessages]);
 
   useEffect(() => {
     if (isConversationEnded) {
@@ -104,30 +108,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (conversation) {
-      conversation.onMessage = (message) => {
-        console.log("Received message:", message);
-        if (message.content) {
-          setMessages(prev => [...prev, { 
-            role: message.role, 
-            content: message.content 
-          }]);
-        }
-      };
-
-      conversation.onError = (error) => {
-        console.error("Conversation error:", error);
-        toast({
-          title: "Error",
-          description: "There was an error with the voice conversation. Please try again.",
-          variant: "destructive",
-        });
-        setConversationStarted(false);
-      };
-    }
-  }, [conversation, setConversationStarted]);
 
   return (
     <Card className="p-4">
