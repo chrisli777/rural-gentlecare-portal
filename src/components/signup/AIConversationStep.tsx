@@ -17,7 +17,6 @@ interface AIConversationStepProps {
 
 export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProps) => {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -52,7 +51,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     checkAuth();
   }, [navigate]);
 
-  const { conversation } = useConversationSetup(userId, onProfileComplete);
+  const { conversation, messages } = useConversationSetup(userId, onProfileComplete);
   const audioContext = useAudioContext();
   const { isRecording, conversationStarted, toggleVoiceRecording, setConversationStarted } = 
     useVoiceRecording(userId, conversation);
@@ -71,7 +70,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     try {
       setIsLoading(true);
       const userMessage: Message = { role: 'user', content: currentMessage };
-      setMessages(prev => [...prev, userMessage]);
       setCurrentMessage("");
 
       if (!conversationStarted) {
@@ -93,30 +91,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (conversation) {
-      conversation.onMessage = (message) => {
-        console.log("Received message:", message);
-        if (message.content) {
-          setMessages(prev => [...prev, { 
-            role: message.role, 
-            content: message.content 
-          }]);
-        }
-      };
-
-      conversation.onError = (error) => {
-        console.error("Conversation error:", error);
-        toast({
-          title: "Error",
-          description: "There was an error with the voice conversation. Please try again.",
-          variant: "destructive",
-        });
-        setConversationStarted(false);
-      };
-    }
-  }, [conversation]);
 
   return (
     <Card className="p-4">
