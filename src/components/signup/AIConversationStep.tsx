@@ -147,7 +147,7 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
         if (!conversationStarted) {
           console.log("Starting new conversation session");
           await conversation.startSession({
-            agentId: "wMSrAmBurxqAvGQKpCgH",
+            agentId: "TnwIxSktmaUK3EAqZ6fb",
             userId: userId,
           });
           console.log("Conversation session started");
