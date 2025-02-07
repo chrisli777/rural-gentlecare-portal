@@ -17,12 +17,6 @@ serve(async (req) => {
   try {
     const { message } = await req.json();
 
-    if (!message) {
-      throw new Error('Message is required');
-    }
-
-    console.log('Sending request to OpenAI with message:', message);
-
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -41,31 +35,15 @@ serve(async (req) => {
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API error response:', errorText);
-      throw new Error(`OpenAI API error: ${errorText}`);
-    }
-
     const data = await response.json();
-    console.log('OpenAI API response:', data);
-
-    if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid response structure from OpenAI:', data);
-      throw new Error('Invalid response structure from OpenAI API');
-    }
-
     const aiResponse = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error in healthcare-chat function:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'An unexpected error occurred',
-      details: error instanceof Error ? error.stack : undefined
-    }), {
+    console.error('Error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

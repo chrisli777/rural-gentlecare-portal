@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
@@ -7,8 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -40,11 +37,9 @@ const PatientAppointment = () => {
   const [appointmentType, setAppointmentType] = useState("");
   const [selectedClinic, setSelectedClinic] = useState("");
   const [notificationMethods, setNotificationMethods] = useState<string[]>(["app"]);
-  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  const handleBookAppointment = async () => {
+  const handleBookAppointment = () => {
     if (!date || !selectedDoctor || !selectedTime || !appointmentType || notificationMethods.length === 0) {
       toast({
         title: "Missing Information",
@@ -55,54 +50,11 @@ const PatientAppointment = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to book an appointment",
-          variant: "destructive",
-          className: "left-0 right-auto",
-        });
-        navigate("/patient/login");
-        return;
-      }
-
-      const { error } = await supabase
-        .from('appointments')
-        .insert({
-          patient_id: user.id,
-          doctor_id: parseInt(selectedDoctor),
-          clinic_id: appointmentType === "in-person" ? parseInt(selectedClinic) : null,
-          appointment_type: appointmentType,
-          appointment_date: date.toISOString().split('T')[0],
-          appointment_time: selectedTime,
-          notification_methods: notificationMethods,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Appointment Booked",
-        description: "Your appointment has been successfully scheduled",
-        className: "left-0 right-auto",
-      });
-
-      // Redirect to dashboard after successful booking
-      navigate("/patient/dashboard");
-    } catch (error: any) {
-      toast({
-        title: "Booking Failed",
-        description: error.message || "Failed to book appointment. Please try again.",
-        variant: "destructive",
-        className: "left-0 right-auto",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    toast({
+      title: "Appointment Booked",
+      description: "Your appointment has been successfully scheduled",
+      className: "left-0 right-auto",
+    });
   };
 
   return (
@@ -209,9 +161,8 @@ const PatientAppointment = () => {
               <Button
                 className="w-full"
                 onClick={handleBookAppointment}
-                disabled={isLoading}
               >
-                {isLoading ? "Booking..." : "Book Appointment"}
+                Book Appointment
               </Button>
             </div>
           </Card>
