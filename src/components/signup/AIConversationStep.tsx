@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,31 +47,27 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-
-  const updateProfileField = async (field: keyof ProfileData, value: ProfileFieldValue) => {
-    const updatedProfile = { ...profileData, [field]: value };
-    setProfileData(updatedProfile);
-    await updateProfile(updatedProfile);
-    return "Profile updated successfully";
-  };
 
   const conversation = useConversation({
     clientTools: {
-      updateProfile: updateProfileField
+      updateProfile: async (parameters: { field: keyof ProfileData; value: ProfileFieldValue }) => {
+        const updatedProfile = { ...profileData };
+        updatedProfile[parameters.field] = parameters.value;
+        setProfileData(updatedProfile);
+        await updateProfile(updatedProfile);
+        return "Profile updated successfully";
+      }
     },
     overrides: {
       agent: {
         prompt: {
           prompt: "You are a helpful medical assistant collecting patient information. Ask simple, clear questions one at a time to gather essential medical information. Start with basic details like name and date of birth, then move on to medical history, allergies, and current medications. Be friendly but professional.",
-          model: "eleven_turbo_v2"
         },
         firstMessage: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?",
         language: "en",
       },
       tts: {
-        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah's voice
-        model: "eleven_turbo_v2"
+        voiceId: "EXAVITQu4vr4xnSDxMaL"
       }
     },
     onMessage: (message) => {
@@ -97,21 +94,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
       content: "Hi! I'm your medical assistant, and I'll help you complete your profile. Let's start with your name. What's your first name?"
     };
     setMessages([initialMessage]);
-
-    // Check for microphone permission
-    checkMicrophonePermission();
   }, []);
-
-  const checkMicrophonePermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop()); // Stop the stream after checking
-      setHasPermission(true);
-    } catch (error) {
-      console.error("Error checking microphone permission:", error);
-      setHasPermission(false);
-    }
-  };
 
   const updateProfile = async (data: ProfileData) => {
     try {
@@ -166,13 +149,17 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const toggleVoiceRecording = async () => {
     if (!isRecording) {
       try {
-        await conversation.startSession({ agentId: "eleven_labs_demo" });
+        await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
-      } catch (error: any) {
+        const conversationId = await conversation.startSession({
+          agentId: "medical_assistant", // Use your actual agent ID from ElevenLabs
+        });
+        console.log("Started conversation:", conversationId);
+      } catch (error) {
         console.error("Error starting voice recording:", error);
         toast({
-          title: "Voice Chat Error",
-          description: "There was an error starting the voice conversation. Please try again.",
+          title: "Error",
+          description: "Could not access microphone",
           variant: "destructive",
         });
       }
@@ -191,6 +178,8 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
+      // TODO: Replace with actual AI integration
+      // For now, using a simple mock response
       const lastAssistantMessage = messages[messages.length - 1];
       let response: Message = { role: 'assistant', content: '' };
       let updatedProfile = { ...profileData };
@@ -282,13 +271,11 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
           size="icon"
           onClick={toggleVoiceRecording}
           className={isRecording ? 'bg-red-100' : ''}
-          title={hasPermission === false ? "Microphone access denied" : "Toggle voice chat"}
-          disabled={hasPermission === false}
         >
           {isRecording ? (
             <MicOff className="h-4 w-4" />
           ) : (
-            <Mic className={`h-4 w-4 ${hasPermission === false ? 'text-red-500' : ''}`} />
+            <Mic className="h-4 w-4" />
           )}
         </Button>
         <Input
