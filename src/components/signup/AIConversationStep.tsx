@@ -23,6 +23,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [showReview, setShowReview] = useState(false);
+  const [conversationTranscript, setConversationTranscript] = useState<string[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -99,6 +100,9 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
         modelId: "eleven_multilingual_v2",
         voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
       }
+    },
+    onMessage: (message) => {
+      setConversationTranscript(prev => [...prev, message.content]);
     }
   });
 
@@ -201,15 +205,37 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
   const handleReviewProfile = async () => {
     try {
       if (!userId) throw new Error('No user ID available');
+      setIsLoading(true);
+
+      // Extract information from conversation transcript
+      const fullTranscript = conversationTranscript.join('\n');
+      const { data: extractedData, error: extractionError } = await supabase
+        .rpc('extract_profile_info', {
+          conversation_text: fullTranscript
+        });
+
+      if (extractionError) {
+        console.error("Error extracting profile info:", extractionError);
+        throw extractionError;
+      }
+
+      console.log("Extracted profile data:", extractedData);
+
+      // Merge extracted data with existing profile data
+      const mergedData = {
+        ...profileData,
+        ...extractedData
+      };
       
       // Save current data to database before showing review
-      const { error } = await supabase
+      const { error: saveError } = await supabase
         .from('profiles')
-        .update(profileData)
+        .update(mergedData)
         .eq('id', userId);
 
-      if (error) throw error;
+      if (saveError) throw saveError;
       
+      setProfileData(mergedData);
       setShowReview(true);
     } catch (error: any) {
       console.error("Error saving profile:", error);
@@ -218,6 +244,8 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
         description: "Failed to save profile. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -259,8 +287,9 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
           onClick={handleReviewProfile}
           className="mt-8"
           variant="outline"
+          disabled={isLoading}
         >
-          Review Your Information
+          {isLoading ? "Processing..." : "Review Your Information"}
         </Button>
       </Card>
     </div>
