@@ -178,6 +178,10 @@ export type Database = {
         }
         Returns: Json
       }
+      set_huggingface_token: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
