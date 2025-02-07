@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { ProfileData } from "@/types/conversation";
+import { ProfileReview } from "./ProfileReview";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -21,7 +22,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [conversationStarted, setConversationStarted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [showSavedInfo, setShowSavedInfo] = useState(false);
+  const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -61,47 +62,11 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
           const updatedData = { ...prev, [parameters.field]: parameters.value };
           return updatedData;
         });
-        
-        try {
-          if (!userId) throw new Error('No user ID available');
-          
-          const { error } = await supabase
-            .from('profiles')
-            .update({ [parameters.field]: parameters.value })
-            .eq('id', userId);
-
-          if (error) throw error;
-          
-          return "Profile updated successfully";
-        } catch (error: any) {
-          console.error("Error updating profile:", error);
-          return "Failed to update profile";
-        }
+        return "Profile updated successfully";
       },
       completeProfile: async () => {
         console.log("Profile complete, data:", profileData);
-        try {
-          if (!userId) throw new Error('No user ID available');
-
-          const { error } = await supabase
-            .from('profiles')
-            .update(profileData)
-            .eq('id', userId);
-
-          if (error) throw error;
-
-          setShowSavedInfo(true);
-          
-          return "Profile completed successfully";
-        } catch (error: any) {
-          console.error("Error completing profile:", error);
-          toast({
-            title: "Error",
-            description: "Failed to save profile. Please try again.",
-            variant: "destructive",
-          });
-          return "Failed to complete profile";
-        }
+        return "Profile completed successfully";
       }
     },
     overrides: {
@@ -109,23 +74,23 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         prompt: {
           prompt: `You are Sarah, a friendly and professional medical assistant helping patients complete their medical profile. Your role is to:
 
-1. Gather essential medical information through natural conversation
-2. Ask one question at a time, waiting for the patient's response
-3. Confirm information before moving to the next question
-4. Use the updateProfile function to save each piece of information immediately after confirmation
-5. When all essential information is collected, use completeProfile function
+1. Have a natural conversation to gather basic medical information
+2. Pay attention to what the patient says and extract relevant information
+3. Use the updateProfile function to save information as you understand it
+4. Be flexible and understanding - it's okay if you don't get every detail
+5. When you feel you have enough basic information, let the patient know they can review it
 
-Essential information to collect:
+Focus on getting these key details in a conversational way:
 - first_name
 - last_name
-- date_of_birth (format: YYYY-MM-DD)
-- emergency_contact (full name)
+- date_of_birth (any format is fine)
+- emergency_contact
 - emergency_phone
-- allergies (if any)
-- current_medications (if any)
-- chronic_conditions (if any)
+- allergies
+- current_medications
+- chronic_conditions
 
-Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification.`,
+Be friendly and conversational. Don't be too rigid about information formats.`,
         },
         firstMessage: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
         language: "en",
@@ -133,10 +98,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       tts: {
         modelId: "eleven_multilingual_v2",
         voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
-        stability: 0.75,
-        similarityBoost: 0.85,
-        style: 0.0,
-        useSSML: false
       }
     }
   });
@@ -237,25 +198,36 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     }
   };
 
-  if (showSavedInfo) {
+  const handleReviewProfile = async () => {
+    try {
+      if (!userId) throw new Error('No user ID available');
+      
+      // Save current data to database before showing review
+      const { error } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('id', userId);
+
+      if (error) throw error;
+      
+      setShowReview(true);
+    } catch (error: any) {
+      console.error("Error saving profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (showReview) {
     return (
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Your Saved Information</h3>
-        <div className="space-y-2">
-          <p><strong>Name:</strong> {profileData.first_name} {profileData.last_name}</p>
-          <p><strong>Date of Birth:</strong> {profileData.date_of_birth}</p>
-          <p><strong>Emergency Contact:</strong> {profileData.emergency_contact}</p>
-          <p><strong>Emergency Phone:</strong> {profileData.emergency_phone}</p>
-          <p><strong>Allergies:</strong> {profileData.allergies || 'None'}</p>
-          <p><strong>Current Medications:</strong> {profileData.current_medications || 'None'}</p>
-          <p><strong>Chronic Conditions:</strong> {profileData.chronic_conditions || 'None'}</p>
-        </div>
-        <div className="mt-6 flex justify-end">
-          <Button onClick={onProfileComplete}>
-            Continue to Dashboard
-          </Button>
-        </div>
-      </Card>
+      <ProfileReview 
+        initialData={profileData}
+        userId={userId!}
+        onComplete={onProfileComplete}
+      />
     );
   }
 
@@ -282,8 +254,15 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
             <Mic className="h-12 w-12 text-white" />
           )}
         </button>
+
+        <Button 
+          onClick={handleReviewProfile}
+          className="mt-8"
+          variant="outline"
+        >
+          Review Your Information
+        </Button>
       </Card>
     </div>
   );
 };
-
