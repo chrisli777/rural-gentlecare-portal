@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Calendar, MessageSquare, User, Bot, Send, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { format } from "date-fns";
 
 const PatientDashboard = () => {
   const [message, setMessage] = useState("");
@@ -19,7 +20,47 @@ const PatientDashboard = () => {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
   const { toast } = useToast();
+
+  // Fetch recent appointments
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const { data: appointments, error } = await supabase
+          .from('appointments')
+          .select('*')
+          .order('appointment_date', { ascending: true })
+          .limit(3);
+
+        if (error) throw error;
+
+        if (appointments) {
+          setRecentAppointments(appointments);
+          
+          // Add appointment notifications to conversation
+          const appointmentMessages = appointments.map(apt => ({
+            role: "assistant",
+            content: `You have an appointment scheduled for ${format(new Date(apt.appointment_date), 'PPP')} at ${apt.appointment_time}. Type: ${apt.appointment_type}`
+          }));
+          
+          setConversation(prev => [
+            prev[0],
+            ...appointmentMessages
+          ]);
+        }
+      } catch (error: any) {
+        console.error('Error fetching appointments:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch appointments",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchAppointments();
+  }, [toast]);
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -96,6 +137,34 @@ const PatientDashboard = () => {
             </Link>
           </div>
         </section>
+
+        {/* Recent Appointments Section */}
+        {recentAppointments.length > 0 && (
+          <section className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming Appointments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentAppointments.map((appointment, index) => (
+                    <div key={index} className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg">
+                      <div>
+                        <p className="font-medium">{appointment.appointment_type}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                        {appointment.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Chatbot Section */}
         <section className="mb-8">
