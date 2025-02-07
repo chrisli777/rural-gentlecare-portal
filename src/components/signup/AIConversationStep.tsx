@@ -117,7 +117,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      await conversation.sendMessage(currentMessage);
+      await conversation.sendTextMessage(currentMessage);
     } catch (error: any) {
       toast({
         title: "Error",
