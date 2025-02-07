@@ -3,34 +3,19 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhoneVerificationStep } from "@/components/signup/PhoneVerificationStep";
 import { AIConversationStep } from "@/components/signup/AIConversationStep";
-import { BasicMedicalForm } from "@/components/signup/BasicMedicalForm";
 import { AudioWaveform, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileData } from "@/types/conversation";
 
-type SignupStep = 'phone' | 'method' | 'ai' | 'form';
+type SignupStep = 'phone' | 'ai';
 
 const PatientSignup = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<SignupStep>('phone');
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [formData, setFormData] = useState<ProfileData>({});
-  const [previousStep, setPreviousStep] = useState<SignupStep>('method');
 
   const handleVerificationComplete = (phone: string) => {
-    setPreviousStep('phone');
     setPhoneNumber(phone);
-    setStep('method');
-  };
-
-  const handleAIProfileUpdate = (data: ProfileData) => {
-    setPreviousStep('ai');
-    setFormData(prev => ({ ...prev, ...data }));
-    setStep('form');
-  };
-
-  const handleMethodChoice = () => {
-    setPreviousStep('method');
     setStep('ai');
   };
 
@@ -39,18 +24,8 @@ const PatientSignup = () => {
   };
 
   const handleBack = () => {
-    switch (step) {
-      case 'form':
-        setStep(previousStep);
-        break;
-      case 'ai':
-        setStep('method');
-        break;
-      case 'method':
-        setStep('phone');
-        break;
-      default:
-        break;
+    if (step === 'ai') {
+      setStep('phone');
     }
   };
 
@@ -70,15 +45,11 @@ const PatientSignup = () => {
           )}
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             {step === 'phone' && 'Patient Signup'}
-            {step === 'method' && 'Choose Profile Setup Method'}
             {step === 'ai' && 'AI Assistant'}
-            {step === 'form' && 'Complete Your Profile'}
           </h2>
           <p className="text-muted-foreground">
             {step === 'phone'
               ? 'Welcome to Adams County Rural Health Clinic'
-              : step === 'method'
-              ? 'Choose how you would like to set up your profile'
               : 'Please provide your medical information'}
           </p>
         </div>
@@ -87,29 +58,8 @@ const PatientSignup = () => {
           <PhoneVerificationStep onVerificationComplete={handleVerificationComplete} />
         )}
 
-        {step === 'method' && (
-          <div className="space-y-4">
-            <Button
-              className="w-full h-24 text-lg"
-              onClick={handleMethodChoice}
-            >
-              Talk to AI Assistant
-            </Button>
-          </div>
-        )}
-
         {step === 'ai' && (
-          <AIConversationStep 
-            onProfileComplete={handleProfileComplete}
-            onProfileUpdate={handleAIProfileUpdate}
-          />
-        )}
-
-        {step === 'form' && (
-          <BasicMedicalForm
-            initialData={formData}
-            onComplete={handleProfileComplete}
-          />
+          <AIConversationStep onProfileComplete={handleProfileComplete} />
         )}
 
         <div className="text-center space-y-2">
@@ -139,3 +89,4 @@ const PatientSignup = () => {
 };
 
 export default PatientSignup;
+

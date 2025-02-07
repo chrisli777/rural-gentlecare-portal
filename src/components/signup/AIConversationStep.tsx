@@ -8,14 +8,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 import { ProfileData } from "@/types/conversation";
-import { MessageList } from "./MessageList";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
-  onProfileUpdate: (data: ProfileData) => void;
 }
 
-export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AIConversationStepProps) => {
+export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({});
@@ -61,7 +59,6 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
         console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
         setProfileData(prev => {
           const updatedData = { ...prev, [parameters.field]: parameters.value };
-          onProfileUpdate(updatedData);
           return updatedData;
         });
         
@@ -253,12 +250,9 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
           <p><strong>Current Medications:</strong> {profileData.current_medications || 'None'}</p>
           <p><strong>Chronic Conditions:</strong> {profileData.chronic_conditions || 'None'}</p>
         </div>
-        <div className="mt-6 flex justify-end space-x-4">
-          <Button variant="outline" onClick={() => setShowSavedInfo(false)}>
-            Edit Information
-          </Button>
-          <Button onClick={() => onProfileComplete()}>
-            Continue
+        <div className="mt-6 flex justify-end">
+          <Button onClick={onProfileComplete}>
+            Continue to Dashboard
           </Button>
         </div>
       </Card>
@@ -289,13 +283,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
           )}
         </button>
       </Card>
-      
-      <Button 
-        className="w-full"
-        onClick={() => onProfileUpdate(profileData)}
-      >
-        Continue to Form
-      </Button>
     </div>
   );
 };
+
