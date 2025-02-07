@@ -92,25 +92,29 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         variant: "destructive",
       });
       setIsRecording(false);
+      setConversationStarted(false);
     }
   });
 
   useEffect(() => {
-    // Initialize AudioContext
     const initAudio = async () => {
       try {
-        const context = new AudioContext({ sampleRate: 24000 });
+        const context = new AudioContext();
         await context.resume();
         setAudioContext(context);
         console.log("AudioContext initialized successfully");
       } catch (error) {
         console.error("Error initializing AudioContext:", error);
+        toast({
+          title: "Error",
+          description: "Could not initialize audio system. Please check your browser settings.",
+          variant: "destructive",
+        });
       }
     };
     initAudio();
 
     return () => {
-      // Cleanup
       audioContext?.close();
       if (conversationStarted) {
         conversation.endSession().catch(console.error);
@@ -152,25 +156,41 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       }
 
       if (!isRecording) {
-        // Request microphone permission and start recording
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        setIsRecording(true);
+        // Start recording
+        console.log("Starting voice recording...");
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("Microphone access granted");
         
         if (!conversationStarted) {
           console.log("Starting new conversation session");
-          const conversationId = await conversation.startSession({
+          await conversation.startSession({
             agentId: "sg6ewalyElwtFCXBkUOk",
           });
-          console.log("Started conversation with ID:", conversationId);
+          console.log("Conversation session started");
           setConversationStarted(true);
         }
+        
+        setIsRecording(true);
+        toast({
+          title: "Recording Started",
+          description: "You can now speak with Sarah",
+        });
       } else {
+        // Stop recording
+        console.log("Stopping voice recording...");
         setIsRecording(false);
+        
         if (conversationStarted) {
           console.log("Ending conversation session");
           await conversation.endSession();
           setConversationStarted(false);
+          console.log("Conversation session ended");
         }
+        
+        toast({
+          title: "Recording Stopped",
+          description: "Voice interaction ended",
+        });
       }
     } catch (error: any) {
       console.error("Error with voice recording:", error);
@@ -180,6 +200,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         variant: "destructive",
       });
       setIsRecording(false);
+      setConversationStarted(false);
     }
   };
 
@@ -196,7 +217,6 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         console.log("Starting new conversation session for text message");
         await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
-          messages: [...messages, userMessage]
         });
         setConversationStarted(true);
       }
