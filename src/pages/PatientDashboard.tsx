@@ -45,23 +45,31 @@ const PatientDashboard = () => {
           console.log('Fetched appointments:', appointments);
           // Sort appointments by date and time
           const sortedAppointments = appointments.sort((a, b) => {
-            const dateA = new Date(`${a.appointment_date} ${a.appointment_time}`);
-            const dateB = new Date(`${b.appointment_date} ${b.appointment_time}`);
-            return dateA.getTime() - dateB.getTime();
+            const dateTimeA = new Date(`${a.appointment_date} ${a.appointment_time}`);
+            const dateTimeB = new Date(`${b.appointment_date} ${b.appointment_time}`);
+            return dateTimeA.getTime() - dateTimeB.getTime();
           });
           
           setRecentAppointments(sortedAppointments);
           
-          // Add appointment notifications to conversation
+          // Add appointment notifications to conversation without replacing existing messages
           const appointmentMessages = sortedAppointments.map(apt => ({
             role: "assistant",
             content: `You have an appointment scheduled for ${format(new Date(apt.appointment_date), 'PPP')} at ${apt.appointment_time}. Type: ${apt.appointment_type}`
           }));
           
-          setConversation(prev => [
-            prev[0],
-            ...appointmentMessages
-          ]);
+          setConversation(prev => {
+            const initialGreeting = prev.find(msg => msg.role === "assistant" && msg.content.includes("Hello! I'm your healthcare assistant"));
+            const nonAppointmentMessages = prev.filter(msg => 
+              msg.role !== "assistant" || 
+              (!msg.content.includes("You have an appointment scheduled"))
+            );
+            return [
+              initialGreeting || prev[0],
+              ...appointmentMessages,
+              ...nonAppointmentMessages.slice(1)
+            ];
+          });
         }
       } catch (error: any) {
         console.error('Error fetching appointments:', error);
@@ -85,8 +93,8 @@ const PatientDashboard = () => {
           schema: 'public',
           table: 'appointments'
         },
-        () => {
-          console.log('Appointment change detected, refreshing...');
+        (payload) => {
+          console.log('Appointment change detected:', payload);
           fetchAppointments();
         }
       )
