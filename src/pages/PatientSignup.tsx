@@ -1,17 +1,33 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhoneVerificationStep } from "@/components/signup/PhoneVerificationStep";
 import { AIConversationStep } from "@/components/signup/AIConversationStep";
+import { FileUploadStep } from "@/components/signup/FileUploadStep";
+import { BasicMedicalForm } from "@/components/signup/BasicMedicalForm";
 import { AudioWaveform } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+type SignupStep = 'phone' | 'method' | 'upload' | 'ai' | 'form';
 
 const PatientSignup = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState<'phone' | 'ai'>('phone');
+  const [step, setStep] = useState<SignupStep>('phone');
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [formData, setFormData] = useState({});
 
   const handleVerificationComplete = (phone: string) => {
     setPhoneNumber(phone);
-    setStep('ai');
+    setStep('method');
+  };
+
+  const handleUploadComplete = (data: any) => {
+    setFormData(data);
+    setStep('form');
+  };
+
+  const handleMethodChoice = (method: 'upload' | 'ai') => {
+    setStep(method);
   };
 
   const handleProfileComplete = () => {
@@ -23,19 +39,59 @@ const PatientSignup = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg animate-fade-in">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            {step === 'phone' ? 'Patient Signup' : 'Complete Your Profile'}
+            {step === 'phone' && 'Patient Signup'}
+            {step === 'method' && 'Choose Profile Setup Method'}
+            {step === 'upload' && 'Upload Medical Documents'}
+            {step === 'ai' && 'AI Assistant'}
+            {step === 'form' && 'Complete Your Profile'}
           </h2>
           <p className="text-muted-foreground">
             {step === 'phone'
               ? 'Welcome to Adams County Rural Health Clinic'
-              : 'Let our AI assistant help you complete your profile'}
+              : step === 'method'
+              ? 'Choose how you would like to set up your profile'
+              : 'Please provide your medical information'}
           </p>
         </div>
 
-        {step === 'phone' ? (
+        {step === 'phone' && (
           <PhoneVerificationStep onVerificationComplete={handleVerificationComplete} />
-        ) : (
+        )}
+
+        {step === 'method' && (
+          <div className="space-y-4">
+            <Button
+              className="w-full h-24 text-lg"
+              onClick={() => handleMethodChoice('upload')}
+            >
+              Upload Medical Documents
+            </Button>
+            <Button
+              className="w-full h-24 text-lg"
+              variant="outline"
+              onClick={() => handleMethodChoice('ai')}
+            >
+              Talk to AI Assistant
+            </Button>
+          </div>
+        )}
+
+        {step === 'upload' && (
+          <FileUploadStep
+            onUploadComplete={handleUploadComplete}
+            onSkip={() => setStep('form')}
+          />
+        )}
+
+        {step === 'ai' && (
           <AIConversationStep onProfileComplete={handleProfileComplete} />
+        )}
+
+        {step === 'form' && (
+          <BasicMedicalForm
+            initialData={formData}
+            onComplete={handleProfileComplete}
+          />
         )}
 
         <div className="text-center space-y-2">

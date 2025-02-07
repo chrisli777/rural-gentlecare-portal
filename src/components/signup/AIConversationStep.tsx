@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useConversation } from "@11labs/react";
-import { ProfilePhotoUpload } from "./ProfilePhotoUpload";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { Message, ProfileData } from "@/types/conversation";
@@ -19,7 +18,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [isRecording, setIsRecording] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const conversation = useConversation({
     clientTools: {
@@ -131,15 +129,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
 
   return (
     <Card className="p-4">
-      <div className="mb-4 flex justify-center space-x-4">
-        <ProfilePhotoUpload
-          profileData={profileData}
-          setProfileData={setProfileData}
-          previewUrl={previewUrl}
-          setPreviewUrl={setPreviewUrl}
-        />
-      </div>
-
       <MessageList messages={messages} />
 
       <MessageInput
