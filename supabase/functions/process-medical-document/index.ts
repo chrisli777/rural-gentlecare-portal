@@ -34,8 +34,27 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // Process with GPT-4
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Process with Hugging Face OCR model
+    const response = await fetch('https://api-inference.huggingface.co/models/stepfun-ai/GOT-OCR-2.0-hf', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('HUGGING_FACE_ACCESS_TOKEN')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: base64File,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Hugging Face API error: ${response.statusText}`);
+    }
+
+    const ocrResult = await response.json();
+    console.log('OCR Result:', ocrResult);
+
+    // Process the OCR result with GPT to extract structured data
+    const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
@@ -46,28 +65,17 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a medical document analyzer. Extract patient information from the provided document and return it in a structured format. Focus on extracting these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Make sure to format dates as YYYY-MM-DD and return data in JSON format.'
+            content: 'You are a medical document analyzer. Extract patient information from the provided OCR text and return it in a structured format. Focus on extracting these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Make sure to format dates as YYYY-MM-DD and return data in JSON format.'
           },
           {
             role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Please analyze this medical document and extract patient information in JSON format with the following fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone.'
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:image/jpeg;base64,${base64File}`
-                }
-              }
-            ]
+            content: `Please analyze this medical document text and extract patient information in JSON format with the following fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone.\n\nDocument text:\n${ocrResult.generated_text}`
           }
         ]
       })
     });
 
-    const aiResponse = await response.json();
+    const aiResponse = await gptResponse.json();
     
     if (!aiResponse.choices?.[0]?.message?.content) {
       throw new Error('No response from AI');
