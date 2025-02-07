@@ -163,8 +163,10 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         
         if (!conversationStarted) {
           console.log("Starting new conversation session");
+          const { data: { user } } = await supabase.auth.getUser();
           await conversation.startSession({
             agentId: "sg6ewalyElwtFCXBkUOk",
+            userId: user?.id,
           });
           console.log("Conversation session started");
           setConversationStarted(true);
@@ -215,8 +217,10 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     try {
       if (!conversationStarted) {
         console.log("Starting new conversation session for text message");
+        const { data: { user } } = await supabase.auth.getUser();
         await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
+          userId: user?.id,
         });
         setConversationStarted(true);
       }
