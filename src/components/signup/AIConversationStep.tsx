@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -8,6 +7,7 @@ import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { Message, ProfileData } from "@/types/conversation";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -291,16 +291,24 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
   };
 
   return (
-    <Card className="p-4">
-      <MessageList messages={messages} />
-      <MessageInput
-        currentMessage={currentMessage}
-        setCurrentMessage={setCurrentMessage}
-        isLoading={isLoading}
-        isRecording={isRecording}
-        handleSendMessage={handleSendMessage}
-        toggleVoiceRecording={toggleVoiceRecording}
-      />
-    </Card>
+    <div className="space-y-4">
+      <Card className="p-4">
+        <MessageList messages={messages} />
+        <MessageInput
+          currentMessage={currentMessage}
+          setCurrentMessage={setCurrentMessage}
+          isLoading={isLoading}
+          isRecording={isRecording}
+          handleSendMessage={handleSendMessage}
+          toggleVoiceRecording={toggleVoiceRecording}
+        />
+      </Card>
+      <Button 
+        className="w-full"
+        onClick={() => navigate('/patient/form')}
+      >
+        Continue to Form
+      </Button>
+    </div>
   );
 };
