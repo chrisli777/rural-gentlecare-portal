@@ -34,7 +34,7 @@ serve(async (req) => {
     const base64File = await fileData.arrayBuffer()
       .then(buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))));
 
-    // Process with OpenAI
+    // Process with GPT-4
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -46,14 +46,14 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a medical document analyzer. Extract patient information from the provided document and return it in a structured format. Focus on: first name, last name, date of birth, allergies, current medications, chronic conditions, emergency contact, and emergency phone.'
+            content: 'You are a medical document analyzer. Extract patient information from the provided document and return it in a structured format. Focus on extracting these fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone. Make sure to format dates as YYYY-MM-DD and return data in JSON format.'
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Please analyze this medical document and extract patient information in JSON format.'
+                text: 'Please analyze this medical document and extract patient information in JSON format with the following fields: first_name, last_name, date_of_birth, allergies, current_medications, chronic_conditions, emergency_contact, and emergency_phone.'
               },
               {
                 type: 'image_url',
@@ -68,7 +68,18 @@ serve(async (req) => {
     });
 
     const aiResponse = await response.json();
-    const extractedData = JSON.parse(aiResponse.choices[0].message.content);
+    
+    if (!aiResponse.choices?.[0]?.message?.content) {
+      throw new Error('No response from AI');
+    }
+
+    let extractedData;
+    try {
+      extractedData = JSON.parse(aiResponse.choices[0].message.content);
+    } catch (e) {
+      console.error('Error parsing AI response:', aiResponse.choices[0].message.content);
+      throw new Error('Failed to parse AI response');
+    }
 
     // Update the processed_documents table
     const { error: updateError } = await supabase
