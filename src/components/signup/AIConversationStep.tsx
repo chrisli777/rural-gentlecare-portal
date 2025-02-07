@@ -38,10 +38,16 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         language: "en",
       },
       tts: {
-        voiceId: "EXAVITQu4vr4xnSDxMaL" // Sarah's voice - professional and friendly
+        modelId: "eleven_multilingual_v2",
+        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah's voice - professional and friendly
+        stability: 0.5,
+        similarityBoost: 0.75,
+        style: 0.0,
+        useSSML: false
       }
     },
     onMessage: (message) => {
+      console.log("Received message:", message);
       if (message.content) {
         setMessages(prev => [...prev, { role: message.role, content: message.content }]);
       }
@@ -133,7 +139,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   return (
     <Card className="p-4">
       <MessageList messages={messages} />
-
       <MessageInput
         currentMessage={currentMessage}
         setCurrentMessage={setCurrentMessage}
