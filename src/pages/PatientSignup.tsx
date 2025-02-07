@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhoneVerificationStep } from "@/components/signup/PhoneVerificationStep";
+import { AIConversationStep } from "@/components/signup/AIConversationStep";
 import { FileUploadStep } from "@/components/signup/FileUploadStep";
 import { BasicMedicalForm } from "@/components/signup/BasicMedicalForm";
 import { AudioWaveform, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type SignupStep = 'phone' | 'method' | 'upload' | 'form';
+type SignupStep = 'phone' | 'method' | 'upload' | 'ai' | 'form';
 
 const PatientSignup = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const PatientSignup = () => {
     setStep('form');
   };
 
-  const handleMethodChoice = (method: 'upload') => {
+  const handleMethodChoice = (method: 'upload' | 'ai') => {
     setStep(method);
   };
 
@@ -39,6 +40,7 @@ const PatientSignup = () => {
         setStep(formData ? 'upload' : 'method');
         break;
       case 'upload':
+      case 'ai':
         setStep('method');
         break;
       case 'method':
@@ -67,6 +69,7 @@ const PatientSignup = () => {
             {step === 'phone' && 'Patient Signup'}
             {step === 'method' && 'Choose Profile Setup Method'}
             {step === 'upload' && 'Upload Medical Documents'}
+            {step === 'ai' && 'AI Assistant'}
             {step === 'form' && 'Complete Your Profile'}
           </h2>
           <p className="text-muted-foreground">
@@ -90,9 +93,13 @@ const PatientSignup = () => {
             >
               Upload Medical Documents
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Use the voice command button in the bottom right corner for voice assistance
-            </p>
+            <Button
+              className="w-full h-24 text-lg"
+              variant="outline"
+              onClick={() => handleMethodChoice('ai')}
+            >
+              Talk to AI Assistant
+            </Button>
           </div>
         )}
 
@@ -101,6 +108,10 @@ const PatientSignup = () => {
             onUploadComplete={handleUploadComplete}
             onSkip={() => setStep('form')}
           />
+        )}
+
+        {step === 'ai' && (
+          <AIConversationStep onProfileComplete={handleProfileComplete} />
         )}
 
         {step === 'form' && (
@@ -137,3 +148,4 @@ const PatientSignup = () => {
 };
 
 export default PatientSignup;
+

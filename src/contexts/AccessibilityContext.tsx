@@ -1,9 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { translations } from "@/utils/translations";
-import { useConversation } from "@11labs/react";
-import { ProfileData } from "@/types/conversation";
 
 interface AccessibilityContextType {
   fontSize: 'normal' | 'large' | 'extra-large';
@@ -23,72 +20,6 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
   const [language, setLanguage] = useState<'en' | 'es'>('en');
   const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
-  const [profileData, setProfileData] = useState<ProfileData>({});
-
-  const conversation = useConversation({
-    clientTools: {
-      updateProfile: async (parameters: { field: string; value: any }) => {
-        console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
-        const updatedProfile = { ...profileData };
-        updatedProfile[parameters.field] = parameters.value;
-        setProfileData(updatedProfile);
-        return "Profile updated successfully";
-      },
-      completeProfile: async () => {
-        console.log("Profile complete, data:", profileData);
-        return "Profile completed successfully";
-      }
-    },
-    overrides: {
-      agent: {
-        prompt: {
-          prompt: `You are Sarah, a friendly and professional medical assistant helping patients complete their medical profile. Your role is to:
-
-1. Gather essential medical information through natural conversation
-2. Ask one question at a time, waiting for the patient's response
-3. Confirm information before moving to the next question
-4. Use the updateProfile function to save each piece of information
-5. When all essential information is collected, use completeProfile function
-
-Essential information to collect:
-- first_name
-- last_name
-- date_of_birth (format: YYYY-MM-DD)
-- emergency_contact (full name)
-- emergency_phone
-- allergies (if any)
-- current_medications (if any)
-- chronic_conditions (if any)
-
-Always be empathetic, professional, and HIPAA-compliant. If you don't understand something, ask for clarification.`,
-        },
-        firstMessage: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
-        language: "en",
-      },
-      tts: {
-        modelId: "eleven_multilingual_v2",
-        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
-        stability: 0.5,
-        similarityBoost: 0.75,
-        style: 0.0,
-        useSSML: false
-      }
-    },
-    onMessage: (message) => {
-      if (message.content) {
-        console.log("AI Message:", message.content);
-      }
-    },
-    onError: (error) => {
-      console.error("Conversation error:", error);
-      toast({
-        title: "Error",
-        description: "There was an error with the voice conversation. Please try again.",
-        variant: "destructive",
-      });
-      setIsListening(false);
-    }
-  });
 
   const translate = (key: string): string => {
     const keys = key.split('.');
@@ -98,38 +29,54 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
       if (translation && translation[k]) {
         translation = translation[k];
       } else {
-        return key;
+        return key; // Return the key if translation not found
       }
     }
     
     return translation;
   };
 
-  const startListening = async () => {
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      setIsListening(true);
-      const conversationId = await conversation.startSession({
-        agentId: "sg6ewalyElwtFCXBkUOk",
-      });
-      console.log("Started conversation with ID:", conversationId);
-    } catch (error) {
-      console.error("Error starting voice conversation:", error);
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window)) {
       toast({
-        title: "Error",
-        description: "Could not access microphone. Please check your permissions.",
+        title: "Voice Recognition Not Available",
+        description: "Your browser doesn't support voice recognition.",
         variant: "destructive",
+        duration: 2000,
       });
-      setIsListening(false);
+      return;
+    }
+
+    const recognition = new (window as any).webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.lang = language === 'en' ? 'en-US' : 'es-ES';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+      
+      if (command.includes('profile')) {
+        window.location.href = '/patient/profile';
+      } else if (command.includes('dashboard')) {
+        window.location.href = '/patient/dashboard';
+      }
+    };
+
+    recognition.start();
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.stop();
     }
   };
 
-  const stopListening = async () => {
-    setIsListening(false);
-    await conversation.endSession();
-    console.log("Ended conversation");
-  };
-
+  // Apply font size changes globally
   useEffect(() => {
     const fontSizes = {
       normal: '16px',
@@ -145,6 +92,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     htmlElement.classList.add(`text-${fontSize}`);
   }, [fontSize]);
 
+  // Apply language changes
   useEffect(() => {
     document.documentElement.lang = language;
     document.body.setAttribute('data-language', language);
