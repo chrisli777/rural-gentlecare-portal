@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -56,10 +57,11 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
     clientTools: {
       updateProfile: async (parameters: { field: string; value: any }) => {
         console.log("Updating profile field:", parameters.field, "with value:", parameters.value);
-        const updatedProfile = { ...profileData };
-        updatedProfile[parameters.field] = parameters.value;
-        setProfileData(updatedProfile);
-        onProfileUpdate(updatedProfile);
+        setProfileData(prev => {
+          const updatedData = { ...prev, [parameters.field]: parameters.value };
+          onProfileUpdate(updatedData); // Send updated data to parent component
+          return updatedData;
+        });
         
         try {
           if (!userId) throw new Error('No user ID available');
@@ -95,7 +97,6 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
           });
 
           onProfileComplete();
-          navigate("/patient/dashboard");
           return "Profile completed successfully";
         } catch (error: any) {
           console.error("Error completing profile:", error);
@@ -116,7 +117,7 @@ export const AIConversationStep = ({ onProfileComplete, onProfileUpdate }: AICon
 1. Gather essential medical information through natural conversation
 2. Ask one question at a time, waiting for the patient's response
 3. Confirm information before moving to the next question
-4. Use the updateProfile function to save each piece of information
+4. Use the updateProfile function to save each piece of information immediately after confirmation
 5. When all essential information is collected, use completeProfile function
 
 Essential information to collect:
