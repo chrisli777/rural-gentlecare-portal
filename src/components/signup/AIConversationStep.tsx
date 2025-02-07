@@ -22,19 +22,33 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
   const [isRecording, setIsRecording] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check authentication status
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          console.log("No authenticated session found");
+          toast({
+            title: "Authentication required",
+            description: "Please log in to continue.",
+            variant: "destructive",
+          });
+          navigate("/patient/login");
+          return;
+        }
+        console.log("User authenticated:", session.user.id);
+        setUserId(session.user.id);
+      } catch (error) {
+        console.error("Auth check error:", error);
         toast({
-          title: "Authentication required",
-          description: "Please log in to continue.",
+          title: "Authentication error",
+          description: "Please try logging in again.",
           variant: "destructive",
         });
         navigate("/patient/login");
-        return;
       }
     };
     
@@ -143,20 +157,21 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
   }, []);
 
   const updateProfile = async (data: ProfileData) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error("No authenticated user found");
-      }
+    if (!userId) {
+      console.error("No user ID available");
+      return "Failed to update profile: User not authenticated";
+    }
 
+    try {
       const { error } = await supabase
         .from('profiles')
         .update(data)
-        .eq('id', user.id);
+        .eq('id', userId);
 
       if (error) throw error;
       
       console.log("Profile updated successfully with data:", data);
+      return "Profile updated successfully";
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast({
@@ -169,18 +184,17 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
   };
 
   const toggleVoiceRecording = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to continue.",
-          variant: "destructive",
-        });
-        navigate("/patient/login");
-        return;
-      }
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to continue.",
+        variant: "destructive",
+      });
+      navigate("/patient/login");
+      return;
+    }
 
+    try {
       if (!audioContext) {
         console.error("AudioContext not initialized");
         toast({
@@ -201,7 +215,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
           console.log("Starting new conversation session");
           await conversation.startSession({
             agentId: "sg6ewalyElwtFCXBkUOk",
-            userId: session.user.id,
+            userId: userId,
           });
           console.log("Conversation session started");
           setConversationStarted(true);
@@ -242,20 +256,9 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
   };
 
   const handleSendMessage = async () => {
-    if (!currentMessage.trim()) return;
+    if (!currentMessage.trim() || !userId) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to continue.",
-          variant: "destructive",
-        });
-        navigate("/patient/login");
-        return;
-      }
-
       setIsLoading(true);
       const userMessage: Message = { role: 'user', content: currentMessage };
       setMessages(prev => [...prev, userMessage]);
@@ -265,7 +268,7 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         console.log("Starting new conversation session for text message");
         await conversation.startSession({
           agentId: "sg6ewalyElwtFCXBkUOk",
-          userId: session.user.id,
+          userId: userId,
         });
         setConversationStarted(true);
       }
