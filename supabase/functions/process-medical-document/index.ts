@@ -61,7 +61,7 @@ serve(async (req) => {
     const ocrResult = await ocrResponse.json();
     console.log('OCR processing complete. Extracted text length:', ocrResult.generated_text?.length);
 
-    // Step 2: Use GPT to extract structured data from OCR text
+    // Step 2: Process with GPT-4o-mini for structured data extraction
     console.log('Sending OCR text to GPT for information extraction...');
     const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -104,6 +104,12 @@ serve(async (req) => {
       throw new Error('Failed to parse AI response');
     }
 
+    // Get user ID from auth context
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
     // Update the processed_documents table with extracted data
     const { error: updateError } = await supabaseAdmin
       .from('processed_documents')
@@ -111,6 +117,7 @@ serve(async (req) => {
       .eq('file_path', filePath);
 
     if (updateError) {
+      console.error('Database update error:', updateError);
       throw updateError;
     }
 
@@ -127,7 +134,7 @@ serve(async (req) => {
       error: error.message 
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
