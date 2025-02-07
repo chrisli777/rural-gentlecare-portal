@@ -1,12 +1,11 @@
+
 import { Header } from "@/components/layout/Header";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, Bell, Calendar, Pill } from "lucide-react";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { useState } from "react";
 
 const PatientMessages = () => {
-  const { translate } = useAccessibility();
   const [notificationMethods, setNotificationMethods] = useState<string[]>(["app"]);
   
   return (
@@ -14,7 +13,7 @@ const PatientMessages = () => {
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-8">
         <div className="flex justify-between items-start mb-6">
-          <h1 className="text-3xl font-bold">{translate("messages.title")}</h1>
+          <h1 className="text-3xl font-bold">Messages</h1>
           <div className="w-64">
             <NotificationPreferences
               selectedMethods={notificationMethods}
@@ -28,7 +27,7 @@ const PatientMessages = () => {
           <Card>
             <CardHeader className="flex flex-row items-center space-x-2">
               <Pill className="w-5 h-5 text-primary" />
-              <CardTitle>{translate("messages.medicationAlerts")}</CardTitle>
+              <CardTitle>Medication Alerts</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -48,7 +47,7 @@ const PatientMessages = () => {
           <Card>
             <CardHeader className="flex flex-row items-center space-x-2">
               <Calendar className="w-5 h-5 text-primary" />
-              <CardTitle>{translate("messages.appointmentAlerts")}</CardTitle>
+              <CardTitle>Appointment Alerts</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -68,7 +67,7 @@ const PatientMessages = () => {
           <Card>
             <CardHeader className="flex flex-row items-center space-x-2">
               <MessageSquare className="w-5 h-5 text-primary" />
-              <CardTitle>{translate("messages.doctorsMessages")}</CardTitle>
+              <CardTitle>Doctor's Messages</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -88,7 +87,7 @@ const PatientMessages = () => {
           <Card>
             <CardHeader className="flex flex-row items-center space-x-2">
               <Bell className="w-5 h-5 text-primary" />
-              <CardTitle>{translate("messages.generalNotifications")}</CardTitle>
+              <CardTitle>General Notifications</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

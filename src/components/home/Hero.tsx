@@ -1,9 +1,7 @@
+
 import { Button } from "@/components/ui/button";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 export const Hero = () => {
-  const { translate } = useAccessibility();
-
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-white to-gray-50 pt-16">
       <div className="container mx-auto px-4 py-12">

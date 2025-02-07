@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { Bot, LineChart, FileText, Send, Loader2 } from "lucide-react";
 import {
   ChartContainer,
@@ -27,7 +27,6 @@ const PatientAIAssistant = () => {
   const [conversation, setConversation] = useState<{ role: string; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { translate } = useAccessibility();
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -52,7 +51,7 @@ const PatientAIAssistant = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-20">
-        <h1 className="text-3xl font-bold mb-6">{translate("aiAssistant.title")}</h1>
+        <h1 className="text-3xl font-bold mb-6">Healthcare Assistant</h1>
 
         <Tabs defaultValue="chat" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
