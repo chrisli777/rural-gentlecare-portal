@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -252,27 +251,18 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
         
         <button
           onClick={toggleVoiceRecording}
-          className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${
+          className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
             isRecording 
               ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
               : 'bg-primary hover:bg-primary/90'
           }`}
           disabled={isLoading}
         >
-          <div className="relative">
-            <img
-              src="https://deepinfra.com/elevenlabs/eleven-english-v2/avatar.jpg"
-              alt="Sarah AI Assistant"
-              className="w-full h-full rounded-full object-cover"
-            />
-            <div className={`absolute inset-0 flex items-center justify-center bg-black/40 rounded-full`}>
-              {isRecording ? (
-                <MicOff className="h-12 w-12 text-white" />
-              ) : (
-                <Mic className="h-12 w-12 text-white" />
-              )}
-            </div>
-          </div>
+          {isRecording ? (
+            <MicOff className="h-12 w-12 text-white" />
+          ) : (
+            <Mic className="h-12 w-12 text-white" />
+          )}
         </button>
       </Card>
       
