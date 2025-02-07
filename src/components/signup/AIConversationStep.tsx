@@ -96,8 +96,8 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
             description: "Your medical profile has been saved successfully.",
           });
 
+          // Change the step to form instead of completing directly
           onProfileComplete();
-          navigate("/patient/dashboard");
           return "Profile completed successfully";
         } catch (error: any) {
           console.error("Error completing profile:", error);
@@ -148,7 +148,10 @@ Always be empathetic, professional, and HIPAA-compliant. If you don't understand
     onMessage: (message) => {
       console.log("Received message:", message);
       if (message.content) {
-        setMessages(prev => [...prev, { role: message.role, content: message.content }]);
+        setMessages(prev => [...prev, { 
+          role: message.role, 
+          content: message.content 
+        }]);
       }
     },
     onError: (error) => {

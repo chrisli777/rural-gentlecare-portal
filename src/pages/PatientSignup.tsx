@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PhoneVerificationStep } from "@/components/signup/PhoneVerificationStep";
@@ -32,6 +31,10 @@ const PatientSignup = () => {
 
   const handleProfileComplete = () => {
     navigate("/patient/dashboard");
+  };
+
+  const handleAIConversationComplete = () => {
+    setStep('form');
   };
 
   const handleBack = () => {
@@ -111,7 +114,7 @@ const PatientSignup = () => {
         )}
 
         {step === 'ai' && (
-          <AIConversationStep onProfileComplete={handleProfileComplete} />
+          <AIConversationStep onProfileComplete={handleAIConversationComplete} />
         )}
 
         {step === 'form' && (
@@ -148,4 +151,3 @@ const PatientSignup = () => {
 };
 
 export default PatientSignup;
-
