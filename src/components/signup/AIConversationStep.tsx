@@ -13,9 +13,8 @@ interface Message {
   content: string;
 }
 
-type ProfileFieldValue = string | boolean | Record<string, any> | null;
-
 interface ProfileData {
+  [key: string]: string | boolean | Record<string, any> | null;
   first_name?: string;
   last_name?: string;
   date_of_birth?: string;
@@ -50,7 +49,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
 
   const conversation = useConversation({
     clientTools: {
-      updateProfile: async (parameters: { field: keyof ProfileData; value: ProfileFieldValue }) => {
+      updateProfile: async (parameters: { field: string; value: any }) => {
         const updatedProfile = { ...profileData };
         updatedProfile[parameters.field] = parameters.value;
         setProfileData(updatedProfile);
@@ -152,7 +151,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setIsRecording(true);
         const conversationId = await conversation.startSession({
-          agentId: "medical_assistant", // Use your actual agent ID from ElevenLabs
+          agentId: "medical_assistant",
         });
         console.log("Started conversation:", conversationId);
       } catch (error) {
@@ -178,8 +177,6 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     setCurrentMessage("");
 
     try {
-      // TODO: Replace with actual AI integration
-      // For now, using a simple mock response
       const lastAssistantMessage = messages[messages.length - 1];
       let response: Message = { role: 'assistant', content: '' };
       let updatedProfile = { ...profileData };
