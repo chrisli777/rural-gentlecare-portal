@@ -20,7 +20,19 @@ async function queryHuggingFace(message: string, retries = 3): Promise<Response>
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: `You are a helpful and knowledgeable healthcare assistant. Please provide accurate, concise medical information and general health guidance. Always remind users to consult healthcare professionals for specific medical advice. User question: ${message}`,
+          inputs: `You are a helpful healthcare assistant focused on helping patients book medical appointments. Guide users through the appointment booking process by collecting necessary information like:
+- Preferred appointment type (check-up, follow-up, consultation)
+- Preferred date and time
+- Any specific doctor preferences
+- Their symptoms or reason for visit
+
+Current context: ${message}
+
+Please respond in a conversational manner, asking one question at a time to gather the required information. Remind users they can book their appointment through the appointment booking section once all information is collected.
+
+If the user asks about other health-related topics, provide helpful information while maintaining medical accuracy. Always remind users to consult healthcare professionals for specific medical advice.
+
+User question: ${message}`,
           parameters: {
             max_length: 1000,
             temperature: 0.7,
