@@ -140,7 +140,6 @@ export const ProfileReview = ({ initialData, userId, onComplete }: ProfileReview
 
       <div className="flex justify-end space-x-4">
         <Button
-          variant="primary"
           onClick={handleSubmit}
           disabled={isLoading}
         >
