@@ -32,11 +32,16 @@ const PatientDashboard = () => {
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
-          .order('appointment_date', { ascending: true });
+          .order('appointment_date', { ascending: true })
+          .order('appointment_time', { ascending: true }); // Added secondary sort by time
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error details:', error);
+          throw error;
+        }
 
         if (appointments) {
+          console.log('Fetched appointments:', appointments); // Debug log
           setRecentAppointments(appointments);
           
           // Add appointment notifications to conversation
@@ -201,7 +206,7 @@ const PatientDashboard = () => {
               </Card>
             </Link>
 
-            {/* Upcoming Appointments - Modified for better scrolling */}
+            {/* Upcoming Appointments */}
             <Card className="h-full">
               <CardHeader>
                 <CardTitle>Upcoming Appointments</CardTitle>
