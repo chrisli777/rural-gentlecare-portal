@@ -66,14 +66,23 @@ serve(async (req) => {
           console.log('Found existing user with ID:', userId)
         }
 
-        // Generate session for either new or existing user
-        const { data: { session }, error: sessionError } = await supabase.auth.admin.createSession({
-          user_id: userId
+        // Generate access token and refresh token for the user
+        const { data: tokens, error: tokenError } = await supabase.auth.admin.generateLink({
+          type: 'magiclink',
+          email: `${userId}@temp.com`, // Using a temporary email since we're using phone auth
         })
         
-        if (sessionError || !session) {
-          console.error('Session creation error:', sessionError)
-          throw new Error('Failed to create session')
+        if (tokenError || !tokens) {
+          console.error('Token generation error:', tokenError)
+          throw new Error('Failed to generate session tokens')
+        }
+
+        // Create a session object that matches the structure expected by the client
+        const session = {
+          access_token: tokens.properties.access_token,
+          refresh_token: tokens.properties.refresh_token,
+          expires_in: 3600,
+          user: existingUser || { id: userId, phone: formattedPhone }
         }
 
         // Check if profile exists (for both new and existing users)
@@ -109,4 +118,3 @@ serve(async (req) => {
     )
   }
 })
-
