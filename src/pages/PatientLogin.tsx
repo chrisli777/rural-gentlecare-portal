@@ -31,8 +31,18 @@ const PatientLogin = () => {
 
       if (error) {
         console.error("Login failed:", error);
-        // Check if it's the misleading "Invalid From Number" error
-        if (error.message.includes("Invalid From Number")) {
+        
+        // Parse the error body if it exists
+        let errorBody;
+        try {
+          errorBody = JSON.parse(error.message);
+        } catch {
+          errorBody = { message: error.message };
+        }
+
+        // Check if it's the misleading Twilio Verify error
+        if (errorBody.message?.includes("Invalid From Number") || 
+            error.message?.includes("Invalid From Number")) {
           // If we get this error but the code was actually sent, we can proceed
           setPhoneNumber(formattedPhone);
           setShowVerification(true);
