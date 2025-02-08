@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import twilio from 'npm:twilio'
+import * as twilio from 'npm:twilio'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,12 +16,15 @@ serve(async (req) => {
   try {
     const { action, phone, code } = await req.json()
     
-    const client = twilio(
-      Deno.env.get('TWILIO_ACCOUNT_SID'),
-      Deno.env.get('TWILIO_AUTH_TOKEN')
-    )
-    
+    const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
+    const authToken = Deno.env.get('TWILIO_AUTH_TOKEN')
     const verifyServiceSid = Deno.env.get('TWILIO_VERIFY_SERVICE_SID')
+
+    if (!accountSid || !authToken || !verifyServiceSid) {
+      throw new Error('Missing Twilio configuration')
+    }
+    
+    const client = twilio.default(accountSid, authToken)
 
     if (action === 'send') {
       console.log('Sending verification to:', phone)
