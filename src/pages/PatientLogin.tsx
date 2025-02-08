@@ -57,7 +57,8 @@ const PatientLogin = () => {
     try {
       console.log("Verifying code for phone:", phoneNumber);
       
-      const { data, error } = await supabase.functions.invoke('verify-phone', {
+      // Call our new phone-auth function
+      const { data, error } = await supabase.functions.invoke('phone-auth', {
         body: {
           action: 'verify',
           phone: phoneNumber,
@@ -67,41 +68,23 @@ const PatientLogin = () => {
 
       if (error) throw error;
 
-      if (data?.status === 'approved') {
-        try {
-          // Sign in with OTP
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
-            phone: phoneNumber,
-          });
+      // Set the session
+      const { data: { session }, profileExists } = data;
+      const { error: setSessionError } = await supabase.auth.setSession(session);
+      if (setSessionError) throw setSessionError;
 
-          if (signInError) throw signInError;
-
-          // Check if profile exists
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('phone_number', phoneNumber)
-            .maybeSingle();
-
-          if (profileData) {
-            toast({
-              title: "Login Successful",
-              description: "Welcome back!",
-            });
-            navigate("/patient/dashboard");
-          } else {
-            toast({
-              title: "Welcome",
-              description: "Starting conversation with Sarah, your medical assistant",
-            });
-            navigate("/patient/signup/ai-conversation");
-          }
-        } catch (authError: any) {
-          console.error("Auth error:", authError);
-          throw authError;
-        }
+      if (profileExists) {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+        navigate("/patient/dashboard");
       } else {
-        throw new Error('Verification failed');
+        toast({
+          title: "Welcome",
+          description: "Starting conversation with Sarah, your medical assistant",
+        });
+        navigate("/patient/signup/ai-conversation");
       }
     } catch (error: any) {
       console.error("Verification error:", error);
