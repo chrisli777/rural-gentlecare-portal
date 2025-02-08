@@ -78,11 +78,11 @@ const PatientLogin = () => {
 
       toast({
         title: "Login Successful",
-        description: "Welcome to Adams County Rural Health Clinic",
+        description: "Starting conversation with Sarah, your medical assistant",
         variant: "default",
       });
       
-      navigate("/patient/dashboard");
+      navigate("/patient/signup/ai-conversation");
     } catch (error: any) {
       console.error("Verification error:", error);
       toast({
