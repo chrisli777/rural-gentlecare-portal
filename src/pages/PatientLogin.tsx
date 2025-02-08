@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AudioWaveform } from "lucide-react";
@@ -24,27 +25,15 @@ const PatientLogin = () => {
       const formattedPhone = formatPhoneNumber(phone);
       console.log("Attempting to send verification code to:", formattedPhone);
       
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-phone`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            action: 'send',
-            phone: formattedPhone,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('verify-phone', {
+        body: {
+          action: 'send',
+          phone: formattedPhone,
+        },
+      });
 
-      const data = await response.json();
+      if (error) throw error;
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send verification code');
-      }
-
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
       toast({
@@ -68,29 +57,17 @@ const PatientLogin = () => {
     try {
       console.log("Verifying code for phone:", phoneNumber);
       
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-phone`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            action: 'verify',
-            phone: phoneNumber,
-            code,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('verify-phone', {
+        body: {
+          action: 'verify',
+          phone: phoneNumber,
+          code,
+        },
+      });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to verify code');
-      }
+      if (error) throw error;
 
-      if (data.status === 'approved') {
+      if (data?.status === 'approved') {
         // Sign in with phone number using Supabase phone auth
         const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
           phone: phoneNumber,
@@ -122,26 +99,14 @@ const PatientLogin = () => {
 
   const handleResendCode = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-phone`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            action: 'send',
-            phone: phoneNumber,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('verify-phone', {
+        body: {
+          action: 'send',
+          phone: phoneNumber,
+        },
+      });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to resend code');
-      }
+      if (error) throw error;
 
       toast({
         title: "Code Resent",
