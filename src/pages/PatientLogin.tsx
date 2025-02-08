@@ -23,36 +23,27 @@ const PatientLogin = () => {
     setIsLoading(true);
     try {
       const formattedPhone = formatPhoneNumber(phone);
-      console.log("Attempting login with phone:", formattedPhone);
+      console.log("Attempting to send verification code to:", formattedPhone);
       
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-      });
-
-      if (error) {
-        console.error("Login failed:", error);
-        
-        // Parse the error body if it exists
-        let errorBody;
-        try {
-          errorBody = JSON.parse(error.message);
-        } catch {
-          errorBody = { message: error.message };
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-phone`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            action: 'send',
+            phone: formattedPhone,
+          }),
         }
+      );
 
-        // Check if it's the misleading Twilio Verify error
-        if (errorBody.message?.includes("Invalid From Number") || 
-            error.message?.includes("Invalid From Number")) {
-          // If we get this error but the code was actually sent, we can proceed
-          setPhoneNumber(formattedPhone);
-          setShowVerification(true);
-          toast({
-            title: "Verification code sent",
-            description: "Please check your phone for the verification code",
-          });
-          return;
-        }
-        throw error;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send verification code');
       }
 
       setPhoneNumber(formattedPhone);
@@ -62,7 +53,7 @@ const PatientLogin = () => {
         description: "Please check your phone for the verification code",
       });
     } catch (error: any) {
-      console.error("Login error:", error);
+      console.error("Send code error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to send verification code",
@@ -77,33 +68,56 @@ const PatientLogin = () => {
     setIsLoading(true);
     try {
       console.log("Verifying code for phone:", phoneNumber);
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phoneNumber,
-        token: code,
-        type: 'sms',
-      });
-
-      if (error) {
-        console.error("Verification failed:", error);
-        if (error.message.includes("expired")) {
-          toast({
-            title: "Code Expired",
-            description: "The verification code has expired. Please request a new one.",
-            variant: "destructive",
-          });
-        } else {
-          throw error;
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-phone`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            action: 'verify',
+            phone: phoneNumber,
+            code,
+          }),
         }
-        return;
+      );
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to verify code');
       }
 
-      toast({
-        title: "Login Successful",
-        description: "Starting conversation with Sarah, your medical assistant",
-        variant: "default",
-      });
-      
-      navigate("/patient/signup/ai-conversation");
+      if (data.status === 'approved') {
+        // Create a custom token or sign in with phone
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          phone: phoneNumber,
+          password: code, // Using the verification code as a one-time password
+        });
+
+        if (signInError) {
+          // If user doesn't exist, sign them up
+          const { error: signUpError } = await supabase.auth.signUp({
+            phone: phoneNumber,
+            password: code,
+          });
+
+          if (signUpError) throw signUpError;
+        }
+
+        toast({
+          title: "Login Successful",
+          description: "Starting conversation with Sarah, your medical assistant",
+          variant: "default",
+        });
+        
+        navigate("/patient/signup/ai-conversation");
+      } else {
+        throw new Error('Verification failed');
+      }
     } catch (error: any) {
       console.error("Verification error:", error);
       toast({
@@ -118,11 +132,26 @@ const PatientLogin = () => {
 
   const handleResendCode = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phoneNumber,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-phone`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            action: 'send',
+            phone: phoneNumber,
+          }),
+        }
+      );
 
-      if (error) throw error;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to resend code');
+      }
 
       toast({
         title: "Code Resent",
@@ -142,7 +171,7 @@ const PatientLogin = () => {
       title: "Guest Access",
       description: "Starting conversation with Sarah, your medical assistant",
     });
-    navigate("/patient/signup/ai-conversation"); // Changed to direct to Sarah conversation
+    navigate("/patient/signup/ai-conversation");
   };
 
   const handleBack = () => {
