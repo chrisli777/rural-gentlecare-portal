@@ -39,24 +39,42 @@ serve(async (req) => {
       
       // Check if user exists by phone
       const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers()
+      if (getUserError) {
+        console.error('Get users error:', getUserError)
+        throw new Error('Failed to check existing users')
+      }
+
       const existingUser = users?.find(u => u.phone === phone)
-      
       let userId = existingUser?.id
       
       if (!existingUser) {
-        // Create new user if doesn't exist
-        const { data: { user }, error: createError } = await supabase.auth.admin.createUser({
-          phone,
-          phone_confirmed_at: new Date().toISOString(),
-          user_metadata: { phone_verified: true }
-        })
+        console.log('Creating new user for phone:', phone)
+        // Ensure phone number is in E.164 format
+        const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`
         
-        if (createError) {
-          console.error('Create user error:', createError)
+        try {
+          const { data: { user }, error: createError } = await supabase.auth.admin.createUser({
+            phone: formattedPhone,
+            email_confirm: true,
+            phone_confirm: true,
+            user_metadata: { phone_verified: true }
+          })
+          
+          if (createError) {
+            console.error('Create user error:', createError)
+            throw createError
+          }
+          
+          if (!user) {
+            throw new Error('No user returned after creation')
+          }
+          
+          userId = user.id
+          console.log('Successfully created user with ID:', userId)
+        } catch (error) {
+          console.error('Failed to create user:', error)
           throw new Error('Failed to create user account')
         }
-        
-        userId = user?.id
       }
       
       if (!userId) {
@@ -76,22 +94,31 @@ serve(async (req) => {
       }
       
       // Generate session
-      const { data: { session }, error: sessionError } = await supabase.auth.admin.createSession({
-        user_id: userId
-      })
-      
-      if (sessionError) {
-        console.error('Session creation error:', sessionError)
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.admin.createSession({
+          user_id: userId
+        })
+        
+        if (sessionError) {
+          console.error('Session creation error:', sessionError)
+          throw sessionError
+        }
+        
+        if (!session) {
+          throw new Error('No session returned')
+        }
+        
+        return new Response(
+          JSON.stringify({ 
+            session,
+            profileExists: !!profile
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      } catch (error) {
+        console.error('Session creation error:', error)
         throw new Error('Failed to create session')
       }
-      
-      return new Response(
-        JSON.stringify({ 
-          session,
-          profileExists: !!profile
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
     }
     
     throw new Error('Invalid action')
