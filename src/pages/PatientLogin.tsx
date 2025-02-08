@@ -126,7 +126,7 @@ const PatientLogin = () => {
       title: "Guest Access",
       description: "Starting conversation with Sarah, your medical assistant",
     });
-    navigate("/patient/signup/ai-conversation");
+    navigate("/patient/signup");
   };
 
   const handleBack = () => {
