@@ -25,14 +25,25 @@ const PatientLogin = () => {
       const formattedPhone = formatPhoneNumber(phone);
       console.log("Attempting to send verification code to:", formattedPhone);
       
-      const { data, error } = await supabase.functions.invoke('verify-phone', {
-        body: {
-          action: 'send',
+      // First check if user exists
+      const { data: { user }, error: userError } = await supabase.auth.admin.getUserByPhone(formattedPhone);
+      
+      if (!userError && user) {
+        // User exists, send OTP for login
+        const { error } = await supabase.auth.signInWithOtp({
           phone: formattedPhone,
-        },
-      });
-
-      if (error) throw error;
+        });
+        if (error) throw error;
+      } else {
+        // User doesn't exist, send verification code for signup
+        const { data, error } = await supabase.functions.invoke('verify-phone', {
+          body: {
+            action: 'send',
+            phone: formattedPhone,
+          },
+        });
+        if (error) throw error;
+      }
       
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
@@ -55,9 +66,8 @@ const PatientLogin = () => {
   const handleVerificationSubmit = async (code: string) => {
     setIsLoading(true);
     try {
-      console.log("Verifying code for phone:", phoneNumber);
-      
-      const { data, error } = await supabase.functions.invoke('verify-phone', {
+      // First verify the code
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-phone', {
         body: {
           action: 'verify',
           phone: phoneNumber,
@@ -65,37 +75,40 @@ const PatientLogin = () => {
         },
       });
 
-      if (error) throw error;
+      if (verifyError) throw verifyError;
 
-      if (data?.status === 'approved') {
-        try {
-          // Try to sign in first, assuming user exists
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      if (verifyData?.status === 'approved') {
+        // Check if user exists in auth system
+        const { data: { user }, error: userError } = await supabase.auth.admin.getUserByPhone(phoneNumber);
+        
+        if (!userError && user) {
+          // User exists, verify OTP for login
+          const { error: signInError } = await supabase.auth.verifyOtp({
             phone: phoneNumber,
-            password: code,
+            token: code,
+            type: 'sms',
           });
 
-          if (!signInError) {
-            // Successfully signed in, check for profile
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('id')
-              .eq('phone_number', phoneNumber)
-              .maybeSingle();
+          if (signInError) throw signInError;
 
-            toast({
-              title: "Login Successful",
-              description: "Welcome back!",
-            });
-            
-            navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
-            return;
-          }
+          // Check for profile
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('phone_number', phoneNumber)
+            .maybeSingle();
 
-          // If sign in failed, try to sign up
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          toast({
+            title: "Login Successful",
+            description: "Welcome back!",
+          });
+          
+          navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
+        } else {
+          // New user, create account
+          const { error: signUpError } = await supabase.auth.signUp({
             phone: phoneNumber,
-            password: code,
+            password: code, // Using verification code as initial password
           });
 
           if (signUpError) throw signUpError;
@@ -106,9 +119,6 @@ const PatientLogin = () => {
           });
           
           navigate("/patient/signup/ai-conversation");
-        } catch (authError: any) {
-          console.error("Auth error:", authError);
-          throw authError;
         }
       } else {
         throw new Error('Verification failed');
