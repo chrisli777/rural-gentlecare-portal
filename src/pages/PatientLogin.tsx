@@ -68,40 +68,48 @@ const PatientLogin = () => {
       if (error) throw error;
 
       if (data?.status === 'approved') {
-        // Check if user exists in auth system first
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-          phone: phoneNumber,
-          password: code,
-        });
+        try {
+          // Try to sign in first, assuming user exists
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            phone: phoneNumber,
+            password: code,
+          });
 
-        if (authError && authError.message.includes("Invalid login credentials")) {
-          // User doesn't exist in auth system, create them
+          if (!signInError) {
+            // Successfully signed in, check for profile
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('phone_number', phoneNumber)
+              .maybeSingle();
+
+            toast({
+              title: "Login Successful",
+              description: "Welcome back!",
+            });
+            
+            navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
+            return;
+          }
+
+          // If sign in failed, try to sign up
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             phone: phoneNumber,
             password: code,
           });
 
           if (signUpError) throw signUpError;
-        } else if (authError) {
+
+          toast({
+            title: "Account Created",
+            description: "Starting conversation with Sarah, your medical assistant",
+          });
+          
+          navigate("/patient/signup/ai-conversation");
+        } catch (authError: any) {
+          console.error("Auth error:", authError);
           throw authError;
         }
-
-        // Now check if they have a profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('phone_number', phoneNumber)
-          .maybeSingle();
-
-        if (profileError) throw profileError;
-
-        toast({
-          title: "Verification Successful",
-          description: "Starting conversation with Sarah, your medical assistant",
-        });
-        
-        // If profile exists, go to dashboard, otherwise to signup flow
-        navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
       } else {
         throw new Error('Verification failed');
       }
