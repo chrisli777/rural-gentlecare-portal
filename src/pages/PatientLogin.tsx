@@ -68,28 +68,37 @@ const PatientLogin = () => {
       if (error) throw error;
 
       if (data?.status === 'approved') {
-        // Once verified, create a custom token or sign in with phone
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          phone: phoneNumber,
-          password: code, // Using the verification code as a one-time password
-        });
+        // Check if user exists
+        const { data: userData, error: userError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('phone_number', phoneNumber)
+          .single();
 
-        if (signInError) {
-          // If the user doesn't exist, sign them up
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            phone: phoneNumber,
-            password: code,
-          });
-
-          if (signUpError) throw signUpError;
+        if (userError && userError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+          throw userError;
         }
 
+        // After verification, sign in or sign up the user
+        const authResponse = userData
+          ? await supabase.auth.signInWithPassword({
+              phone: phoneNumber,
+              password: code,
+            })
+          : await supabase.auth.signUp({
+              phone: phoneNumber,
+              password: code,
+            });
+
+        if (authResponse.error) throw authResponse.error;
+
         toast({
-          title: "Login Successful",
+          title: "Verification Successful",
           description: "Starting conversation with Sarah, your medical assistant",
         });
         
-        navigate("/patient/signup/ai-conversation");
+        // If user doesn't exist, go to signup flow, otherwise go to dashboard
+        navigate(userData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
       } else {
         throw new Error('Verification failed');
       }
@@ -219,3 +228,4 @@ const PatientLogin = () => {
 };
 
 export default PatientLogin;
+
