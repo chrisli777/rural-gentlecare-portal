@@ -49,36 +49,15 @@ serve(async (req) => {
           console.log('Comparing with user phone:', userPhone)
           return userPhone === formattedPhone
         })
-        
-        let userId = existingUser?.id
-        let isNewUser = false
 
-        // Create new user only if no existing user found
-        if (!userId) {
-          console.log('No existing user found, creating new user...')
-          const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-            phone: formattedPhone,
-            user_metadata: { phone_verified: true },
-            email_confirm: true,
-            phone_confirm: true,
-          })
-          
-          if (createError || !newUser?.user) {
-            console.error('Create user error:', createError)
-            throw new Error('Failed to create user account: ' + createError?.message)
-          }
-          
-          userId = newUser.user.id
-          isNewUser = true
-          console.log('Created new user with ID:', userId)
-        } else {
-          console.log('Found existing user with ID:', userId)
+        if (!existingUser) {
+          throw new Error('No account found with this phone number. Please sign up first.')
         }
 
         // Generate access token and refresh token for the user
         const { data: tokens, error: tokenError } = await supabase.auth.admin.generateLink({
           type: 'magiclink',
-          email: `${userId}@temp.com`, // Using a temporary email since we're using phone auth
+          email: `${existingUser.id}@temp.com`, // Using a temporary email since we're using phone auth
         })
         
         if (tokenError || !tokens) {
@@ -86,7 +65,7 @@ serve(async (req) => {
           throw new Error('Failed to generate session tokens')
         }
 
-        // Check if profile exists (for both new and existing users)
+        // Check if profile exists
         const { data: profile } = await supabase
           .from('profiles')
           .select('id')
@@ -98,13 +77,13 @@ serve(async (req) => {
           access_token: tokens.properties.access_token,
           refresh_token: tokens.properties.refresh_token,
           expires_in: 3600,
-          user: existingUser || { id: userId, phone: formattedPhone }
+          user: existingUser
         }
 
         return new Response(
           JSON.stringify({ 
             session,
-            isNewUser,
+            isNewUser: false,
             profileExists: !!profile
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
