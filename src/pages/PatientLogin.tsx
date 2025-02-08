@@ -57,7 +57,6 @@ const PatientLogin = () => {
     try {
       console.log("Verifying code for phone:", phoneNumber);
       
-      // Call our new phone-auth function
       const { data, error } = await supabase.functions.invoke('phone-auth', {
         body: {
           action: 'verify',
@@ -69,22 +68,22 @@ const PatientLogin = () => {
       if (error) throw error;
 
       // Set the session
-      const { data: { session }, profileExists } = data;
+      const { session, isNewUser } = data;
       const { error: setSessionError } = await supabase.auth.setSession(session);
       if (setSessionError) throw setSessionError;
 
-      if (profileExists) {
-        toast({
-          title: "Login Successful",
-          description: "Welcome back!",
-        });
-        navigate("/patient/dashboard");
-      } else {
+      if (isNewUser) {
         toast({
           title: "Welcome",
           description: "Starting conversation with Sarah, your medical assistant",
         });
         navigate("/patient/signup/ai-conversation");
+      } else {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
+        navigate("/patient/dashboard");
       }
     } catch (error: any) {
       console.error("Verification error:", error);
@@ -140,7 +139,7 @@ const PatientLogin = () => {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Patient Login</h2>
           <p className="text-muted-foreground">
-            Welcome back to Adams County Rural Health Clinic
+            Welcome to Adams County Rural Health Clinic
           </p>
         </div>
 
@@ -178,16 +177,7 @@ const PatientLogin = () => {
             </>
           )}
 
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link
-                to="/patient/signup"
-                className="text-primary hover:underline"
-              >
-                Sign up
-              </Link>
-            </p>
+          <div className="text-center">
             <Link
               to="/"
               className="text-sm text-primary hover:underline block"

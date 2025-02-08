@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -42,6 +41,8 @@ serve(async (req) => {
         }
 
         const existingUser = users?.find(u => u.phone === formattedPhone)
+        let isNewUser = false
+
         let userId = existingUser?.id
         
         // If user doesn't exist, create them
@@ -60,6 +61,7 @@ serve(async (req) => {
           }
           
           userId = user.id
+          isNewUser = true
           console.log('Created new user with ID:', userId)
         }
 
@@ -83,6 +85,7 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({ 
             session,
+            isNewUser,
             profileExists: !!profile
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -105,4 +108,3 @@ serve(async (req) => {
     )
   }
 })
-
