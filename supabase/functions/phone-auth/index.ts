@@ -21,8 +21,6 @@ serve(async (req) => {
     )
     
     if (action === 'verify') {
-      console.log('Verifying code for:', phone)
-      
       try {
         // Verify with Twilio first
         const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-phone', {
@@ -33,7 +31,7 @@ serve(async (req) => {
           throw new Error('Invalid verification code')
         }
 
-        // Code is valid, get or create user
+        // Format phone number to E.164
         const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`
         
         // Check if user exists
@@ -51,22 +49,18 @@ serve(async (req) => {
           console.log('Creating new user for phone:', formattedPhone)
           const { data: { user }, error: createError } = await supabase.auth.admin.createUser({
             phone: formattedPhone,
+            user_metadata: { phone_verified: true },
             email_confirm: true,
             phone_confirm: true,
-            user_metadata: { phone_verified: true }
           })
           
-          if (createError) {
+          if (createError || !user) {
             console.error('Create user error:', createError)
-            throw new Error('Failed to create user account')
+            throw new Error('Failed to create user account: ' + createError?.message)
           }
           
-          userId = user?.id
+          userId = user.id
           console.log('Created new user with ID:', userId)
-        }
-        
-        if (!userId) {
-          throw new Error('Failed to get or create user')
         }
 
         // Generate session
@@ -74,7 +68,7 @@ serve(async (req) => {
           user_id: userId
         })
         
-        if (sessionError) {
+        if (sessionError || !session) {
           console.error('Session creation error:', sessionError)
           throw new Error('Failed to create session')
         }
@@ -111,3 +105,4 @@ serve(async (req) => {
     )
   }
 })
+
