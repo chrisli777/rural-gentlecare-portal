@@ -69,43 +69,33 @@ const PatientLogin = () => {
 
       if (data?.status === 'approved') {
         try {
-          // Try to sign in first, assuming user exists
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          // Sign in with OTP
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
             phone: phoneNumber,
-            password: code,
           });
 
-          if (!signInError) {
-            // Successfully signed in, check for profile
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('id')
-              .eq('phone_number', phoneNumber)
-              .maybeSingle();
+          if (signInError) throw signInError;
 
+          // Check if profile exists
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('phone_number', phoneNumber)
+            .maybeSingle();
+
+          if (profileData) {
             toast({
               title: "Login Successful",
               description: "Welcome back!",
             });
-            
-            navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
-            return;
+            navigate("/patient/dashboard");
+          } else {
+            toast({
+              title: "Welcome",
+              description: "Starting conversation with Sarah, your medical assistant",
+            });
+            navigate("/patient/signup/ai-conversation");
           }
-
-          // If sign in failed, try to sign up
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            phone: phoneNumber,
-            password: code,
-          });
-
-          if (signUpError) throw signUpError;
-
-          toast({
-            title: "Account Created",
-            description: "Starting conversation with Sarah, your medical assistant",
-          });
-          
-          navigate("/patient/signup/ai-conversation");
         } catch (authError: any) {
           console.error("Auth error:", authError);
           throw authError;
@@ -239,4 +229,3 @@ const PatientLogin = () => {
 };
 
 export default PatientLogin;
-
