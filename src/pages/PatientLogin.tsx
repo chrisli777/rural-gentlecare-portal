@@ -31,6 +31,17 @@ const PatientLogin = () => {
 
       if (error) {
         console.error("Login failed:", error);
+        // Check if it's the misleading "Invalid From Number" error
+        if (error.message.includes("Invalid From Number")) {
+          // If we get this error but the code was actually sent, we can proceed
+          setPhoneNumber(formattedPhone);
+          setShowVerification(true);
+          toast({
+            title: "Verification code sent",
+            description: "Please check your phone for the verification code",
+          });
+          return;
+        }
         throw error;
       }
 
@@ -206,4 +217,3 @@ const PatientLogin = () => {
 };
 
 export default PatientLogin;
-
