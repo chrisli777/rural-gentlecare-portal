@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AudioWaveform } from "lucide-react";
@@ -25,25 +24,12 @@ const PatientLogin = () => {
       const formattedPhone = formatPhoneNumber(phone);
       console.log("Attempting to send verification code to:", formattedPhone);
       
-      // First check if user exists
-      const { data: { user }, error: userError } = await supabase.auth.admin.getUserByPhone(formattedPhone);
+      // Always send OTP for login/signup
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+      });
       
-      if (!userError && user) {
-        // User exists, send OTP for login
-        const { error } = await supabase.auth.signInWithOtp({
-          phone: formattedPhone,
-        });
-        if (error) throw error;
-      } else {
-        // User doesn't exist, send verification code for signup
-        const { data, error } = await supabase.functions.invoke('verify-phone', {
-          body: {
-            action: 'send',
-            phone: formattedPhone,
-          },
-        });
-        if (error) throw error;
-      }
+      if (error) throw error;
       
       setPhoneNumber(formattedPhone);
       setShowVerification(true);
@@ -66,60 +52,29 @@ const PatientLogin = () => {
   const handleVerificationSubmit = async (code: string) => {
     setIsLoading(true);
     try {
-      // First verify the code
-      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-phone', {
-        body: {
-          action: 'verify',
-          phone: phoneNumber,
-          code,
-        },
+      // Verify OTP
+      const { data: { session }, error: verifyError } = await supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: code,
+        type: 'sms',
       });
 
       if (verifyError) throw verifyError;
 
-      if (verifyData?.status === 'approved') {
-        // Check if user exists in auth system
-        const { data: { user }, error: userError } = await supabase.auth.admin.getUserByPhone(phoneNumber);
+      if (session) {
+        // Check for profile
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('phone_number', phoneNumber)
+          .maybeSingle();
+
+        toast({
+          title: "Login Successful",
+          description: "Welcome back!",
+        });
         
-        if (!userError && user) {
-          // User exists, verify OTP for login
-          const { error: signInError } = await supabase.auth.verifyOtp({
-            phone: phoneNumber,
-            token: code,
-            type: 'sms',
-          });
-
-          if (signInError) throw signInError;
-
-          // Check for profile
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('phone_number', phoneNumber)
-            .maybeSingle();
-
-          toast({
-            title: "Login Successful",
-            description: "Welcome back!",
-          });
-          
-          navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
-        } else {
-          // New user, create account
-          const { error: signUpError } = await supabase.auth.signUp({
-            phone: phoneNumber,
-            password: code, // Using verification code as initial password
-          });
-
-          if (signUpError) throw signUpError;
-
-          toast({
-            title: "Account Created",
-            description: "Starting conversation with Sarah, your medical assistant",
-          });
-          
-          navigate("/patient/signup/ai-conversation");
-        }
+        navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
       } else {
         throw new Error('Verification failed');
       }
@@ -137,11 +92,8 @@ const PatientLogin = () => {
 
   const handleResendCode = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('verify-phone', {
-        body: {
-          action: 'send',
-          phone: phoneNumber,
-        },
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phoneNumber,
       });
 
       if (error) throw error;
@@ -249,4 +201,3 @@ const PatientLogin = () => {
 };
 
 export default PatientLogin;
-
