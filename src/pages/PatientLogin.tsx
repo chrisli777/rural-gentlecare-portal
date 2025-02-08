@@ -68,37 +68,40 @@ const PatientLogin = () => {
       if (error) throw error;
 
       if (data?.status === 'approved') {
-        // Check if user exists
-        const { data: userData, error: userError } = await supabase
+        // Check if user exists in auth system first
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          phone: phoneNumber,
+          password: code,
+        });
+
+        if (authError && authError.message.includes("Invalid login credentials")) {
+          // User doesn't exist in auth system, create them
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            phone: phoneNumber,
+            password: code,
+          });
+
+          if (signUpError) throw signUpError;
+        } else if (authError) {
+          throw authError;
+        }
+
+        // Now check if they have a profile
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('id')
           .eq('phone_number', phoneNumber)
-          .single();
+          .maybeSingle();
 
-        if (userError && userError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-          throw userError;
-        }
-
-        // After verification, sign in or sign up the user
-        const authResponse = userData
-          ? await supabase.auth.signInWithPassword({
-              phone: phoneNumber,
-              password: code,
-            })
-          : await supabase.auth.signUp({
-              phone: phoneNumber,
-              password: code,
-            });
-
-        if (authResponse.error) throw authResponse.error;
+        if (profileError) throw profileError;
 
         toast({
           title: "Verification Successful",
           description: "Starting conversation with Sarah, your medical assistant",
         });
         
-        // If user doesn't exist, go to signup flow, otherwise go to dashboard
-        navigate(userData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
+        // If profile exists, go to dashboard, otherwise to signup flow
+        navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
       } else {
         throw new Error('Verification failed');
       }
