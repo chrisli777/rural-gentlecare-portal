@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AudioWaveform } from "lucide-react";
@@ -24,11 +25,13 @@ const PatientLogin = () => {
       const formattedPhone = formatPhoneNumber(phone);
       console.log("Attempting to send verification code to:", formattedPhone);
       
-      // Always send OTP for login/signup
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
+      const { data, error } = await supabase.functions.invoke('verify-phone', {
+        body: {
+          action: 'send',
+          phone: formattedPhone,
+        },
       });
-      
+
       if (error) throw error;
       
       setPhoneNumber(formattedPhone);
@@ -52,29 +55,61 @@ const PatientLogin = () => {
   const handleVerificationSubmit = async (code: string) => {
     setIsLoading(true);
     try {
-      // Verify OTP
-      const { data: { session }, error: verifyError } = await supabase.auth.verifyOtp({
-        phone: phoneNumber,
-        token: code,
-        type: 'sms',
+      console.log("Verifying code for phone:", phoneNumber);
+      
+      const { data, error } = await supabase.functions.invoke('verify-phone', {
+        body: {
+          action: 'verify',
+          phone: phoneNumber,
+          code,
+        },
       });
 
-      if (verifyError) throw verifyError;
+      if (error) throw error;
 
-      if (session) {
-        // Check for profile
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('phone_number', phoneNumber)
-          .maybeSingle();
+      if (data?.status === 'approved') {
+        try {
+          // Try to sign in first, assuming user exists
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            phone: phoneNumber,
+            password: code,
+          });
 
-        toast({
-          title: "Login Successful",
-          description: "Welcome back!",
-        });
-        
-        navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
+          if (!signInError) {
+            // Successfully signed in, check for profile
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('phone_number', phoneNumber)
+              .maybeSingle();
+
+            toast({
+              title: "Login Successful",
+              description: "Welcome back!",
+            });
+            
+            navigate(profileData ? "/patient/dashboard" : "/patient/signup/ai-conversation");
+            return;
+          }
+
+          // If sign in failed, try to sign up
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            phone: phoneNumber,
+            password: code,
+          });
+
+          if (signUpError) throw signUpError;
+
+          toast({
+            title: "Account Created",
+            description: "Starting conversation with Sarah, your medical assistant",
+          });
+          
+          navigate("/patient/signup/ai-conversation");
+        } catch (authError: any) {
+          console.error("Auth error:", authError);
+          throw authError;
+        }
       } else {
         throw new Error('Verification failed');
       }
@@ -92,8 +127,11 @@ const PatientLogin = () => {
 
   const handleResendCode = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phoneNumber,
+      const { data, error } = await supabase.functions.invoke('verify-phone', {
+        body: {
+          action: 'send',
+          phone: phoneNumber,
+        },
       });
 
       if (error) throw error;
@@ -201,3 +239,4 @@ const PatientLogin = () => {
 };
 
 export default PatientLogin;
+
