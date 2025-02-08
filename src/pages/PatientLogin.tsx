@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AudioWaveform } from "lucide-react";
@@ -92,21 +91,12 @@ const PatientLogin = () => {
       }
 
       if (data.status === 'approved') {
-        // Create a custom token or sign in with phone
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        // Sign in with phone number using Supabase phone auth
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
           phone: phoneNumber,
-          password: code, // Using the verification code as a one-time password
         });
 
-        if (signInError) {
-          // If user doesn't exist, sign them up
-          const { error: signUpError } = await supabase.auth.signUp({
-            phone: phoneNumber,
-            password: code,
-          });
-
-          if (signUpError) throw signUpError;
-        }
+        if (signInError) throw signInError;
 
         toast({
           title: "Login Successful",
