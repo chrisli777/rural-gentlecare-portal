@@ -68,17 +68,25 @@ const PatientLogin = () => {
       if (error) throw error;
 
       if (data?.status === 'approved') {
-        // Sign in with phone number using Supabase phone auth
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
+        // Once verified, create a custom token or sign in with phone
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           phone: phoneNumber,
+          password: code, // Using the verification code as a one-time password
         });
 
-        if (signInError) throw signInError;
+        if (signInError) {
+          // If the user doesn't exist, sign them up
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            phone: phoneNumber,
+            password: code,
+          });
+
+          if (signUpError) throw signUpError;
+        }
 
         toast({
           title: "Login Successful",
           description: "Starting conversation with Sarah, your medical assistant",
-          variant: "default",
         });
         
         navigate("/patient/signup/ai-conversation");
