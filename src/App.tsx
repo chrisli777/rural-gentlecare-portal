@@ -17,6 +17,7 @@ import ProviderLogin from "./pages/ProviderLogin";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import ProviderPatients from "./pages/ProviderPatients";
 import ProviderAnalytics from "./pages/ProviderAnalytics";
+import PatientOnboarding from "./pages/PatientOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/patient/login" element={<PatientLogin />} />
           <Route path="/patient/signup" element={<PatientSignup />} />
+          <Route path="/patient/onboarding" element={<PatientOnboarding />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
           <Route path="/patient/profile" element={<PatientProfile />} />
           <Route path="/patient/messages" element={<PatientMessages />} />
@@ -49,3 +51,4 @@ const App = () => (
 );
 
 export default App;
+

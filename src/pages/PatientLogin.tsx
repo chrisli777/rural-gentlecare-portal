@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AudioWaveform } from "lucide-react";
@@ -77,7 +76,7 @@ const PatientLogin = () => {
           title: "Welcome",
           description: "Starting conversation with Sarah, your medical assistant",
         });
-        navigate("/patient/signup/ai-conversation");
+        navigate("/patient/onboarding");
       } else {
         toast({
           title: "Login Successful",
@@ -126,7 +125,7 @@ const PatientLogin = () => {
       title: "Guest Access",
       description: "Starting conversation with Sarah, your medical assistant",
     });
-    navigate("/patient/signup");
+    navigate("/patient/onboarding");
   };
 
   const handleBack = () => {
