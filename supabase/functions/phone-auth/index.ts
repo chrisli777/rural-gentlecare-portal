@@ -33,33 +33,42 @@ serve(async (req) => {
         // Format phone number to E.164
         const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`
         
-        // First check if user exists
-        const { data: existingUsers, error: getUserError } = await supabase.auth.admin.listUsers()
+        // Get existing users
+        const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers()
         if (getUserError) {
           console.error('Get users error:', getUserError)
           throw new Error('Failed to check existing users')
         }
 
-        const existingUser = existingUsers?.users?.find(u => u.phone === formattedPhone)
+        // Check for existing user with this phone number
+        console.log('Checking for existing user with phone:', formattedPhone)
+        console.log('Total users:', users?.length)
+        
+        const existingUser = users?.find(u => {
+          const userPhone = u.phone
+          console.log('Comparing with user phone:', userPhone)
+          return userPhone === formattedPhone
+        })
+        
         let userId = existingUser?.id
         let isNewUser = false
 
         // Create new user only if no existing user found
         if (!userId) {
-          console.log('Creating new user for phone:', formattedPhone)
-          const { data: { user }, error: createError } = await supabase.auth.admin.createUser({
+          console.log('No existing user found, creating new user...')
+          const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
             phone: formattedPhone,
             user_metadata: { phone_verified: true },
             email_confirm: true,
             phone_confirm: true,
           })
           
-          if (createError || !user) {
+          if (createError || !newUser?.user) {
             console.error('Create user error:', createError)
             throw new Error('Failed to create user account: ' + createError?.message)
           }
           
-          userId = user.id
+          userId = newUser.user.id
           isNewUser = true
           console.log('Created new user with ID:', userId)
         } else {
@@ -77,6 +86,13 @@ serve(async (req) => {
           throw new Error('Failed to generate session tokens')
         }
 
+        // Check if profile exists (for both new and existing users)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('phone_number', formattedPhone)
+          .maybeSingle()
+        
         // Create a session object that matches the structure expected by the client
         const session = {
           access_token: tokens.properties.access_token,
@@ -85,13 +101,6 @@ serve(async (req) => {
           user: existingUser || { id: userId, phone: formattedPhone }
         }
 
-        // Check if profile exists (for both new and existing users)
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('phone_number', formattedPhone)
-          .maybeSingle()
-        
         return new Response(
           JSON.stringify({ 
             session,
