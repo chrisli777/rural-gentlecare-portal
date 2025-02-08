@@ -33,19 +33,18 @@ serve(async (req) => {
         // Format phone number to E.164
         const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`
         
-        // Check if user exists
-        const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers()
+        // First check if user exists
+        const { data: existingUsers, error: getUserError } = await supabase.auth.admin.listUsers()
         if (getUserError) {
           console.error('Get users error:', getUserError)
           throw new Error('Failed to check existing users')
         }
 
-        const existingUser = users?.find(u => u.phone === formattedPhone)
+        const existingUser = existingUsers?.users?.find(u => u.phone === formattedPhone)
+        let userId = existingUser?.id
         let isNewUser = false
 
-        let userId = existingUser?.id
-        
-        // If user doesn't exist, create them
+        // Create new user only if no existing user found
         if (!userId) {
           console.log('Creating new user for phone:', formattedPhone)
           const { data: { user }, error: createError } = await supabase.auth.admin.createUser({
@@ -63,9 +62,11 @@ serve(async (req) => {
           userId = user.id
           isNewUser = true
           console.log('Created new user with ID:', userId)
+        } else {
+          console.log('Found existing user with ID:', userId)
         }
 
-        // Generate session
+        // Generate session for either new or existing user
         const { data: { session }, error: sessionError } = await supabase.auth.admin.createSession({
           user_id: userId
         })
@@ -75,7 +76,7 @@ serve(async (req) => {
           throw new Error('Failed to create session')
         }
 
-        // Check if profile exists
+        // Check if profile exists (for both new and existing users)
         const { data: profile } = await supabase
           .from('profiles')
           .select('id')
@@ -108,3 +109,4 @@ serve(async (req) => {
     )
   }
 })
+
