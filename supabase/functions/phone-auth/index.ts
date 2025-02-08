@@ -23,48 +23,72 @@ serve(async (req) => {
     if (action === 'verify') {
       console.log('Verifying code for:', phone)
       
-      // Verify with Twilio first
-      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-phone', {
-        body: { action: 'verify', phone, code }
-      })
-      
-      if (verifyError || verifyData?.status !== 'approved') {
-        throw new Error('Invalid verification code')
+      try {
+        // Verify with Twilio first
+        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-phone', {
+          body: { action: 'verify', phone, code }
+        })
+        
+        if (verifyError || verifyData?.status !== 'approved') {
+          throw new Error('Invalid verification code')
+        }
+      } catch (error) {
+        console.error('Twilio verification error:', error)
+        throw new Error('Failed to verify code. Please try again.')
       }
       
-      // Check if profile exists
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('phone_number', phone)
-        .maybeSingle()
+      // Check if user exists by phone
+      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers()
+      const existingUser = users?.find(u => u.phone === phone)
       
-      if (profileError) throw profileError
-
-      // If no profile exists, create one
-      if (!profiles) {
+      let userId = existingUser?.id
+      
+      if (!existingUser) {
+        // Create new user if doesn't exist
         const { data: { user }, error: createError } = await supabase.auth.admin.createUser({
           phone,
           phone_confirmed_at: new Date().toISOString(),
           user_metadata: { phone_verified: true }
         })
         
-        if (createError) throw createError
+        if (createError) {
+          console.error('Create user error:', createError)
+          throw new Error('Failed to create user account')
+        }
         
-        // Profile will be created automatically via trigger
+        userId = user?.id
+      }
+      
+      if (!userId) {
+        throw new Error('Failed to get or create user')
+      }
+      
+      // Check if profile exists
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('phone_number', phone)
+        .maybeSingle()
+      
+      if (profileError) {
+        console.error('Profile check error:', profileError)
+        throw new Error('Failed to check user profile')
       }
       
       // Generate session
       const { data: { session }, error: sessionError } = await supabase.auth.admin.createSession({
-        phone,
+        user_id: userId
       })
       
-      if (sessionError) throw sessionError
+      if (sessionError) {
+        console.error('Session creation error:', sessionError)
+        throw new Error('Failed to create session')
+      }
       
       return new Response(
         JSON.stringify({ 
           session,
-          profileExists: !!profiles
+          profileExists: !!profile
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
