@@ -119,9 +119,9 @@ const PatientLogin = () => {
   const handleGuestLogin = () => {
     toast({
       title: "Guest Access",
-      description: "Accessing AI assistant as a guest user",
+      description: "Starting conversation with Sarah, your medical assistant",
     });
-    navigate("/patient/ai-assistant"); // Changed to redirect to AI assistant first
+    navigate("/patient/signup/ai-conversation"); // Changed to direct to Sarah conversation
   };
 
   const handleBack = () => {
