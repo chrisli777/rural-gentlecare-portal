@@ -119,9 +119,9 @@ const PatientLogin = () => {
   const handleGuestLogin = () => {
     toast({
       title: "Guest Access",
-      description: "Accessing dashboard as a guest user",
+      description: "Accessing AI assistant as a guest user",
     });
-    navigate("/patient/dashboard");
+    navigate("/patient/ai-assistant"); // Changed to redirect to AI assistant first
   };
 
   const handleBack = () => {
@@ -206,3 +206,4 @@ const PatientLogin = () => {
 };
 
 export default PatientLogin;
+
