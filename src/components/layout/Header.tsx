@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Heart, ArrowLeft, Menu } from "lucide-react";
 import { useState } from "react";
@@ -8,8 +9,6 @@ export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if we're on the provider or patient dashboard
-  const isDashboard = location.pathname === '/provider/dashboard' || location.pathname === '/patient/dashboard';
   // Check if we're on provider patients or analytics page
   const isProviderPatientsOrAnalytics = location.pathname === '/provider/patients' || location.pathname === '/provider/analytics';
   // Check if we're on appointment or messages page
@@ -47,31 +46,25 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {isDashboard && (
-              <>
-                <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
-                  About Us
-                </Link>
-                <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
-                  Contact Us
-                </a>
-              </>
-            )}
+            <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
+              About Us
+            </Link>
+            <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
+              Contact Us
+            </a>
           </nav>
 
           {/* Mobile Menu Button */}
-          {isDashboard && (
-            <button
-              className="md:hidden p-2"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <Menu className="w-6 h-6 text-gray-600" />
-            </button>
-          )}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <Menu className="w-6 h-6 text-gray-600" />
+          </button>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && isDashboard && (
+        {isMenuOpen && (
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
               <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
