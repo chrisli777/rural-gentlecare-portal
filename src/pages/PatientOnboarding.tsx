@@ -28,13 +28,6 @@ const PatientOnboarding = () => {
 
           <AIConversationStep onProfileComplete={handleProfileComplete} />
         </div>
-
-        {/* Trust Indicators */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-muted-foreground">
-            Your privacy and security are our top priorities. All conversations are encrypted and protected.
-          </p>
-        </div>
       </div>
     </div>
   );
