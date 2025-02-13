@@ -2,6 +2,7 @@
 import { AIConversationStep } from "@/components/signup/AIConversationStep";
 import { useNavigate } from "react-router-dom";
 import { Heart } from "lucide-react";
+import { Header } from "@/components/layout/Header";
 
 const PatientOnboarding = () => {
   const navigate = useNavigate();
@@ -12,7 +13,8 @@ const PatientOnboarding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-white">
-      <div className="container mx-auto px-4 py-12">
+      <Header />
+      <div className="container mx-auto px-4 pt-24 pb-12">
         {/* Main Header */}
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-2 mb-4">
