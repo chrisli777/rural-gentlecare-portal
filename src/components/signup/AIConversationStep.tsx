@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -62,7 +61,7 @@ export const AIConversationStep = ({ onProfileComplete }: AIConversationStepProp
     overrides: {
       agent: {
         prompt: {
-          prompt: `You are Sarah, a friendly and professional medical assistant helping patients complete their medical profile. Your role is to:
+          prompt: `You are Lisa, a friendly and professional medical assistant helping patients complete their medical profile. Your role is to:
 
 1. Have a natural conversation to gather basic medical information
 2. Pay attention to what the patient says and extract relevant information
@@ -81,12 +80,12 @@ Focus on getting these key details in a conversational way:
 
 Be friendly and conversational. Don't be too rigid about information formats.`,
         },
-        firstMessage: "Hi! I'm Sarah, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
+        firstMessage: "Hi! I'm Lisa, your medical assistant. I'll help you complete your profile using voice interaction. Let's start with your name - what's your first name?",
         language: "en",
       },
       tts: {
         modelId: "eleven_multilingual_v2",
-        voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah voice
+        voiceId: "EXAVITQu4vr4xnSDxMaL", // Lisa voice
       }
     }
   });
@@ -157,7 +156,7 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
         setIsRecording(true);
         toast({
           title: "Recording Started",
-          description: "You can now speak with Sarah",
+          description: "You can now speak with Lisa",
         });
       } else {
         console.log("Stopping voice recording...");
@@ -192,7 +191,7 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
     <div className="space-y-4">
       <Card className="p-8 flex flex-col items-center justify-center min-h-[400px]">
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Talk to Sarah</h2>
+          <h2 className="text-2xl font-semibold mb-2">Talk to Lisa</h2>
           <p className="text-muted-foreground">Click the button below to start speaking with your AI medical assistant</p>
         </div>
         
@@ -225,4 +224,3 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
     </div>
   );
 };
-

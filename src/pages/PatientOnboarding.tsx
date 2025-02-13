@@ -19,10 +19,10 @@ const PatientOnboarding = () => {
         <div className="max-w-md mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg animate-fade-in">
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold text-gray-900">
-              Meet Sarah
+              Meet Lisa
             </h2>
             <p className="text-muted-foreground">
-              Your friendly AI medical assistant who's here to help you get started. Just speak naturally, and Sarah will guide you through creating your health profile.
+              Your friendly AI medical assistant who's here to help you get started. Just speak naturally, and Lisa will guide you through creating your health profile.
             </p>
           </div>
 
