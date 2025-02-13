@@ -15,19 +15,6 @@ const PatientOnboarding = () => {
     <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-white">
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-12">
-        {/* Main Header */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Heart className="h-8 w-8 text-primary animate-pulse" />
-            <h1 className="text-4xl font-bold text-gray-900">
-              Adams Rural Care
-            </h1>
-          </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Your health companion in rural healthcare, bringing personalized medical assistance right to your home
-          </p>
-        </div>
-
         {/* AI Assistant Section */}
         <div className="max-w-md mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg animate-fade-in">
           <div className="text-center space-y-4">
