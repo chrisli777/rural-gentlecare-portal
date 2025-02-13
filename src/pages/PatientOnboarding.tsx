@@ -21,9 +21,6 @@ const PatientOnboarding = () => {
             <h2 className="text-3xl font-bold text-gray-900">
               Meet Lisa
             </h2>
-            <p className="text-muted-foreground">
-              Your friendly AI medical assistant who's here to help you get started. Just speak naturally, and Lisa will guide you through creating your health profile.
-            </p>
           </div>
 
           <AIConversationStep onProfileComplete={handleProfileComplete} />
