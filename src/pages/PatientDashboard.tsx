@@ -1,7 +1,7 @@
 
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
+import { Calendar, Bot, Send, Loader2, Mic, MicOff, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -301,7 +301,17 @@ const PatientDashboard = () => {
       <Header />
       <main className="container mx-auto px-4 pt-20 pb-6 h-[calc(100vh-80px)]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-          <div className="md:col-span-1 space-y-6 overflow-y-auto">            
+          <div className="md:col-span-1 space-y-6 overflow-y-auto">
+            <Link to="/patient/onboarding" className="block group">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <Headphones className="w-12 h-12 text-[#1E5AAB] mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Voice Assistant</h3>
+                  <p className="text-gray-600">Experience hands-free interaction with our voice-enabled features.</p>
+                </CardContent>
+              </Card>
+            </Link>
+            
             <Link to="/patient/appointment" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
