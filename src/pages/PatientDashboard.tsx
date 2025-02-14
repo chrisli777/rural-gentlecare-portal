@@ -38,7 +38,7 @@ const PatientDashboard = () => {
           <div className="p-4 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-5 w-5 bg-[#1E5AAB] rounded-full animate-pulse" />
-              <h2 className="text-lg font-semibold">AI Realtime Conversation</h2>
+              <h2 className="text-lg font-semibold">AI Health Assistant</h2>
             </div>
             <Button
               onClick={() => navigate("/patient/ai-assistant")}
