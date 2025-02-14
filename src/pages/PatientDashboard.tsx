@@ -305,11 +305,13 @@ const PatientDashboard = () => {
             <Link to="/patient/onboarding" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-4 relative">
                     <Headphones className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Voice Assistant</h3>
-                      <p className="text-gray-600 hidden sm:block">Experience hands-free interaction with our voice-enabled features.</p>
+                      <h3 className="text-2xl font-semibold text-[#1E5AAB]">Voice Assistant</h3>
+                      <p className="text-gray-600 opacity-0 group-hover:opacity-100 absolute left-0 right-0 mt-2 transition-opacity duration-200">
+                        Experience hands-free interaction with our voice-enabled features.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -319,70 +321,74 @@ const PatientDashboard = () => {
             <Link to="/patient/appointment" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-4 relative">
                     <Calendar className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book Appointments</h3>
-                      <p className="text-gray-600 hidden sm:block">Schedule your next visit with our healthcare providers.</p>
+                      <h3 className="text-2xl font-semibold text-[#1E5AAB]">Book Appointments</h3>
+                      <p className="text-gray-600 opacity-0 group-hover:opacity-100 absolute left-0 right-0 mt-2 transition-opacity duration-200">
+                        Schedule your next visit with our healthcare providers.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </Link>
 
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow group">
               <CardContent className="p-6">
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 relative">
                   <ClipboardList className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">All Appointments</h3>
-                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                      {recentAppointments.length > 0 ? (
-                        recentAppointments.map((appointment) => (
-                          <div 
-                            key={appointment.id}
-                            className="flex flex-col p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <div>
-                                <p className="font-medium text-[#1E5AAB]">{appointment.appointment_type}</p>
-                                <p className="text-sm text-muted-foreground hidden sm:block">
-                                  {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
-                                </p>
-                                <p className="text-sm text-muted-foreground sm:hidden">
-                                  {format(new Date(appointment.appointment_date), 'PP')}
-                                </p>
+                    <h3 className="text-2xl font-semibold text-[#1E5AAB]">All Appointments</h3>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                        {recentAppointments.length > 0 ? (
+                          recentAppointments.map((appointment) => (
+                            <div 
+                              key={appointment.id}
+                              className="flex flex-col p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <p className="font-medium text-[#1E5AAB]">{appointment.appointment_type}</p>
+                                  <p className="text-sm text-muted-foreground hidden sm:block">
+                                    {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground sm:hidden">
+                                    {format(new Date(appointment.appointment_date), 'PP')}
+                                  </p>
+                                </div>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm"
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="text-[#1E5AAB]">Are you sure?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently cancel your appointment.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
+                                        Yes, cancel appointment
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="sm"
-                                  >
-                                    Cancel
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-[#1E5AAB]">Are you sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This action cannot be undone. This will permanently cancel your appointment.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
-                                      Yes, cancel appointment
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
                             </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-muted-foreground text-center py-4">No appointments found</p>
-                      )}
+                          ))
+                        ) : (
+                          <p className="text-muted-foreground text-center py-4">No appointments found</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
