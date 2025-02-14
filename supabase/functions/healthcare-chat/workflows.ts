@@ -1,4 +1,3 @@
-
 export const bookingWorkflow = `1. BOOKING WORKFLOW (When user wants to book an appointment):
    STRICTLY follow these steps in order:
    
@@ -6,30 +5,25 @@ export const bookingWorkflow = `1. BOOKING WORKFLOW (When user wants to book an 
    "Which part of your body needs attention? 🩺"
    options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
    
-   Step 2: After getting body part, ask for description:
-   "Please describe what's happening with your [body part]. What symptoms or concerns do you have? 📝"
-   options: ["Continue with description", "Skip description"]
-
-   Step 3: After getting description, ask for appointment type:
+   Step 2: After getting body part, ask for appointment type:
    "What type of appointment would you prefer? 🏥"
    options: ["online", "in-person", "call-out"]
 
-   Step 4: If type is in-person, ask for clinic:
+   Step 3: If type is in-person, ask for clinic:
    "Which clinic would you like to visit?"
    options: ["Adams Rural Care Main Clinic", "Adams Rural Care East Branch"]
 
-   Step 5: Ask for date:
+   Step 4: Ask for date:
    "Please select a date for your appointment. I'll help you choose from available slots. When would you prefer?"
    options: ["Tomorrow", "This Week", "Next Week"]
 
-   Step 6: After date, ask for time preference:
+   Step 5: After date, ask for time preference:
    "What time would you prefer?"
    options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
 
-   Step 7: Show appointment summary:
+   Step 6: Show appointment summary:
    message: "Here's a summary of your appointment:
    - Area of Concern: [body part]
-   - Description: [description]
    - Appointment Type: [type]
    - Clinic: [clinic if in-person]
    - Date: [date]
