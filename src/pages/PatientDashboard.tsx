@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
@@ -15,15 +15,28 @@ const PatientDashboard = () => {
     {
       role: "assistant",
       content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can describe your health concern, and I'll guide you through the process. 🏥",
+      options: [
+        "I need to book an appointment",
+        "I have a health concern",
+        "I need medical advice"
+      ]
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [conversation]);
 
   const handleOptionSelect = (option: string) => {
-    // Automatically send the selected option as a message
     setMessage(option);
     handleSendMessage(option);
   };
@@ -44,7 +57,6 @@ const PatientDashboard = () => {
 
       if (error) throw error;
 
-      // Handle multiple responses
       if (data.responses) {
         const newMessages = data.responses.map((response: string) => {
           const message: { role: string; content: string; options?: string[] } = {
@@ -52,11 +64,10 @@ const PatientDashboard = () => {
             content: response,
           };
 
-          // Add appointment type options if asking about appointment type
+          // Add common response options based on message content
           if (response.toLowerCase().includes("online or in-person")) {
             message.options = ["Online Appointment", "In-Person Appointment"];
           }
-          // Add time slot options if asking about time
           else if (response.toLowerCase().includes("how about") && response.toLowerCase().includes("am?")) {
             message.options = [
               "Yes, that time works",
@@ -64,12 +75,35 @@ const PatientDashboard = () => {
               "Different day please"
             ];
           }
+          else if (response.toLowerCase().includes("what symptoms")) {
+            message.options = [
+              "Fever",
+              "Headache",
+              "Cough",
+              "Sore throat",
+              "Other symptoms"
+            ];
+          }
+          else if (response.toLowerCase().includes("how long")) {
+            message.options = [
+              "Just started",
+              "Few days",
+              "About a week",
+              "More than a week"
+            ];
+          }
+          else if (response.toLowerCase().includes("severity")) {
+            message.options = [
+              "Mild",
+              "Moderate",
+              "Severe"
+            ];
+          }
 
           return message;
         });
         setConversation(prev => [...prev, ...newMessages]);
       } else if (data.response) {
-        // Backward compatibility for single responses
         setConversation(prev => [...prev, {
           role: "assistant",
           content: data.response
@@ -182,7 +216,7 @@ const PatientDashboard = () => {
             <h2 className="text-lg font-semibold">AI Health Assistant</h2>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
               {conversation.map((msg, index) => (
                 <motion.div
@@ -225,6 +259,7 @@ const PatientDashboard = () => {
                   )}
                 </motion.div>
               ))}
+              <div ref={messagesEndRef} />
             </AnimatePresence>
           </div>
 
