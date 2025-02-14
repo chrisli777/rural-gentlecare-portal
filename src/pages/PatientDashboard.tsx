@@ -6,7 +6,9 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 const PatientDashboard = () => {
   const {
@@ -18,6 +20,14 @@ const PatientDashboard = () => {
   } = useChat();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+
+  const handleVoiceProcessed = (text: string) => {
+    setMessage(text);
+    handleSendMessage(text);
+  };
+
+  const { isRecording, toggleRecording } = useVoiceRecording(handleVoiceProcessed);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,9 +61,9 @@ const PatientDashboard = () => {
             message={message}
             setMessage={setMessage}
             isLoading={isLoading}
-            isRecording={false}
+            isRecording={isRecording}
             onSendMessage={() => handleSendMessage()}
-            onToggleRecording={() => {}}
+            onToggleRecording={toggleRecording}
           />
         </Card>
       </main>
