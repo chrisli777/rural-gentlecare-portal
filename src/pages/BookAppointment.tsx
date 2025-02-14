@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
@@ -171,13 +172,13 @@ const PatientAppointment = () => {
                   )}
 
                   <div>
-                    <Label>Select Body Part</Label>
+                    <Label>{t.appointments.bodyPart.label}</Label>
                     <Select
                       value={bodyPart}
                       onValueChange={setBodyPart}
                     >
                       <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Select body part" />
+                        <SelectValue placeholder={t.appointments.bodyPart.select} />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
                         {bodyParts.map((part) => (
@@ -190,11 +191,11 @@ const PatientAppointment = () => {
                   </div>
 
                   <div>
-                    <Label>Additional Description (Optional)</Label>
+                    <Label>{t.appointments.additionalDescription.label}</Label>
                     <Textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Please describe your symptoms or reason for visit"
+                      placeholder={t.appointments.additionalDescription.placeholder}
                       className="mt-1"
                     />
                   </div>
@@ -203,7 +204,7 @@ const PatientAppointment = () => {
                     className="w-full mt-4"
                     onClick={handleDetailsNext}
                   >
-                    Continue to Schedule
+                    {t.appointments.continueToSchedule}
                   </Button>
                 </div>
               )}

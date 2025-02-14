@@ -206,7 +206,7 @@ export const translations = {
     },
     appointments: {
       title: "Programar Citas",
-      description: "Description",
+      description: "Descripción",
       type: {
         label: "Tipo de Cita",
         select: "Seleccione el tipo de cita",
