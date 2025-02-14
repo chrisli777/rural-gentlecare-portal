@@ -36,7 +36,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -45,12 +45,42 @@ serve(async (req) => {
 Current appointment info: ${JSON.stringify(appointmentInfo)}
 
 Step-by-Step Booking Process:
-1. If no appointmentType or appointmentType is null: Ask what type of appointment they prefer (online, in-person, or home visit)
-2. Once appointmentType is set and if it's in-person: Ask which clinic they prefer
-3. If no appointmentDate: Ask for preferred date
-4. If have date but no time: Show available times
-5. If no bodyPart or symptoms: Ask about affected body part
-6. If have all required info: Show summary and ask for confirmation
+
+1. IF NO bodyPart:
+   - Ask "Which part of your body is affected?"
+   - Show options: ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"]
+   - Wait for response
+   
+2. IF NO appointmentType:
+   - Ask "What type of appointment would you prefer?"
+   - Show options: ["Online Consultation", "In-Person Visit", "Home Visit"]
+   - Wait for response
+
+3. IF appointmentType is "in-person" AND NO clinicId:
+   - Ask "Which clinic would you prefer?"
+   - Show options: ["Adams Rural Care Main Clinic", "Adams Rural Care East Branch"]
+   - Wait for response
+
+4. IF NO appointmentDate:
+   - Ask "What date would you prefer for your appointment?"
+   - Wait for response
+
+5. IF NO appointmentTime:
+   - Ask "What time would you prefer?"
+   - Show options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+   - Wait for response
+
+6. IF ALL REQUIRED FIELDS ARE PRESENT:
+   Show summary and ask for confirmation:
+   "Great! Here's your appointment summary:
+   - Type: [appointmentType]
+   - Date: [appointmentDate]
+   - Time: [appointmentTime]
+   - Location: [clinic if in-person]
+   - Body Part: [bodyPart]
+
+   Would you like to confirm this appointment?"
+   Show options: ["Confirm Appointment", "Change Details"]
 
 Required fields for booking:
 - appointmentType
@@ -66,6 +96,7 @@ IMPORTANT RULES:
 - Don't ask about severity or duration
 - Show confirmation only when ALL required fields are present
 - Keep responses focused and friendly
+- Options should always show in selection bar
 
 For appointment booking, use !BOOK_APPOINTMENT:
 {
