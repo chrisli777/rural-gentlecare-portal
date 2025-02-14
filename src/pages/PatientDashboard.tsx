@@ -1,5 +1,5 @@
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -7,7 +7,7 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabase";
+import VoiceInterface from "@/components/chat/VoiceInterface";
 
 const PatientDashboard = () => {
   const {
@@ -18,8 +18,8 @@ const PatientDashboard = () => {
     handleSendMessage,
   } = useChat();
 
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,41 +29,12 @@ const PatientDashboard = () => {
     scrollToBottom();
   }, [conversation]);
 
-  const handleVoiceInput = async (text: string) => {
-    // Send the transcribed text as a message
-    await handleSendMessage(text);
-
-    // Get the last assistant message
-    const lastAssistantMessage = conversation[conversation.length - 1];
-    if (lastAssistantMessage && lastAssistantMessage.role === 'assistant') {
-      try {
-        // Convert assistant's response to speech
-        const { data, error } = await supabase.functions.invoke('text-to-speech', {
-          body: { text: lastAssistantMessage.content }
-        });
-
-        if (error) throw error;
-
-        if (data.audioContent) {
-          // Play the audio response
-          const audio = audioRef.current;
-          if (audio) {
-            audio.src = `data:audio/mp3;base64,${data.audioContent}`;
-            await audio.play();
-          }
-        }
-      } catch (error) {
-        console.error('Error converting text to speech:', error);
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex">
         <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
-          <ChatHeader onVoiceInputReceived={handleVoiceInput} />
+          <ChatHeader onVoiceInputReceived={() => {}} />
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
@@ -88,7 +59,7 @@ const PatientDashboard = () => {
           />
         </Card>
       </main>
-      <audio ref={audioRef} className="hidden" />
+      <VoiceInterface onSpeakingChange={setIsAISpeaking} />
     </div>
   );
 };
