@@ -1,41 +1,28 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
-import { Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
-import { motion, AnimatePresence } from "framer-motion";
-
-interface AppointmentInfo {
-  appointmentType?: string;
-  appointmentDate?: string;
-  appointmentTime?: string;
-  symptoms?: string;
-  duration?: string;
-  severity?: string;
-}
+import { ChatHeader } from "@/components/chat/ChatHeader";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { useChat } from "@/hooks/useChat";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
+import { AnimatePresence } from "framer-motion";
 
 const PatientDashboard = () => {
-  const [message, setMessage] = useState("");
-  const [appointmentInfo, setAppointmentInfo] = useState<AppointmentInfo>({});
-  const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
-    {
-      role: "assistant",
-      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can book an appointment or discuss your health concerns.",
-      options: [
-        "Book an appointment",
-        "Discuss health concerns",
-        "Get medical advice"
-      ]
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const { toast } = useToast();
+  const {
+    message,
+    setMessage,
+    conversation,
+    isLoading,
+    handleSendMessage,
+  } = useChat();
+
+  const { isRecording, toggleRecording } = useVoiceRecording((text) => {
+    setMessage(text);
+    handleSendMessage(text);
+  });
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -46,284 +33,34 @@ const PatientDashboard = () => {
     scrollToBottom();
   }, [conversation]);
 
-  const handleOptionSelect = (option: string) => {
-    setMessage(option);
-    handleSendMessage(option);
-  };
-
-  const getOptionsForResponse = (content: string, currentInfo: AppointmentInfo): string[] => {
-    if (content.toLowerCase().includes("online or in-person")) {
-      return ["Online Appointment", "In-Person Appointment"];
-    }
-    if (content.toLowerCase().includes("what date")) {
-      return ["Today", "Tomorrow", "Next Week", "Choose specific date"];
-    }
-    if (content.toLowerCase().includes("available times") || content.toLowerCase().includes("time works")) {
-      return ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
-    }
-    if (content.toLowerCase().includes("what symptoms")) {
-      return ["Fever", "Headache", "Cough", "Sore throat", "Other symptoms"];
-    }
-    if (content.toLowerCase().includes("how long")) {
-      return ["Just started", "Few days", "About a week", "More than a week"];
-    }
-    if (content.toLowerCase().includes("severity")) {
-      return ["Mild", "Moderate", "Severe"];
-    }
-    if (content.toLowerCase().includes("confirm")) {
-      return ["Confirm Appointment", "Change Details"];
-    }
-    return [];
-  };
-
-  const updateAppointmentInfo = (response: string, selectedOption: string) => {
-    const newInfo = { ...appointmentInfo };
-    
-    if (response.toLowerCase().includes("online or in-person")) {
-      newInfo.appointmentType = selectedOption.toLowerCase().includes("online") ? "online" : "in-person";
-    } else if (response.toLowerCase().includes("what date")) {
-      newInfo.appointmentDate = selectedOption;
-    } else if (response.toLowerCase().includes("time works")) {
-      newInfo.appointmentTime = selectedOption;
-    } else if (response.toLowerCase().includes("what symptoms")) {
-      newInfo.symptoms = selectedOption;
-    } else if (response.toLowerCase().includes("how long")) {
-      newInfo.duration = selectedOption;
-    } else if (response.toLowerCase().includes("severity")) {
-      newInfo.severity = selectedOption;
-    }
-
-    setAppointmentInfo(newInfo);
-  };
-
-  const handleSendMessage = async (manualMessage?: string) => {
-    const messageToSend = manualMessage || message;
-    if (!messageToSend.trim()) return;
-
-    setIsLoading(true);
-    const userMessage = { role: "user", content: messageToSend };
-    setConversation(prev => [...prev, userMessage]);
-    setMessage("");
-
-    try {
-      const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { 
-          message: userMessage.content,
-          appointmentInfo: appointmentInfo 
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.responses) {
-        const newMessages = data.responses.map((response: string) => {
-          const options = getOptionsForResponse(response, appointmentInfo);
-          const message = {
-            role: "assistant",
-            content: response,
-            options: options
-          };
-
-          // Update appointment info based on the response and previous selection
-          if (userMessage.content) {
-            updateAppointmentInfo(response, userMessage.content);
-          }
-
-          return message;
-        });
-        setConversation(prev => [...prev, ...newMessages]);
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to get response from AI assistant. Please try again.",
-        variant: "destructive",
-      });
-      console.error("AI Chat Error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const toggleRecording = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const audioChunks: BlobPart[] = [];
-
-      recorder.ondataavailable = (event) => {
-        audioChunks.push(event.data);
-      };
-
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-
-        reader.onload = async () => {
-          if (reader.result && typeof reader.result === 'string') {
-            const base64Audio = reader.result.split(',')[1];
-            
-            try {
-              setIsLoading(true);
-              const { data, error } = await supabase.functions.invoke('voice-to-text', {
-                body: { audio: base64Audio }
-              });
-
-              if (error) throw error;
-
-              if (data.text) {
-                setMessage(data.text);
-                await handleSendMessage(data.text);
-              }
-            } catch (error: any) {
-              console.error('Voice to text error:', error);
-              toast({
-                title: "Error",
-                description: "Failed to convert voice to text. Please try again.",
-                variant: "destructive",
-              });
-            } finally {
-              setIsLoading(false);
-            }
-          }
-        };
-
-        reader.readAsDataURL(audioBlob);
-      };
-
-      setMediaRecorder(recorder);
-      recorder.start();
-      setIsRecording(true);
-
-      toast({
-        title: "Recording Started",
-        description: "Speak clearly into your microphone.",
-      });
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      toast({
-        title: "Error",
-        description: "Could not access microphone. Please check your permissions.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-      mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      setIsRecording(false);
-      
-      toast({
-        title: "Recording Stopped",
-        description: "Processing your message...",
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex">
         <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
-          <div className="p-4 border-b flex items-center gap-2">
-            <Bot className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">AI Health Assistant</h2>
-          </div>
+          <ChatHeader />
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
               {conversation.map((msg, index) => (
-                <motion.div
+                <ChatMessage
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col gap-2"
-                >
-                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap ${
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
-                  </div>
-                  
-                  {msg.options && msg.role === "assistant" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="flex flex-wrap gap-2 ml-4"
-                    >
-                      {msg.options.map((option, optionIndex) => (
-                        <Button
-                          key={optionIndex}
-                          variant="outline"
-                          onClick={() => handleOptionSelect(option)}
-                          className="bg-white hover:bg-gray-50"
-                        >
-                          {option}
-                        </Button>
-                      ))}
-                    </motion.div>
-                  )}
-                </motion.div>
+                  message={msg}
+                  onOptionSelect={handleSendMessage}
+                />
               ))}
               <div ref={messagesEndRef} />
             </AnimatePresence>
           </div>
 
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Button
-                variant={isRecording ? "destructive" : "outline"}
-                size="icon"
-                onClick={toggleRecording}
-                disabled={isLoading}
-                className={isRecording ? 'animate-pulse' : ''}
-              >
-                {isRecording ? (
-                  <MicOff className="h-4 w-4" />
-                ) : (
-                  <Mic className="h-4 w-4" />
-                )}
-              </Button>
-              
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={isRecording ? "Listening..." : "Type your message here..."}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                disabled={isLoading || isRecording}
-                className="flex-1"
-              />
-              
-              <Button 
-                onClick={() => handleSendMessage()}
-                disabled={isLoading || isRecording || !message.trim()}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
+          <ChatInput
+            message={message}
+            setMessage={setMessage}
+            isLoading={isLoading}
+            isRecording={isRecording}
+            onSendMessage={() => handleSendMessage()}
+            onToggleRecording={toggleRecording}
+          />
         </Card>
       </main>
     </div>
