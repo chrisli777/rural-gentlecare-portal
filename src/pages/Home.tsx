@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HandHeart, Volume2, Stethoscope, Leaf, CalendarCheck, Robot, Video, Headphones } from "lucide-react";
+import { HandHeart, Volume2, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones } from "lucide-react";
 import { useState } from "react";
 import {
   Dialog,
@@ -50,7 +50,7 @@ const Home = () => {
       description: "Schedule in-person, online, or home visit appointments with our healthcare providers."
     },
     {
-      icon: <Robot className="w-6 h-6 text-[#1E5AAB]" />,
+      icon: <Bot className="w-6 h-6 text-[#1E5AAB]" />,
       title: "AI Health Assistant",
       description: "Get instant health guidance and preliminary assessments through our advanced AI system."
     },
