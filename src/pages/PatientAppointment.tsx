@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
@@ -6,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 import {
   Select,
   SelectContent,
@@ -38,23 +41,58 @@ const PatientAppointment = () => {
   const [selectedClinic, setSelectedClinic] = useState("");
   const [notificationMethods, setNotificationMethods] = useState<string[]>(["app"]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleBookAppointment = () => {
+  const handleBookAppointment = async () => {
     if (!date || !selectedDoctor || !selectedTime || !appointmentType || notificationMethods.length === 0) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields and select at least one notification method",
         variant: "destructive",
-        className: "left-0 right-auto",
       });
       return;
     }
 
-    toast({
-      title: "Appointment Booked",
-      description: "Your appointment has been successfully scheduled",
-      className: "left-0 right-auto",
-    });
+    try {
+      // Get the current user's session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Create the appointment
+      const { error } = await supabase
+        .from('appointments')
+        .insert({
+          patient_id: session.user.id,
+          appointment_date: date.toISOString().split('T')[0],
+          appointment_time: selectedTime,
+          doctor_id: parseInt(selectedDoctor),
+          appointment_type: appointmentType,
+          clinic_id: selectedClinic ? parseInt(selectedClinic) : null,
+          notification_methods: notificationMethods,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your appointment has been successfully scheduled",
+      });
+
+      // Navigate back to dashboard
+      navigate('/patient/dashboard');
+
+    } catch (error: any) {
+      console.error('Error booking appointment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to book appointment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
