@@ -45,28 +45,36 @@ serve(async (req) => {
 Current appointment info: ${JSON.stringify(appointmentInfo)}
 
 Step-by-Step Booking Process:
-1. If no appointmentType: Ask if they prefer online or in-person appointment
-2. If no appointmentDate: Ask for preferred date
-3. If have date but no time: Show available times
-4. If no symptoms: Ask about symptoms
-5. If no duration: Ask how long they've had symptoms
-6. If no severity: Ask about severity
-7. If all info collected: Show summary and ask for confirmation
+1. If no appointmentType: Ask if they prefer online, in-person, or home visit appointment
+2. If appointmentType is in-person and no clinicId: Ask which clinic they prefer
+3. If no appointmentDate: Ask for preferred date
+4. If have date but no time: Show available times
+5. If no bodyPart: Ask about affected body part
+6. If no symptoms/description: Ask about symptoms
+7. If no duration: Ask how long they've had symptoms
+8. If no severity: Ask about severity
+9. If all info collected: Show summary and ask for confirmation
 
-For appointment booking, use:
-!BOOK_APPOINTMENT:
+For appointment booking, check if message contains "confirm" and all required fields are present:
+- appointmentType
+- appointmentDate
+- appointmentTime
+- bodyPart (symptoms)
+- description
+- clinicId (if in-person)
+
+Then use !BOOK_APPOINTMENT:
 {
   "appointment_type": "[type]",
   "appointment_date": "YYYY-MM-DD",
   "appointment_time": "HH:MM AM/PM",
   "notification_methods": ["app"],
-  "doctor_id": 1,
-  "symptoms": "[symptoms]",
-  "duration": "[duration]",
-  "severity": "[severity]"
+  "clinic_id": "[clinic_id]",
+  "body_part": "[body_part]",
+  "description": "[description]"
 }
 
-Always provide relevant quick-select options for users to click.
+Always provide relevant quick-select options for users to choose from.
 Keep responses focused and clear.
 Use emojis to keep it friendly 😊`
           },
@@ -90,6 +98,7 @@ Use emojis to keep it friendly 😊`
 
     const aiResponse = data.choices[0].message.content.trim();
     let finalResponses = [];
+    let appointmentCreated = false;
 
     if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       try {
@@ -117,12 +126,9 @@ Use emojis to keep it friendly 😊`
               appointment_date: appointmentDetails.appointment_date,
               appointment_time: appointmentDetails.appointment_time,
               notification_methods: appointmentDetails.notification_methods,
-              doctor_id: appointmentDetails.doctor_id,
-              description: JSON.stringify({
-                symptoms: appointmentDetails.symptoms,
-                duration: appointmentDetails.duration,
-                severity: appointmentDetails.severity
-              }),
+              clinic_id: appointmentDetails.clinic_id,
+              body_part: appointmentDetails.body_part,
+              description: appointmentDetails.description,
               status: 'pending'
             }
           ])
@@ -135,6 +141,7 @@ Use emojis to keep it friendly 😊`
         }
 
         console.log('Successfully booked appointment:', appointment);
+        appointmentCreated = true;
         
         finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
@@ -145,7 +152,7 @@ Use emojis to keep it friendly 😊`
       finalResponses = [aiResponse];
     }
 
-    return new Response(JSON.stringify({ responses: finalResponses }), {
+    return new Response(JSON.stringify({ responses: finalResponses, appointmentCreated }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

@@ -10,6 +10,9 @@ interface AppointmentInfo {
   symptoms?: string;
   duration?: string;
   severity?: string;
+  clinicId?: number;
+  bodyPart?: string;
+  description?: string;
 }
 
 export const useChat = () => {
@@ -31,7 +34,7 @@ export const useChat = () => {
 
   const getOptionsForResponse = (content: string, currentInfo: AppointmentInfo): string[] => {
     if (content.toLowerCase().includes("online or in-person")) {
-      return ["Online Appointment", "In-Person Appointment"];
+      return ["Online Appointment", "In-Person Appointment", "Home Visit"];
     }
     if (content.toLowerCase().includes("what date")) {
       return ["Today", "Tomorrow", "Next Week", "Choose specific date"];
@@ -39,8 +42,11 @@ export const useChat = () => {
     if (content.toLowerCase().includes("available times") || content.toLowerCase().includes("time works")) {
       return ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
     }
-    if (content.toLowerCase().includes("what symptoms")) {
-      return ["Fever", "Headache", "Cough", "Sore throat", "Other symptoms"];
+    if (content.toLowerCase().includes("which clinic") && currentInfo.appointmentType === "in-person") {
+      return ["Adams Rural Care Main Clinic", "Adams Rural Care East Branch"];
+    }
+    if (content.toLowerCase().includes("what symptoms") || content.toLowerCase().includes("body part")) {
+      return ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"];
     }
     if (content.toLowerCase().includes("how long")) {
       return ["Just started", "Few days", "About a week", "More than a week"];
@@ -58,17 +64,39 @@ export const useChat = () => {
     const newInfo = { ...appointmentInfo };
     
     if (response.toLowerCase().includes("online or in-person")) {
-      newInfo.appointmentType = selectedOption.toLowerCase().includes("online") ? "online" : "in-person";
+      newInfo.appointmentType = selectedOption.toLowerCase().includes("online") 
+        ? "online" 
+        : selectedOption.toLowerCase().includes("home") 
+          ? "call-out"
+          : "in-person";
     } else if (response.toLowerCase().includes("what date")) {
-      newInfo.appointmentDate = selectedOption;
+      // Handle date selection
+      let date = new Date();
+      if (selectedOption === "Tomorrow") {
+        date.setDate(date.getDate() + 1);
+      } else if (selectedOption === "Next Week") {
+        date.setDate(date.getDate() + 7);
+      }
+      newInfo.appointmentDate = date.toISOString().split('T')[0];
     } else if (response.toLowerCase().includes("time works")) {
       newInfo.appointmentTime = selectedOption;
-    } else if (response.toLowerCase().includes("what symptoms")) {
+    } else if (response.toLowerCase().includes("which clinic")) {
+      newInfo.clinicId = selectedOption.includes("Main") ? 1 : 2;
+    } else if (response.toLowerCase().includes("body part") || response.toLowerCase().includes("what symptoms")) {
+      newInfo.bodyPart = selectedOption;
       newInfo.symptoms = selectedOption;
     } else if (response.toLowerCase().includes("how long")) {
       newInfo.duration = selectedOption;
+      if (!newInfo.description) {
+        newInfo.description = '';
+      }
+      newInfo.description += `Duration: ${selectedOption}. `;
     } else if (response.toLowerCase().includes("severity")) {
       newInfo.severity = selectedOption;
+      if (!newInfo.description) {
+        newInfo.description = '';
+      }
+      newInfo.description += `Severity: ${selectedOption}.`;
     }
 
     setAppointmentInfo(newInfo);
@@ -109,6 +137,16 @@ export const useChat = () => {
           return message;
         });
         setConversation(prev => [...prev, ...newMessages]);
+      }
+
+      // If appointment was created successfully
+      if (data.appointmentCreated) {
+        toast({
+          title: "Success",
+          description: "Your appointment has been successfully scheduled!",
+        });
+        // Reset appointment info after successful booking
+        setAppointmentInfo({});
       }
     } catch (error: any) {
       toast({
