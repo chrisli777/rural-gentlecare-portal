@@ -27,16 +27,26 @@ const PatientDashboard = () => {
     scrollToBottom();
   }, [conversation]);
 
+  const handleVoiceInput = (text: string) => {
+    const newMessage = {
+      role: "assistant",
+      content: text
+    };
+    setConversation(prev => [...prev, newMessage]);
+  };
+
+  const [conversationState, setConversation] = useState(conversation);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex">
         <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
-          <ChatHeader onVoiceInputReceived={() => {}} />
+          <ChatHeader onVoiceInputReceived={handleVoiceInput} />
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
-              {conversation.map((msg, index) => (
+              {conversationState.map((msg, index) => (
                 <ChatMessage
                   key={index}
                   message={msg}
