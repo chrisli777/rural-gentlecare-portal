@@ -81,9 +81,9 @@ const PatientDashboard = () => {
               }`}
             >
               {isRecording ? (
-                <MicOff className="h-10 w-10 text-white" />
+                <MicOff className="h-14 w-14 text-white" />
               ) : (
-                <Mic className="h-10 w-10 text-white" />
+                <Mic className="h-14 w-14 text-white" />
               )}
             </Button>
             <span className="text-sm text-gray-600 font-medium">Talk to us</span>
