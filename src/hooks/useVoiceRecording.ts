@@ -32,8 +32,8 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
         }
       });
 
-      // Initialize WebSocket connection using the supabase URL
-      const projectRef = new URL(supabase.getUrl()).hostname.split('.')[0];
+      // Initialize WebSocket connection using the project reference
+      const projectRef = "pascdrwwolpnfljfzioj"; // Project ID from supabase/config.toml
       wsRef.current = new WebSocket(`wss://${projectRef}.functions.supabase.co/realtime-chat`);
       
       const recorder = new MediaRecorder(stream);
