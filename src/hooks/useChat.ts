@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { parse, isValid } from "date-fns";
 
 interface AppointmentInfo {
-  appointmentType?: string;
+  appointmentType?: string | null;
   appointmentDate?: string;
   appointmentTime?: string;
   symptoms?: string;
@@ -17,7 +17,9 @@ interface AppointmentInfo {
 
 export const useChat = () => {
   const [message, setMessage] = useState("");
-  const [appointmentInfo, setAppointmentInfo] = useState<AppointmentInfo>({});
+  const [appointmentInfo, setAppointmentInfo] = useState<AppointmentInfo>({
+    appointmentType: null // Setting default to null instead of in-person
+  });
   const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
@@ -33,11 +35,12 @@ export const useChat = () => {
   const { toast } = useToast();
 
   const getOptionsForResponse = (content: string, currentInfo: AppointmentInfo): string[] => {
+    // Only return options that are specifically related to the current context
     if (content.toLowerCase().includes("book an appointment") || content.toLowerCase().includes("let's get started")) {
       return ["Online Appointment", "In-Person Appointment", "Home Visit"];
     }
     if (content.toLowerCase().includes("what date") || content.toLowerCase().includes("which date")) {
-      return ["Today", "Tomorrow", "Next Week", "Choose specific date"];
+      return ["Today", "Tomorrow", "Next Week"];
     }
     if (content.toLowerCase().includes("available times") || content.toLowerCase().includes("time works")) {
       return ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
@@ -57,8 +60,32 @@ export const useChat = () => {
     if (content.toLowerCase().includes("confirm")) {
       return ["Confirm Appointment", "Change Details"];
     }
-    // Default options for any other case
-    return ["Book an appointment", "Discuss health concerns", "Get medical advice"];
+    // Don't return default options anymore
+    return [];
+  };
+
+  const parseDateFromMessage = (message: string): string | null => {
+    // Try different date formats
+    const formats = [
+      'MM/dd',
+      'MM-dd',
+      'MM.dd',
+      'MMMM d',
+      'MMM d',
+    ];
+
+    for (const format of formats) {
+      // Add current year to the date
+      const currentYear = new Date().getFullYear();
+      const dateWithYear = `${message}/${currentYear}`;
+      const parsedDate = parse(dateWithYear, `${format}/yyyy`, new Date());
+      
+      if (isValid(parsedDate)) {
+        return parsedDate.toISOString().split('T')[0];
+      }
+    }
+
+    return null;
   };
 
   const updateAppointmentInfo = async (response: string, selectedOption: string) => {
@@ -85,6 +112,13 @@ export const useChat = () => {
       }
       newInfo.appointmentDate = date.toISOString().split('T')[0];
       updated = true;
+    } else {
+      // Try to parse date from message
+      const parsedDate = parseDateFromMessage(selectedOption);
+      if (parsedDate) {
+        newInfo.appointmentDate = parsedDate;
+        updated = true;
+      }
     }
     
     // Handle time selection
