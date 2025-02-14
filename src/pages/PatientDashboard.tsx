@@ -127,9 +127,21 @@ const PatientDashboard = () => {
       if (error) throw error;
 
       // Immediately update the local state by filtering out the cancelled appointment
-      setRecentAppointments(prevAppointments => 
-        prevAppointments.filter(apt => apt.id !== appointmentId)
-      );
+      setRecentAppointments(prevAppointments => {
+        const cancelledAppointment = prevAppointments.find(apt => apt.id === appointmentId);
+        const updatedAppointments = prevAppointments.filter(apt => apt.id !== appointmentId);
+        
+        // Add AI confirmation message about the cancellation
+        if (cancelledAppointment) {
+          const cancellationMessage = {
+            role: "assistant",
+            content: `I've noted that you've cancelled your appointment scheduled for ${format(new Date(cancelledAppointment.appointment_date), 'PPP')} at ${cancelledAppointment.appointment_time}. Is there anything else you need help with?`
+          };
+          setConversation(prev => [...prev, cancellationMessage]);
+        }
+        
+        return updatedAppointments;
+      });
 
       toast({
         title: "Success",
