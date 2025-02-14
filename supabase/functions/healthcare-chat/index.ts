@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -44,14 +43,6 @@ serve(async (req) => {
 
 Current appointment info: ${JSON.stringify(appointmentInfo)}
 
-Step-by-Step Booking Process:
-1. If no appointmentType or appointmentType is null: Ask what type of appointment they prefer (online, in-person, or home visit)
-2. Once appointmentType is set and if it's in-person: Ask which clinic they prefer
-3. If no appointmentDate: Ask for preferred date
-4. If have date but no time: Show available times
-5. If no bodyPart or symptoms: Ask about affected body part
-6. If have all required info: Show summary and ask for confirmation
-
 Required fields for booking:
 - appointmentType
 - appointmentDate
@@ -59,12 +50,19 @@ Required fields for booking:
 - bodyPart/symptoms
 - clinicId (only if in-person)
 
+Step-by-Step Logic:
+1. If appointmentType is null: Ask what type of appointment they prefer
+2. If appointmentType is set but no clinicId and type is in-person: Ask for clinic
+3. If no appointmentDate: Ask for date
+4. If date set but no time: Show available times
+5. If no bodyPart/symptoms: Ask about affected body part
+6. IF ALL REQUIRED FIELDS ARE PRESENT: Show summary and ask for confirmation
+
 IMPORTANT RULES:
-- Never assume appointmentType. Only mention it if user has explicitly chosen one
+- Never assume appointmentType
 - Only ask ONE question at a time
-- Only ask for required fields listed above
-- Don't ask about severity or duration
-- Show confirmation only when ALL required fields are present
+- After each answer, check if all required fields are present
+- If all required fields are present, show summary and ask for confirmation
 - Keep responses focused and friendly
 
 For appointment booking, use !BOOK_APPOINTMENT:
