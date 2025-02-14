@@ -36,7 +36,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and helpful healthcare assistant with knowledge of our healthcare platform's features. Your responses should be concise and include relevant follow-up options for display in a separate options bar.
+            content: `You are a friendly and helpful healthcare assistant with knowledge of our healthcare platform's features. Your responses should be concise.
 
 You can help users with information about:
 1. Appointments (explaining how to book online, in-person, or home visits)
@@ -63,9 +63,7 @@ For Spanish users:
 4. Selecciona qué parte de tu cuerpo está afectada
 5. Añade cualquier descripción adicional de tus síntomas
 6. Elige tu fecha y hora preferida
-7. Revisa los detalles de tu cita y confirma"
-
-IMPORTANT: At the end of your message, ALWAYS add 2-4 contextual follow-up options that are directly related to the current topic, using this EXACT format (on a new line): \nOPTIONS:["option1", "option2"]. The options should be in the same language as the user's message.`
+7. Revisa los detalles de tu cita y confirma"`
           },
           {
             role: "user",
@@ -90,26 +88,11 @@ IMPORTANT: At the end of your message, ALWAYS add 2-4 contextual follow-up optio
 
     const content = data.choices[0].message.content.trim();
     
-    // Extract options if present
-    const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);
-    let options: string[] = [];
-    let cleanContent = content;
-
-    if (optionsMatch && optionsMatch[1]) {
-      try {
-        options = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
-        // Remove the OPTIONS:[...] text and any preceding newlines
-        cleanContent = content.replace(/\n*OPTIONS:\[.*?\]/, '').trim();
-      } catch (error) {
-        console.error('Error parsing options:', error);
-        cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
-      }
-    }
-
+    // No options for regular messages
     return new Response(JSON.stringify({ 
       responses: [{
-        content: cleanContent,
-        options: options
+        content: content,
+        options: []
       }]
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
