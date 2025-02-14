@@ -13,11 +13,10 @@ const Home = () => {
   const handleReadAloud = () => {
     if ('speechSynthesis' in window) {
       const speech = new SpeechSynthesisUtterance(welcomeText);
-      speech.rate = 0.85; // Even slower rate for better comprehension
-      speech.pitch = 1.1; // Slightly higher pitch for a feminine voice
+      speech.rate = 0.85;
+      speech.pitch = 1.1;
       speech.volume = 1;
       
-      // Try to select a female voice if available
       const voices = window.speechSynthesis.getVoices();
       const femaleVoice = voices.find(voice => 
         voice.name.includes('female') || voice.name.includes('woman')
@@ -32,7 +31,15 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary/30 via-white to-background relative overflow-hidden">
+    <div 
+      className="min-h-screen relative overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: 'url("https://datausa.io/api/profile/geo/adams-county-wa/splash")',
+      }}
+    >
+      {/* Overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40" />
+
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Floating Clouds */}
@@ -62,25 +69,26 @@ const Home = () => {
           {/* Hero Section */}
           <div className="space-y-6 mb-12 animate-fade-in">
             <div className="relative">
-              <HandHeart className="w-16 h-16 text-primary mx-auto animate-float hover:scale-110 transition-transform duration-300" />
+              <HandHeart className="w-16 h-16 text-white mx-auto animate-float hover:scale-110 transition-transform duration-300" />
               <div className="absolute -inset-4 bg-primary/5 rounded-full blur-xl -z-10" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
               Welcome to the Virtual Clinic of Adams County
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
               We're here to help you book appointments and fill out forms—easily and stress-free.
             </p>
-          </div>
-
-          {/* Main Image */}
-          <div className="relative rounded-2xl overflow-hidden shadow-xl mb-12">
-            <img
-              src="https://datausa.io/api/profile/geo/adams-county-wa/splash"
-              alt="Adams County, Washington landscape"
-              className="w-full h-[400px] md:h-[600px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            
+            {/* Get Started Button moved here */}
+            <Button
+              size="lg"
+              className="text-xl px-8 py-6 mt-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
+                         bg-gradient-to-r from-primary to-primary/90 hover:scale-105
+                         border-2 border-white/50"
+              onClick={() => navigate("/patient/dashboard")}
+            >
+              Get Started
+            </Button>
           </div>
 
           {/* Accessibility Controls */}
@@ -89,27 +97,11 @@ const Home = () => {
               variant="outline"
               size="lg"
               onClick={handleReadAloud}
-              className="flex items-center gap-2 hover:bg-secondary/50 transition-colors duration-300 text-lg px-6 py-3"
+              className="flex items-center gap-2 hover:bg-white/20 transition-colors duration-300 text-lg px-6 py-3 text-white border-white"
             >
               <Volume2 className={`h-6 w-6 ${isPlaying ? 'animate-pulse' : ''}`} />
               Read Aloud
             </Button>
-          </div>
-
-          {/* Call to Action */}
-          <div className="space-y-6">
-            <Button
-              size="lg"
-              className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-                         bg-gradient-to-r from-primary to-primary/90 hover:scale-105
-                         border-2 border-white/50"
-              onClick={() => navigate("/patient/dashboard")}
-            >
-              Get Started
-            </Button>
-            <p className="text-gray-600 text-lg">
-              Take your time, we're here to guide you through every step.
-            </p>
           </div>
         </div>
       </div>
