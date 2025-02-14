@@ -63,9 +63,10 @@ const Appointments = () => {
     if (!appointmentToDelete) return;
 
     try {
+      // Update the appointment status to 'cancelled' instead of deleting it
       const { error } = await supabase
         .from('appointments')
-        .delete()
+        .update({ status: 'cancelled' })
         .eq('id', appointmentToDelete);
 
       if (error) throw error;
