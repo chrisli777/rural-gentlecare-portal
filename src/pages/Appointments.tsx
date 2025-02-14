@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-</invoke>} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 
 interface Appointment {
   id: string;
