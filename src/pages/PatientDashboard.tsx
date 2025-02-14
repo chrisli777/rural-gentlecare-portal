@@ -71,7 +71,7 @@ const PatientDashboard = () => {
             </AnimatePresence>
           </div>
 
-          <div className="p-4 border-t flex justify-center">
+          <div className="p-4 border-t flex flex-col items-center gap-2">
             <Button
               onClick={toggleRecording}
               className={`rounded-full w-16 h-16 p-0 ${
@@ -86,6 +86,7 @@ const PatientDashboard = () => {
                 <Mic className="h-6 w-6 text-white" />
               )}
             </Button>
+            <span className="text-sm text-gray-600 font-medium">Talk to us</span>
           </div>
         </Card>
       </main>

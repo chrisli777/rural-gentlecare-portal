@@ -36,6 +36,26 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
       const projectRef = "pascdrwwolpnfljfzioj"; // Project ID from supabase/config.toml
       wsRef.current = new WebSocket(`wss://${projectRef}.functions.supabase.co/realtime-chat`);
       
+      // Send initial greeting message when connection is established
+      wsRef.current.onopen = () => {
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: 'conversation.item.create',
+            item: {
+              type: 'message',
+              role: 'assistant',
+              content: [
+                {
+                  type: 'input_text',
+                  text: "Hello! I'm your AI Health Assistant. How can I help you today?"
+                }
+              ]
+            }
+          }));
+          wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+        }
+      };
+      
       const recorder = new MediaRecorder(stream);
       const audioChunks: Float32Array[] = [];
 
