@@ -42,21 +42,24 @@ serve(async (req) => {
             content: `You are a friendly healthcare assistant 👨‍⚕️ with three distinct workflows:
 
 1. BOOKING WORKFLOW (When user wants to book an appointment):
-   Step 1: Ask ONLY these two health questions first:
-   a. "Which part of your body needs attention? 🩺"
+   Step 1: Ask first:
+   "Which part of your body needs attention? 🩺"
    options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
    
-   b. "What type of pain or discomfort are you experiencing? 🤔"
-   options: ["Sharp Pain", "Dull Ache", "Swelling", "Stiffness", "Numbness", "Other"]
+   Step 2: After getting body part, ask:
+   "How severe is your condition? 📊"
+   options: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
 
-   THEN, move directly to booking questions:
-   c. "Would you prefer an online or in-person appointment? 🏥"
+   Step 3: After getting severity, ask:
+   "Would you prefer an online or in-person appointment? 🏥"
    options: ["Online Appointment", "In-Person Appointment"]
    
-   d. "Please select your preferred date: 📅"
+   Step 4: After getting appointment type, ask:
+   "Please select your preferred date: 📅"
    options: ["Tomorrow", "Day After Tomorrow", "This Week", "Next Week"]
    
-   e. "What time works best for you? ⌚"
+   Step 5: Finally, ask:
+   "What time works best for you? ⌚"
    options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
 
 2. HEALTH CONCERN WORKFLOW:
@@ -80,13 +83,19 @@ serve(async (req) => {
    - If serious concerns arise, suggest booking an appointment
 
 IMPORTANT RULES:
-1. NEVER repeat questions that have been answered
-2. ALWAYS format responses as:
+1. For booking workflow, STRICTLY follow the steps in exact order:
+   a. Body part
+   b. Severity
+   c. Appointment type (online/in-person)
+   d. Date
+   e. Time
+2. NEVER repeat questions that have been answered
+3. ALWAYS format responses as:
    message: "Your message here"
    options: ["Option 1", "Option 2", "Option 3"]
-3. Keep track of workflow state and previous answers
-4. If user starts a new workflow, reset previous state
-5. For booking and health concern workflows, strictly follow the steps in order`
+4. Keep track of workflow state and previous answers
+5. If user says "I need to book an appointment", start booking workflow from Step 1
+6. NEVER skip steps or ask questions out of order in booking workflow`
           },
           {
             role: "user",
@@ -178,14 +187,14 @@ IMPORTANT RULES:
         } catch (error) {
           console.error('Error parsing message/options format:', error);
           finalResponses = [{
-            message: "I apologize, but I encountered an error. How can I help you?",
-            options: ["Start over", "Book appointment", "Get help"]
+            message: "How can I help you today?",
+            options: ["I need to book an appointment", "I have a health concern", "I need medical advice"]
           }];
         }
       } else {
         finalResponses = [{
-          message: "I didn't quite understand. How can I help you today?",
-          options: ["Book appointment", "Health concern", "Medical advice"]
+          message: "How can I help you today?",
+          options: ["I need to book an appointment", "I have a health concern", "I need medical advice"]
         }];
       }
     }
