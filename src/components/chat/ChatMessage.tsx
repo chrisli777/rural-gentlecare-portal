@@ -7,11 +7,26 @@ interface ChatMessageProps {
     role: string;
     content: string;
     options?: string[];
+    isTranscript?: boolean;
   };
   onOptionSelect: (option: string) => void;
 }
 
 export const ChatMessage = ({ message, onOptionSelect }: ChatMessageProps) => {
+  if (message.isTranscript) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-gray-100 p-4 rounded-lg"
+      >
+        <div className="font-medium mb-2">Transcript:</div>
+        <div className="whitespace-pre-wrap">{message.content}</div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
