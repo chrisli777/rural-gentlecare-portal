@@ -97,7 +97,8 @@ const Home = () => {
               variant="outline"
               size="lg"
               onClick={handleReadAloud}
-              className="flex items-center gap-2 hover:bg-white/20 transition-colors duration-300 text-lg px-6 py-3 text-white border-white"
+              className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 transition-colors duration-300 
+                        text-lg px-6 py-3 text-white border-primary/50"
             >
               <Volume2 className={`h-6 w-6 ${isPlaying ? 'animate-pulse' : ''}`} />
               Read Aloud
