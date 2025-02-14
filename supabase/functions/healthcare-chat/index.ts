@@ -36,8 +36,11 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and helpful healthcare assistant. When users ask about booking appointments or select "Need to see a doctor?", provide direct guidance without asking for more details. Your response should be concise:
+            content: `You are a friendly and helpful healthcare assistant. When users ask about booking appointments or select "Need to see a doctor?" (or "¿Necesitas ver a un médico?" in Spanish), provide direct guidance without asking for more details. Your response should be concise.
 
+The response format should match the user's language (English or Spanish). 
+
+For English:
 "Based on your request, here's how to book an appointment:
 1. Click 'Appointments' in the top right corner of the page
 2. Select your preferred appointment type (online/in-person/home visit)
@@ -47,7 +50,17 @@ serve(async (req) => {
 6. Choose your preferred date and time
 7. Review your appointment details and confirm"
 
-For other health topics, provide focused responses with relevant follow-up options in a JSON array at the end of your message, formatted like this: "OPTIONS:["option1", "option2"]". The options should be contextual to your response. For example, if discussing diet, options might include "Learn about nutrition", "Get exercise tips". Limit to 2-3 relevant options.`
+For Spanish:
+"Según tu solicitud, aquí te explico cómo reservar una cita:
+1. Haz clic en 'Citas' en la esquina superior derecha de la página
+2. Selecciona el tipo de cita que prefieras (en línea/presencial/visita a domicilio)
+3. Si eliges visita presencial, selecciona tu clínica preferida
+4. Selecciona qué parte de tu cuerpo está afectada
+5. Añade cualquier descripción adicional de tus síntomas
+6. Elige tu fecha y hora preferida
+7. Revisa los detalles de tu cita y confirma"
+
+For other health topics, provide focused responses with relevant follow-up options in a JSON array at the end of your message, formatted like this: "OPTIONS:["option1", "option2"]". The options should be contextual to your response and in the same language as the user's message.`
           },
           {
             role: "user",
@@ -68,7 +81,9 @@ For other health topics, provide focused responses with relevant follow-up optio
     }
 
     const content = data.choices[0].message.content.trim();
-    let options: string[] = ["Need to see a doctor?"];
+    let options: string[] = message.toLowerCase().includes('español') || /[áéíóúñ¿¡]/.test(message)
+      ? ["¿Necesitas ver a un médico?"]
+      : ["Need to see a doctor?"];
 
     // Extract options if present
     const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);

@@ -2,18 +2,20 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 
 export const useChat = () => {
+  const { language } = useAccessibility();
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
-      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today?",
-      options: [
-        "Need to see a doctor?",
-        "Get medical advice",
-        "Health information"
-      ]
+      content: language === 'en' 
+        ? "Hello! 👋 I'm your AI Health Assistant. How can I help you today?"
+        : "¡Hola! 👋 Soy tu Asistente de Salud con IA. ¿Cómo puedo ayudarte hoy?",
+      options: language === 'en' 
+        ? ["Need to see a doctor?", "Get medical advice", "Health information"]
+        : ["¿Necesitas ver a un médico?", "Obtener consejo médico", "Información de salud"]
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
