@@ -75,11 +75,8 @@ For other health topics, provide focused responses with relevant follow-up optio
     const data = await response.json();
     console.log('OpenAI API response:', data);
 
-    if (!data.choices?.[0]?.message?.content) {
+    if (!data.choices || !data.choices[0]?.message?.content) {
       console.error('Unexpected API response format:', data);
-      if (data.error) {
-        throw new Error(`OpenAI API error: ${data.error.message || JSON.stringify(data.error)}`);
-      }
       throw new Error('Invalid response format from OpenAI API');
     }
 
@@ -90,17 +87,12 @@ For other health topics, provide focused responses with relevant follow-up optio
 
     // Extract options if present
     const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);
-    if (optionsMatch && optionsMatch[1]) {
-      try {
-        const parsedOptions = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
-        options = [...options, ...parsedOptions];
-      } catch (error) {
-        console.error('Error parsing options:', error);
-        // Continue with default options if parsing fails
-      }
-    }
-
     const cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
+
+    if (optionsMatch && optionsMatch[1]) {
+      const parsedOptions = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
+      options = [...options, ...parsedOptions];
+    }
 
     return new Response(JSON.stringify({ 
       responses: [{
@@ -110,13 +102,9 @@ For other health topics, provide focused responses with relevant follow-up optio
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'An unexpected error occurred',
-      details: error
-    }), {
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
