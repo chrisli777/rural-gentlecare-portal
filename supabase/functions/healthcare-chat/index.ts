@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -42,8 +41,9 @@ serve(async (req) => {
             content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
 
 1. In your FIRST response to any health concern:
-   • Ask only ONE key question about their main symptom/concern
-   • ALWAYS add "Or, I can help you book an appointment with a doctor right away if you prefer. Would you like that?" 🗓️
+   SPLIT your response into TWO separate parts using [SPLIT] marker:
+   PART 1: Ask only ONE key question about their main symptom/concern
+   PART 2: "Or, I can help you book an appointment with a doctor right away. Would you like that? 🗓️"
 
 2. For appointment booking:
    • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ask:
@@ -94,10 +94,13 @@ Remember:
     }
 
     const aiResponse = data.choices[0].message.content.trim();
-    let finalResponse = aiResponse;
-    
-    // Check if the response contains an appointment booking request
-    if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
+    let finalResponses = [];
+
+    // Split the response if it contains the [SPLIT] marker
+    if (aiResponse.includes('[SPLIT]')) {
+      finalResponses = aiResponse.split('[SPLIT]').map(part => part.trim());
+    } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
+      // Handle appointment booking response
       try {
         // Extract the JSON part
         const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
@@ -131,16 +134,17 @@ Remember:
 
         console.log('Successfully booked appointment:', appointment);
         
-        // Keep only the human-readable part of the response after successful booking
-        finalResponse = aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim();
-
+        // Keep only the human-readable part of the response
+        finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
-        finalResponse = "I apologize, but I encountered an error while trying to book your appointment. Could you please try again with the appointment details?";
+        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Could you please try again with the appointment details?"];
       }
+    } else {
+      finalResponses = [aiResponse];
     }
 
-    return new Response(JSON.stringify({ response: finalResponse }), {
+    return new Response(JSON.stringify({ responses: finalResponses }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

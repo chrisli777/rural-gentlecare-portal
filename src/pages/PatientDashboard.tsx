@@ -37,12 +37,20 @@ const PatientDashboard = () => {
 
       if (error) throw error;
 
-      const aiMessage = {
-        role: "assistant",
-        content: data.response
-      };
-
-      setConversation(prev => [...prev, aiMessage]);
+      // Handle multiple responses
+      if (data.responses) {
+        const newMessages = data.responses.map((response: string) => ({
+          role: "assistant",
+          content: response
+        }));
+        setConversation(prev => [...prev, ...newMessages]);
+      } else if (data.response) {
+        // Backward compatibility for single responses
+        setConversation(prev => [...prev, {
+          role: "assistant",
+          content: data.response
+        }]);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
