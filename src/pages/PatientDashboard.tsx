@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { useChat } from "@/hooks/useChat";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Mic, MicOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -212,21 +212,33 @@ Be friendly and conversational while maintaining professionalism.`,
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
-              {chatConversation.map((msg, index) => (
-                <ChatMessage
+              {conversation.messages?.map((msg, index) => (
+                <motion.div
                   key={index}
-                  message={msg}
-                  onOptionSelect={handleSendMessage}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[80%] p-4 rounded-lg ${
+                      msg.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                </motion.div>
               ))}
               <div ref={messagesEndRef} />
             </AnimatePresence>
           </div>
 
-          <div className="p-4 border-t flex flex-col items-center gap-2">
+          <div className="p-4 border-t flex justify-center">
             <Button
               onClick={toggleVoiceRecording}
-              className={`rounded-full w-20 h-20 p-0 ${
+              className={`rounded-full w-20 h-20 relative p-0 ${
                 isRecording
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
@@ -234,12 +246,11 @@ Be friendly and conversational while maintaining professionalism.`,
               disabled={isLoading}
             >
               {isRecording ? (
-                <MicOff className="h-14 w-14 text-white" />
+                <MicOff className="w-full h-full p-4 text-white" />
               ) : (
-                <Mic className="h-14 w-14 text-white" />
+                <Mic className="w-full h-full p-4 text-white" />
               )}
             </Button>
-            <span className="text-sm text-gray-600 font-medium">Talk to us</span>
           </div>
         </Card>
       </main>
