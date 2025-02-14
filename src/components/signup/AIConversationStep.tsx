@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -6,6 +7,7 @@ import { useConversation } from "@11labs/react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface AIConversationStepProps {
   onProfileComplete: () => void;
@@ -189,38 +191,57 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
 
   return (
     <div className="space-y-4">
-      <Card className="p-8 flex flex-col items-center justify-center min-h-[400px]">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-semibold mb-2">Talk to Lisa</h2>
-          <p className="text-muted-foreground">Click the button below to start speaking with your AI medical assistant</p>
-        </div>
-        
-        <button
-          onClick={toggleVoiceRecording}
-          className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isRecording 
-              ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
-              : 'bg-primary hover:bg-primary/90'
-          }`}
-          disabled={isLoading}
-        >
-          {isRecording ? (
-            <MicOff className="h-12 w-12 text-white" />
-          ) : (
-            <Mic className="h-12 w-12 text-white" />
-          )}
-        </button>
-
-        {conversationEnded && (
-          <Button 
-            onClick={onProfileComplete}
-            className="mt-8"
-            variant="default"
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="p-8 flex flex-col items-center justify-center min-h-[400px]">
+          <motion.div 
+            className="text-center mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
           >
-            Continue to Dashboard
-          </Button>
-        )}
-      </Card>
+            <h2 className="text-2xl font-semibold mb-2">Talk to Lisa</h2>
+            <p className="text-muted-foreground">Click the button below to start speaking with your AI medical assistant</p>
+          </motion.div>
+          
+          <motion.button
+            onClick={toggleVoiceRecording}
+            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+              isRecording 
+                ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
+                : 'bg-primary hover:bg-primary/90'
+            }`}
+            disabled={isLoading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {isRecording ? (
+              <MicOff className="h-12 w-12 text-white" />
+            ) : (
+              <Mic className="h-12 w-12 text-white" />
+            )}
+          </motion.button>
+
+          {conversationEnded && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Button 
+                onClick={onProfileComplete}
+                className="mt-8"
+                variant="default"
+              >
+                Continue to Dashboard
+              </Button>
+            </motion.div>
+          )}
+        </Card>
+      </motion.div>
     </div>
   );
 };
