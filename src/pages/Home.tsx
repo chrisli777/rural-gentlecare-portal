@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe } from "lucide-react";
@@ -99,27 +98,29 @@ const Home = () => {
             </p>
             
             {/* Action Buttons */}
-            <div className="flex justify-center items-center gap-4">
-              <Button
-                size="lg"
-                className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-                           bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
-                           border-2 border-[#1E5AAB]"
-                onClick={handleGetStarted}
-              >
-                {translate('common.patientPortal')}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleLanguageChange}
-                className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
-                          text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
-              >
-                <Globe className="h-6 w-6" />
-                {language === 'en' ? 'Español' : 'English'}
-              </Button>
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex justify-center items-center gap-4">
+                <Button
+                  size="lg"
+                  className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
+                             bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
+                             border-2 border-[#1E5AAB]"
+                  onClick={handleGetStarted}
+                >
+                  Get Started
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleLanguageChange}
+                  className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
+                            text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
+                >
+                  <Globe className="h-6 w-6" />
+                  {language === 'en' ? 'Español' : 'English'}
+                </Button>
+              </div>
 
               <Button
                 variant="outline"
@@ -129,7 +130,7 @@ const Home = () => {
                           text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
               >
                 <HelpCircle className="h-6 w-6" />
-                {translate('accessibility.voiceAssistant')}
+                Learn More
               </Button>
             </div>
           </div>
