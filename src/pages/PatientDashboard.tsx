@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const PatientDashboard = () => {
   const [message, setMessage] = useState("");
-  const [conversation, setConversation] = useState<{ role: string; content: string }[]>([
+  const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
       content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can describe your health concern, and I'll guide you through the process. 🏥",
@@ -22,11 +22,18 @@ const PatientDashboard = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const { toast } = useToast();
 
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
+  const handleOptionSelect = (option: string) => {
+    // Automatically send the selected option as a message
+    setMessage(option);
+    handleSendMessage(option);
+  };
+
+  const handleSendMessage = async (manualMessage?: string) => {
+    const messageToSend = manualMessage || message;
+    if (!messageToSend.trim()) return;
 
     setIsLoading(true);
-    const userMessage = { role: "user", content: message };
+    const userMessage = { role: "user", content: messageToSend };
     setConversation(prev => [...prev, userMessage]);
     setMessage("");
 
@@ -39,10 +46,27 @@ const PatientDashboard = () => {
 
       // Handle multiple responses
       if (data.responses) {
-        const newMessages = data.responses.map((response: string) => ({
-          role: "assistant",
-          content: response
-        }));
+        const newMessages = data.responses.map((response: string) => {
+          const message: { role: string; content: string; options?: string[] } = {
+            role: "assistant",
+            content: response,
+          };
+
+          // Add appointment type options if asking about appointment type
+          if (response.toLowerCase().includes("online or in-person")) {
+            message.options = ["Online Appointment", "In-Person Appointment"];
+          }
+          // Add time slot options if asking about time
+          else if (response.toLowerCase().includes("how about") && response.toLowerCase().includes("am?")) {
+            message.options = [
+              "Yes, that time works",
+              "No, show me other times",
+              "Different day please"
+            ];
+          }
+
+          return message;
+        });
         setConversation(prev => [...prev, ...newMessages]);
       } else if (data.response) {
         // Backward compatibility for single responses
@@ -166,17 +190,39 @@ const PatientDashboard = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  className="flex flex-col gap-2"
                 >
-                  <div
-                    className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap ${
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
-                    {msg.content}
+                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap ${
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
                   </div>
+                  
+                  {msg.options && msg.role === "assistant" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex flex-wrap gap-2 ml-4"
+                    >
+                      {msg.options.map((option, optionIndex) => (
+                        <Button
+                          key={optionIndex}
+                          variant="outline"
+                          onClick={() => handleOptionSelect(option)}
+                          className="bg-white hover:bg-gray-50"
+                        >
+                          {option}
+                        </Button>
+                      ))}
+                    </motion.div>
+                  )}
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -208,7 +254,7 @@ const PatientDashboard = () => {
               />
               
               <Button 
-                onClick={handleSendMessage}
+                onClick={() => handleSendMessage()}
                 disabled={isLoading || isRecording || !message.trim()}
               >
                 {isLoading ? (
