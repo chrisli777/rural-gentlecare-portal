@@ -16,7 +16,7 @@ export type Database = {
           appointment_type: string
           clinic_id: number | null
           created_at: string | null
-          doctor_id: number
+          doctor_id: number | null
           id: string
           notification_methods: string[]
           patient_id: string
@@ -28,7 +28,7 @@ export type Database = {
           appointment_type: string
           clinic_id?: number | null
           created_at?: string | null
-          doctor_id: number
+          doctor_id?: number | null
           id?: string
           notification_methods: string[]
           patient_id: string
@@ -40,7 +40,7 @@ export type Database = {
           appointment_type?: string
           clinic_id?: number | null
           created_at?: string | null
-          doctor_id?: number
+          doctor_id?: number | null
           id?: string
           notification_methods?: string[]
           patient_id?: string
