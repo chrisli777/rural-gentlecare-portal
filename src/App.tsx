@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import Home from "@/pages/Home";
 import PatientDashboard from "@/pages/PatientDashboard";
+import AIAssistant from "@/pages/AIAssistant";
 import BookAppointment from "@/pages/BookAppointment";
 import Appointments from "@/pages/Appointments";
 import PatientOnboarding from "@/pages/PatientOnboarding";
@@ -31,6 +32,7 @@ function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/patient/onboarding" element={<PatientOnboarding />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          <Route path="/patient/ai-assistant" element={<AIAssistant />} />
           <Route path="/patient/book-appointment" element={<BookAppointment />} />
           <Route path="/patient/appointments" element={<Appointments />} />
         </Routes>
