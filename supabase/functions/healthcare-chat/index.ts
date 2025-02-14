@@ -36,20 +36,17 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and helpful healthcare assistant with knowledge of our healthcare platform's features. Your responses should be concise and include relevant follow-up options.
+            content: `You are a friendly and helpful healthcare assistant with knowledge of our healthcare platform's features. Your responses should be concise and include relevant follow-up options for display in a separate options bar.
 
-Key website features you should know and suggest when relevant:
-1. Book Appointments (online, in-person, or home visits)
-2. View and manage existing appointments
-3. Get medical advice and health information
-4. Access medical records and test results
-5. Emergency contact information management
-6. Language preferences (English/Spanish support)
+You can help users with information about:
+1. Appointments (explaining how to book online, in-person, or home visits)
+2. Viewing existing appointments
+3. Basic medical advice and health information
 
-ONLY when the user specifically asks about booking an appointment or selecting appointment-related options, provide these booking instructions:
+When users ask about appointments, explain that you can provide booking instructions but cannot actually make the booking for them. Provide these instructions:
 
 For English users:
-"Based on your request, here's how to book an appointment:
+"Here's how you can book your appointment:
 1. Click 'Appointments' in the top right corner
 2. Select your preferred appointment type (online/in-person/home visit)
 3. If choosing in-person visit, select your preferred clinic
@@ -59,7 +56,7 @@ For English users:
 7. Review your appointment details and confirm"
 
 For Spanish users:
-"Según tu solicitud, aquí te explico cómo reservar una cita:
+"Aquí te explico cómo puedes reservar tu cita:
 1. Haz clic en 'Citas' en la esquina superior derecha
 2. Selecciona el tipo de cita que prefieras (en línea/presencial/visita a domicilio)
 3. Si eliges visita presencial, selecciona tu clínica preferida
@@ -68,7 +65,7 @@ For Spanish users:
 6. Elige tu fecha y hora preferida
 7. Revisa los detalles de tu cita y confirma"
 
-For all other topics, provide helpful, focused responses based on your medical knowledge. ALWAYS provide 2-4 contextual follow-up options at the end of your message using this format: OPTIONS:["option1", "option2"]. The options should be in the same language as the user's message and directly related to the current topic.`
+IMPORTANT: For the options bar, ALWAYS provide 2-4 contextual follow-up options that are directly related to the current topic, using this format in your response: OPTIONS:["option1", "option2"]. The options should be in the same language as the user's message.`
           },
           {
             role: "user",
@@ -93,7 +90,7 @@ For all other topics, provide helpful, focused responses based on your medical k
 
     const content = data.choices[0].message.content.trim();
     
-    // Extract options if present, otherwise use an empty array
+    // Extract options if present
     const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);
     let options: string[] = [];
 
@@ -102,15 +99,7 @@ For all other topics, provide helpful, focused responses based on your medical k
         options = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
       } catch (error) {
         console.error('Error parsing options:', error);
-        // If parsing fails, keep options array empty
       }
-    }
-
-    // Only add "Need to see a doctor" if no options were found and it's the first message
-    if (options.length === 0) {
-      options = message.toLowerCase().includes('español') || /[áéíóúñ¿¡]/.test(message)
-        ? ["¿Necesitas ver a un médico?"]
-        : ["Need to see a doctor?"];
     }
 
     const cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
