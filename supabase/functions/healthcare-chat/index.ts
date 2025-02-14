@@ -39,42 +39,53 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. ALWAYS provide options for EVERY question.
+            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. 
+IMPORTANT: Your responses should be in this format:
+message: "Your question here?"
+options: ["Option 1", "Option 2", "Option 3"]
 
 1. For general health concerns:
-   a. Ask about symptoms + body part: "Which part of your body is affected? 🩺"
-   b. Ask about duration: "How long have you been experiencing this? ⏱️"
-   c. Ask about severity: "How severe is your condition? 📊"
-   d. Ask about additional symptoms
-   e. Generate report
-   f. ONLY after report, suggest booking
+   a. First message:
+   message: "Which part of your body is affected? 🩺"
+   options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
 
-2. For appointment booking, ALWAYS follow these steps in order:
-   Step 1: "Which part of your body needs attention? Please select: 🩺"
-   ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
+   b. Then duration:
+   message: "How long have you been experiencing this? ⏱️"
+   options: ["Just started", "Few days", "About a week", "More than a week"]
 
-   Step 2: "Would you prefer an online or in-person appointment? 🏥"
-   ["Online Appointment", "In-Person Appointment"]
+   c. Then severity:
+   message: "How severe is your condition? 📊"
+   options: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
 
-   Step 3: "Please select your preferred date: 📅"
-   ["Tomorrow", "Day After Tomorrow", "This Week", "Next Week"]
+   d. Then symptoms:
+   message: "Select your main symptoms:"
+   options: ["Fever", "Pain", "Cough", "Nausea", "Other"]
 
-   Step 4: "What time works best for you? ⌚"
-   ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
+2. For appointments, follow EXACTLY this sequence:
+   Step 1:
+   message: "Which part of your body needs attention? 🩺"
+   options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
 
-3. For EVERY question, ALWAYS include clickable options. Examples:
-   • For symptoms: ["Fever", "Pain", "Cough", "Nausea", "Other"]
-   • For duration: ["Just started", "Few days", "About a week", "More than a week"]
-   • For severity: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
-   • For yes/no: ["Yes", "No"]
-   • For confirmation: ["Confirm", "Change details"]
+   Step 2:
+   message: "Would you prefer an online or in-person appointment? 🏥"
+   options: ["Online Appointment", "In-Person Appointment"]
 
-IMPORTANT:
-• NEVER send a message without options to click
-• ALWAYS wait for user selection before moving to next step
-• Keep messages short and clear
-• Use emojis for friendly tone 😊
-• For serious symptoms, still follow the same structured flow`
+   Step 3:
+   message: "Please select your preferred date: 📅"
+   options: ["Tomorrow", "Day After Tomorrow", "This Week", "Next Week"]
+
+   Step 4:
+   message: "What time works best for you? ⌚"
+   options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
+
+IMPORTANT RULES:
+1. ALWAYS format your response as:
+   message: "Question here?"
+   options: ["Option 1", "Option 2", "Option 3"]
+2. NEVER include options in the message text
+3. Keep messages short and clear
+4. Use emojis for friendly tone 😊
+5. Wait for user selection before moving to next step`
           },
           {
             role: "user",
@@ -142,10 +153,37 @@ IMPORTANT:
         finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different time slot."];
+        finalResponses = [{
+          message: "I apologize, but I encountered an error while trying to book your appointment. Would you like to try again?",
+          options: ["Yes, try again", "No, maybe later"]
+        }];
       }
     } else {
-      finalResponses = [aiResponse];
+      // Parse the response to extract message and options
+      const messageMatch = aiResponse.match(/message:\s*"([^"]+)"/);
+      const optionsMatch = aiResponse.match(/options:\s*(\[[\s\S]*?\])/);
+
+      if (messageMatch && optionsMatch) {
+        try {
+          const message = messageMatch[1];
+          const options = JSON.parse(optionsMatch[1]);
+          finalResponses = [{
+            message: message,
+            options: options
+          }];
+        } catch (error) {
+          console.error('Error parsing message/options format:', error);
+          finalResponses = [{
+            message: "I apologize, but I encountered an error. How can I help you?",
+            options: ["Start over", "Book appointment", "Get help"]
+          }];
+        }
+      } else {
+        finalResponses = [{
+          message: aiResponse,
+          options: ["I understand", "Tell me more", "Book appointment"]
+        }];
+      }
     }
 
     return new Response(JSON.stringify({ responses: finalResponses }), {
@@ -153,7 +191,12 @@ IMPORTANT:
     });
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      responses: [{
+        message: "I apologize, but something went wrong. How can I help you?",
+        options: ["Start over", "Try again", "Contact support"]
+      }]
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
