@@ -36,7 +36,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4",
         messages: [
           {
             role: "system",
@@ -45,25 +45,29 @@ serve(async (req) => {
 Current appointment info: ${JSON.stringify(appointmentInfo)}
 
 Step-by-Step Booking Process:
-1. If no appointmentType: Ask if they prefer online, in-person, or home visit appointment
-2. If appointmentType is in-person and no clinicId: Ask which clinic they prefer
+1. If no appointmentType or appointmentType is null: Ask what type of appointment they prefer (online, in-person, or home visit)
+2. Once appointmentType is set and if it's in-person: Ask which clinic they prefer
 3. If no appointmentDate: Ask for preferred date
 4. If have date but no time: Show available times
-5. If no bodyPart: Ask about affected body part
-6. If no symptoms/description: Ask about symptoms
-7. If no duration: Ask how long they've had symptoms
-8. If no severity: Ask about severity
-9. If all info collected: Show summary and ask for confirmation
+5. If no bodyPart or symptoms: Ask about affected body part
+6. If have all required info: Show summary and ask for confirmation
 
-For appointment booking, check if message contains "confirm" and all required fields are present:
+Required fields for booking:
 - appointmentType
 - appointmentDate
 - appointmentTime
-- bodyPart (symptoms)
-- description
-- clinicId (if in-person)
+- bodyPart/symptoms
+- clinicId (only if in-person)
 
-Then use !BOOK_APPOINTMENT:
+IMPORTANT RULES:
+- Never assume appointmentType. Only mention it if user has explicitly chosen one
+- Only ask ONE question at a time
+- Only ask for required fields listed above
+- Don't ask about severity or duration
+- Show confirmation only when ALL required fields are present
+- Keep responses focused and friendly
+
+For appointment booking, use !BOOK_APPOINTMENT:
 {
   "appointment_type": "[type]",
   "appointment_date": "YYYY-MM-DD",
@@ -72,11 +76,7 @@ Then use !BOOK_APPOINTMENT:
   "clinic_id": "[clinic_id]",
   "body_part": "[body_part]",
   "description": "[description]"
-}
-
-Always provide relevant quick-select options for users to choose from.
-Keep responses focused and clear.
-Use emojis to keep it friendly 😊`
+}`
           },
           {
             role: "user",
