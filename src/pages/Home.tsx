@@ -159,19 +159,13 @@ const Home = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="flex flex-col items-center text-center p-4 space-y-3 rounded-lg border bg-card hover:bg-[#1E5AAB]/5 transition-colors duration-300 group relative overflow-hidden"
+                className="flex flex-col items-center text-center p-4 space-y-3 rounded-lg border bg-card hover:bg-[#1E5AAB]/5 transition-colors duration-300"
               >
-                <div className="relative z-10">
-                  <div className="p-3 rounded-full bg-[#1E5AAB]/10">
-                    {feature.icon}
-                  </div>
-                  <h3 className="font-semibold text-2xl text-[#1E5AAB] mt-3">{feature.title}</h3>
+                <div className="p-3 rounded-full bg-[#1E5AAB]/10">
+                  {feature.icon}
                 </div>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute inset-0 flex items-center justify-center bg-white/95 p-4">
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </div>
+                <h3 className="font-semibold text-lg text-[#1E5AAB]">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
               </div>
             ))}
           </div>
