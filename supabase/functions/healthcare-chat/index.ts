@@ -39,43 +39,69 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
+            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. 
 
-1. In your FIRST response to any health concern:
-   SPLIT your response into TWO separate parts using [SPLIT] marker:
-   PART 1: Ask only ONE key question about their main symptom/concern
-   PART 2: "Or, I can help you book an appointment with a doctor right away. Would you like that? 🗓️"
+FOLLOW THIS EXACT CONVERSATION FLOW:
 
-2. For appointment booking:
-   • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ask:
-   "Online or in-person appointment? 🏥"
+1. FIRST, ask about their main health concern:
+   - Provide common symptom options as buttons
+   - Allow "Other" option for custom input
 
-   • Accept ANY variation of these answers:
-     - For online: "online", "virtual", "video", "remote", "tele", etc.
-     - For in-person: "in person", "office", "clinic", "physical", "in-person", etc.
+2. THEN gather these details in order:
+   - Duration of symptoms
+   - Severity level
+   - Related symptoms
+   - Impact on daily life
+   - Previous similar experiences
 
-   • Then immediately suggest a time:
-   "Perfect! How about tomorrow at 10:00 AM? Or I can check other times if this doesn't work for you. 📅"
+3. AFTER gathering ALL information:
+   - Provide a summary of their health concern
+   - Generate a brief health report
+   - ONLY THEN suggest booking an appointment
 
-Then use this format to book it (IMPORTANT: date must be in YYYY-MM-DD format and must be today or a future date):
-!BOOK_APPOINTMENT:
+APPOINTMENT BOOKING RULES:
+- Only suggest booking AFTER completing the health assessment
+- When booking, show ALL available times:
+  ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+
+FORMAT ALL RESPONSES AS:
 {
-  "appointment_type": "in-person",
-  "appointment_date": "${new Date(Date.now() + 86400000).toISOString().split('T')[0]}",
-  "appointment_time": "10:00 AM",
-  "notification_methods": ["app"],
-  "doctor_id": 1
+  "message": "Your clear, concise message here",
+  "options": ["option1", "option2", "option3"]
 }
 
-For serious symptoms (severe pain, breathing issues, high fever, sudden changes in vision/speech), immediately say:
-"This sounds serious. Let me help you book an appointment right away. Online or in-person? 🚨"
+EXAMPLE RESPONSES:
+
+For initial contact:
+{
+  "message": "What's your main health concern today? 🩺",
+  "options": ["Fever", "Headache", "Cough", "Stomach pain", "Other"]
+}
+
+For duration:
+{
+  "message": "How long have you been experiencing these symptoms?",
+  "options": ["Just started", "Few days", "About a week", "More than a week"]
+}
+
+For severity:
+{
+  "message": "How would you rate the severity?",
+  "options": ["Mild", "Moderate", "Severe"]
+}
+
+For booking (only after health assessment):
+{
+  "message": "Based on your symptoms, I recommend seeing a doctor. What time works best for you?",
+  "options": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+}
 
 Remember:
-• Be VERY flexible with user inputs - accept short/informal answers
-• Immediately proceed with booking when user shows any interest
-• Keep messages short and clear
-• Use emojis to keep it friendly 😊
-• ALWAYS suggest tomorrow's date for appointments`
+• Complete the FULL health assessment before suggesting appointments
+• Keep messages clear and concise
+• Use emojis for a friendly tone 😊
+• Show ALL time slots when booking
+• Make every choice a clickable option`
           },
           {
             role: "user",
@@ -95,64 +121,83 @@ Remember:
       throw new Error('Invalid response format from OpenAI API');
     }
 
-    const aiResponse = data.choices[0].message.content.trim();
+    let aiResponse = data.choices[0].message.content.trim();
     let finalResponses = [];
 
-    // Split the response if it contains the [SPLIT] marker
-    if (aiResponse.includes('[SPLIT]')) {
-      finalResponses = aiResponse.split('[SPLIT]').map(part => part.trim());
-    } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
-      // Handle appointment booking response
-      try {
-        // Extract the JSON part
-        const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
-        if (!bookingMatch) {
-          throw new Error('Invalid booking format');
+    try {
+      // Parse the response as JSON
+      const parsedResponse = JSON.parse(aiResponse);
+      
+      if (parsedResponse.message) {
+        // For appointment times, ensure all slots are shown
+        if (parsedResponse.message.toLowerCase().includes('time') || 
+            parsedResponse.message.toLowerCase().includes('appointment')) {
+          parsedResponse.options = ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
         }
-
-        const appointmentDetails = JSON.parse(bookingMatch[1]);
-        console.log('Booking appointment with details:', appointmentDetails);
-
-        // Validate appointment date
-        const appointmentDate = new Date(appointmentDetails.appointment_date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (appointmentDate < today) {
-          throw new Error('Appointment date must be today or in the future');
-        }
-
-        // Insert the appointment into the database
-        const { data: appointment, error: appointmentError } = await supabase
-          .from('appointments')
-          .insert([
-            {
-              appointment_type: appointmentDetails.appointment_type,
-              appointment_date: appointmentDetails.appointment_date,
-              appointment_time: appointmentDetails.appointment_time,
-              notification_methods: appointmentDetails.notification_methods,
-              doctor_id: appointmentDetails.doctor_id,
-              status: 'pending'
-            }
-          ])
-          .select()
-          .single();
-
-        if (appointmentError) {
-          console.error('Error booking appointment:', appointmentError);
-          throw new Error('Failed to book appointment');
-        }
-
-        console.log('Successfully booked appointment:', appointment);
         
-        // Keep only the human-readable part of the response
-        finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
-      } catch (error) {
-        console.error('Error processing appointment booking:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
+        const responseObject = {
+          role: "assistant",
+          content: parsedResponse.message,
+          options: parsedResponse.options
+        };
+        finalResponses = [responseObject];
       }
-    } else {
-      finalResponses = [aiResponse];
+    } catch (e) {
+      console.log('Failed to parse as JSON, handling appointment booking:', e);
+      
+      if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
+        try {
+          const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
+          if (!bookingMatch) {
+            throw new Error('Invalid booking format');
+          }
+
+          const appointmentDetails = JSON.parse(bookingMatch[1]);
+          console.log('Booking appointment with details:', appointmentDetails);
+
+          // Insert appointment into database
+          const { data: appointment, error: appointmentError } = await supabase
+            .from('appointments')
+            .insert([
+              {
+                appointment_type: appointmentDetails.appointment_type,
+                appointment_date: appointmentDetails.appointment_date,
+                appointment_time: appointmentDetails.appointment_time,
+                notification_methods: appointmentDetails.notification_methods,
+                doctor_id: appointmentDetails.doctor_id,
+                status: 'pending'
+              }
+            ])
+            .select()
+            .single();
+
+          if (appointmentError) {
+            console.error('Error booking appointment:', appointmentError);
+            throw new Error('Failed to book appointment');
+          }
+
+          console.log('Successfully booked appointment:', appointment);
+          
+          finalResponses = [{
+            role: "assistant",
+            content: "Your appointment has been booked successfully! 🎉",
+            options: ["View appointment details", "Return to main menu"]
+          }];
+        } catch (error) {
+          console.error('Error processing appointment booking:', error);
+          finalResponses = [{
+            role: "assistant",
+            content: "I couldn't book that appointment. Please select another time:",
+            options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+          }];
+        }
+      } else {
+        // For non-JSON responses, use text as message without options
+        finalResponses = [{
+          role: "assistant",
+          content: aiResponse
+        }];
+      }
     }
 
     return new Response(JSON.stringify({ responses: finalResponses }), {
