@@ -126,6 +126,11 @@ const PatientDashboard = () => {
 
       if (error) throw error;
 
+      // Immediately update the local state by filtering out the cancelled appointment
+      setRecentAppointments(prevAppointments => 
+        prevAppointments.filter(apt => apt.id !== appointmentId)
+      );
+
       toast({
         title: "Success",
         description: "Appointment cancelled successfully",
