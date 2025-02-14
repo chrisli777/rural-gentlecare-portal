@@ -18,16 +18,12 @@ serve(async (req) => {
   }
 
   try {
-    const { message, appointmentInfo } = await req.json();
+    const { message } = await req.json();
     console.log('Received message:', message);
-    console.log('Current appointment info:', appointmentInfo);
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
-
-    // Initialize Supabase client with service role key for admin access
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -36,80 +32,21 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4",
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Guide users through booking appointments step by step.
+            content: `You are a friendly and helpful healthcare assistant. When users ask about booking appointments, politely direct them to use the Book Appointments page. Your response should be:
 
-Current appointment info: ${JSON.stringify(appointmentInfo)}
+"To book an appointment, please use our dedicated appointment booking page. You can find it by:
+1. Going to the Book Appointments section in the menu
+2. Choosing your preferred appointment type
+3. Selecting a date and time that works for you
+4. Providing the required information
 
-Step-by-Step Booking Process:
+Would you like me to help you with any other health-related questions?"
 
-1. IF NO bodyPart:
-   - Ask "Which part of your body is affected?"
-   - Show options: ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"]
-   - Wait for response
-   
-2. IF NO appointmentType:
-   - Ask "What type of appointment would you prefer?"
-   - Show options: ["Online Consultation", "In-Person Visit", "Home Visit"]
-   - Wait for response
-
-3. IF appointmentType is "in-person" AND NO clinicId:
-   - Ask "Which clinic would you prefer?"
-   - Show options: ["Adams Rural Care Main Clinic", "Adams Rural Care East Branch"]
-   - Wait for response
-
-4. IF NO appointmentDate:
-   - Ask "What date would you prefer for your appointment?"
-   - Wait for response
-
-5. IF NO appointmentTime:
-   - Ask "What time would you prefer?"
-   - Show options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
-   - Wait for response
-
-6. IF ALL REQUIRED FIELDS ARE PRESENT:
-   Show summary and ask for confirmation:
-   "Great! Here's your appointment summary:
-   - Type: [appointmentType]
-   - Date: [appointmentDate]
-   - Time: [appointmentTime]
-   - Location: [clinic if in-person]
-   - Body Part: [bodyPart]
-
-   Would you like to confirm this appointment?"
-   Show options: ["Confirm Appointment", "Change Details"]
-
-Required fields for booking:
-- appointmentType
-- appointmentDate
-- appointmentTime
-- bodyPart/symptoms
-- clinicId (only if in-person)
-
-IMPORTANT RULES:
-- Never assume appointmentType. Only mention it if user has explicitly chosen one
-- Only ask ONE question at a time
-- Only ask for required fields listed above
-- Don't ask about severity or duration
-- Show confirmation only when ALL required fields are present
-- Keep responses focused and friendly
-- Options should always show in selection bar
-
-For appointment booking, use !BOOK_APPOINTMENT:
-{
-  "appointment_type": "[type]",
-  "appointment_date": "YYYY-MM-DD",
-  "appointment_time": "HH:MM AM/PM",
-  "notification_methods": ["app"],
-  "clinic_id": "[clinic_id]",
-  "body_part": "[body_part]",
-  "description": "[description]"
-}
-
-For cancellation, use !CANCEL_APPOINTMENT`
+For other health-related questions, provide helpful, friendly guidance while maintaining a professional tone.`
           },
           {
             role: "user",
@@ -129,85 +66,8 @@ For cancellation, use !CANCEL_APPOINTMENT`
       throw new Error('Invalid response format from OpenAI API');
     }
 
-    const aiResponse = data.choices[0].message.content.trim();
-    let finalResponses = [];
-    let appointmentCreated = false;
-    let appointmentCancelled = false;
-
-    if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
-      try {
-        const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
-        if (!bookingMatch) {
-          throw new Error('Invalid booking format');
-        }
-
-        const appointmentDetails = JSON.parse(bookingMatch[1]);
-        console.log('Booking appointment with details:', appointmentDetails);
-
-        const appointmentDate = new Date(appointmentDetails.appointment_date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (appointmentDate < today) {
-          throw new Error('Appointment date must be today or in the future');
-        }
-
-        const { data: appointment, error: appointmentError } = await supabase
-          .from('appointments')
-          .insert([
-            {
-              appointment_type: appointmentDetails.appointment_type,
-              appointment_date: appointmentDetails.appointment_date,
-              appointment_time: appointmentDetails.appointment_time,
-              notification_methods: appointmentDetails.notification_methods,
-              clinic_id: appointmentDetails.clinic_id,
-              body_part: appointmentDetails.body_part,
-              description: appointmentDetails.description,
-              status: 'pending'
-            }
-          ])
-          .select()
-          .single();
-
-        if (appointmentError) {
-          console.error('Error booking appointment:', appointmentError);
-          throw new Error('Failed to book appointment');
-        }
-
-        console.log('Successfully booked appointment:', appointment);
-        appointmentCreated = true;
-        finalResponses = [
-          "Great news! 🎉 Your appointment has been successfully booked. Would you like to book another appointment or is there anything else I can help you with?"
-        ];
-      } catch (error) {
-        console.error('Error processing appointment booking:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
-      }
-    } else if (aiResponse.includes('!CANCEL_APPOINTMENT')) {
-      try {
-        const { error: cancelError } = await supabase
-          .from('appointments')
-          .update({ status: 'cancelled' })
-          .eq('id', appointmentInfo.id);
-
-        if (cancelError) throw cancelError;
-
-        appointmentCancelled = true;
-        finalResponses = [
-          "I've successfully cancelled your appointment. Is there anything else I can help you with?"
-        ];
-      } catch (error) {
-        console.error('Error cancelling appointment:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to cancel your appointment. Please try again."];
-      }
-    } else {
-      finalResponses = [aiResponse];
-    }
-
     return new Response(JSON.stringify({ 
-      responses: finalResponses, 
-      appointmentCreated,
-      appointmentCancelled 
+      responses: [data.choices[0].message.content.trim()]
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
