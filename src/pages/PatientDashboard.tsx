@@ -1,24 +1,32 @@
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/components/chat/ChatMessage";
-import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { AnimatePresence } from "framer-motion";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Mic, MicOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
+import { useToast } from "@/hooks/use-toast";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
   const {
-    message,
-    setMessage,
     conversation,
-    isLoading,
     handleSendMessage,
   } = useChat();
+  
+  const onVoiceProcessed = (text: string) => {
+    if (text.trim()) {
+      handleSendMessage(text);
+    }
+  };
+
+  const { isRecording, toggleRecording } = useVoiceRecording(onVoiceProcessed);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -63,12 +71,22 @@ const PatientDashboard = () => {
             </AnimatePresence>
           </div>
 
-          <ChatInput
-            message={message}
-            setMessage={setMessage}
-            isLoading={isLoading}
-            onSendMessage={handleSendMessage}
-          />
+          <div className="p-4 border-t flex justify-center">
+            <Button
+              onClick={toggleRecording}
+              className={`rounded-full w-16 h-16 p-0 ${
+                isRecording
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
+              }`}
+            >
+              {isRecording ? (
+                <MicOff className="h-6 w-6 text-white" />
+              ) : (
+                <Mic className="h-6 w-6 text-white" />
+              )}
+            </Button>
+          </div>
         </Card>
       </main>
     </div>

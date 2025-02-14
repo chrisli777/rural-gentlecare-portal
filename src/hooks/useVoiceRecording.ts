@@ -32,8 +32,9 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
         }
       });
 
-      // Initialize WebSocket connection using the project reference from the Supabase URL
-      wsRef.current = new WebSocket(`wss://pascdrwwolpnfljfzioj.functions.supabase.co/realtime-chat`);
+      // Initialize WebSocket connection
+      const projectRef = new URL(supabase.supabaseUrl).hostname.split('.')[0];
+      wsRef.current = new WebSocket(`wss://${projectRef}.functions.supabase.co/realtime-chat`);
       
       const recorder = new MediaRecorder(stream);
       const audioChunks: Float32Array[] = [];
@@ -47,7 +48,8 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
         // Send audio data through WebSocket
         if (wsRef.current?.readyState === WebSocket.OPEN) {
           wsRef.current.send(JSON.stringify({
-            audio: Array.from(channelData)
+            type: 'input_audio_buffer.append',
+            audio: encodeAudioData(channelData)
           }));
         }
       };
@@ -56,7 +58,7 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
       wsRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'response.audio.delta') {
-          // Play the audio response
+          // Convert base64 audio to Float32Array and play
           const audioData = atob(data.delta);
           const audioArray = new Float32Array(audioData.length);
           for (let i = 0; i < audioData.length; i++) {
@@ -71,6 +73,8 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
             source.connect(audioContext.destination);
             source.start();
           }
+        } else if (data.type === 'response.text.delta') {
+          onVoiceProcessed(data.delta);
         }
       };
 
@@ -123,4 +127,23 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
     isRecording,
     toggleRecording
   };
+};
+
+const encodeAudioData = (float32Array: Float32Array): string => {
+  const int16Array = new Int16Array(float32Array.length);
+  for (let i = 0; i < float32Array.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32Array[i]));
+    int16Array[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  
+  const uint8Array = new Uint8Array(int16Array.buffer);
+  let binary = '';
+  const chunkSize = 0x8000;
+  
+  for (let i = 0; i < uint8Array.length; i += chunkSize) {
+    const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
+    binary += String.fromCharCode.apply(null, Array.from(chunk));
+  }
+  
+  return btoa(binary);
 };
