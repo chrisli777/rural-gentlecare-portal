@@ -74,16 +74,16 @@ const PatientDashboard = () => {
           <div className="p-4 border-t flex flex-col items-center gap-2">
             <Button
               onClick={toggleRecording}
-              className={`rounded-full w-16 h-16 p-0 ${
+              className={`rounded-full w-20 h-20 p-0 ${
                 isRecording
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
               }`}
             >
               {isRecording ? (
-                <MicOff className="h-6 w-6 text-white" />
+                <MicOff className="h-10 w-10 text-white" />
               ) : (
-                <Mic className="h-6 w-6 text-white" />
+                <Mic className="h-10 w-10 text-white" />
               )}
             </Button>
             <span className="text-sm text-gray-600 font-medium">Talk to us</span>
