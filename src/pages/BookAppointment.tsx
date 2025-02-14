@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { translations } from "@/utils/translations";
 import {
   Dialog,
   DialogContent,
@@ -39,12 +40,6 @@ const bodyParts = [
   "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"
 ];
 
-const appointmentTypes = [
-  { value: "online", label: "Online Consultation" },
-  { value: "in-person", label: "In-Person Visit" },
-  { value: "home", label: "Home Visit" }
-];
-
 const PatientAppointment = () => {
   const [currentStep, setCurrentStep] = useState<'details' | 'schedule'>('details');
   const [appointmentType, setAppointmentType] = useState("");
@@ -56,6 +51,7 @@ const PatientAppointment = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const t = translations.en; // For now using English, can be made dynamic later
 
   const isDetailsComplete = () => {
     if (!appointmentType || !bodyPart) return false;
@@ -72,8 +68,8 @@ const PatientAppointment = () => {
       setCurrentStep('schedule');
     } else {
       toast({
-        title: "Required Fields",
-        description: "Please fill in all required fields before proceeding.",
+        title: t.appointments.missingInfo,
+        description: t.appointments.missingInfoDesc,
         variant: "destructive",
       });
     }
@@ -84,8 +80,8 @@ const PatientAppointment = () => {
       setShowConfirmation(true);
     } else {
       toast({
-        title: "Required Fields",
-        description: "Please select both date and time before proceeding.",
+        title: t.appointments.missingInfo,
+        description: t.appointments.missingInfoDesc,
         variant: "destructive",
       });
     }
@@ -109,8 +105,8 @@ const PatientAppointment = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Your appointment has been successfully scheduled",
+        title: t.appointments.success,
+        description: t.appointments.successDesc,
       });
 
       navigate('/patient/dashboard');
@@ -118,8 +114,8 @@ const PatientAppointment = () => {
     } catch (error: any) {
       console.error('Error booking appointment:', error);
       toast({
-        title: "Error",
-        description: "Failed to book appointment. Please try again.",
+        title: t.appointments.error,
+        description: t.appointments.errorDesc,
         variant: "destructive",
       });
     }
@@ -136,33 +132,31 @@ const PatientAppointment = () => {
               {currentStep === 'details' && (
                 <div className="space-y-6">
                   <div>
-                    <Label>What type of appointment would you prefer?</Label>
+                    <Label>{t.appointments.type.label}</Label>
                     <Select
                       value={appointmentType}
                       onValueChange={setAppointmentType}
                     >
                       <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Select appointment type" />
+                        <SelectValue placeholder={t.appointments.type.select} />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        {appointmentTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="online">{t.appointments.type.online}</SelectItem>
+                        <SelectItem value="in-person">{t.appointments.type.inPerson}</SelectItem>
+                        <SelectItem value="home">{t.appointments.type.homeVisit}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {appointmentType === 'in-person' && (
                     <div>
-                      <Label>Select Clinic</Label>
+                      <Label>{t.appointments.clinic.label}</Label>
                       <Select
                         value={selectedClinic}
                         onValueChange={setSelectedClinic}
                       >
                         <SelectTrigger className="w-full bg-white">
-                          <SelectValue placeholder="Choose a clinic" />
+                          <SelectValue placeholder={t.appointments.clinic.select} />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
                           {clinics.map((clinic) => (
@@ -176,7 +170,7 @@ const PatientAppointment = () => {
                   )}
 
                   <div>
-                    <Label>Which part of your body is affected?</Label>
+                    <Label>Select Body Part</Label>
                     <Select
                       value={bodyPart}
                       onValueChange={setBodyPart}
@@ -216,7 +210,7 @@ const PatientAppointment = () => {
               {currentStep === 'schedule' && (
                 <div className="space-y-6">
                   <div>
-                    <Label>Select Date</Label>
+                    <Label>{t.appointments.date.label}</Label>
                     <Calendar
                       mode="single"
                       selected={date}
@@ -227,13 +221,13 @@ const PatientAppointment = () => {
                   </div>
 
                   <div>
-                    <Label>Select Time</Label>
+                    <Label>{t.appointments.time.label}</Label>
                     <Select
                       value={selectedTime}
                       onValueChange={setSelectedTime}
                     >
                       <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Choose a time" />
+                        <SelectValue placeholder={t.appointments.time.select} />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
                         {timeSlots.map((time) => (
@@ -251,13 +245,13 @@ const PatientAppointment = () => {
                       className="w-full"
                       onClick={() => setCurrentStep('details')}
                     >
-                      Back to Details
+                      {t.common.back}
                     </Button>
                     <Button
                       className="w-full"
                       onClick={handleScheduleNext}
                     >
-                      Review Appointment
+                      {t.appointments.summary}
                     </Button>
                   </div>
                 </div>
@@ -269,16 +263,16 @@ const PatientAppointment = () => {
         <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Confirm Your Appointment</DialogTitle>
+              <DialogTitle>{t.appointments.summary}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <p>
-                <span className="font-medium">Type: </span>
-                {appointmentTypes.find(t => t.value === appointmentType)?.label}
+                <span className="font-medium">{t.appointments.details.type}: </span>
+                {appointmentType}
               </p>
               {selectedClinic && appointmentType === "in-person" && (
                 <p>
-                  <span className="font-medium">Clinic: </span>
+                  <span className="font-medium">{t.appointments.details.clinic}: </span>
                   {clinics.find(c => c.id.toString() === selectedClinic)?.name}
                 </p>
               )}
@@ -288,13 +282,13 @@ const PatientAppointment = () => {
               </p>
               {date && (
                 <p>
-                  <span className="font-medium">Date: </span>
+                  <span className="font-medium">{t.appointments.details.date}: </span>
                   {date.toLocaleDateString()}
                 </p>
               )}
               {selectedTime && (
                 <p>
-                  <span className="font-medium">Time: </span>
+                  <span className="font-medium">{t.appointments.details.time}: </span>
                   {selectedTime}
                 </p>
               )}
@@ -307,10 +301,10 @@ const PatientAppointment = () => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowConfirmation(false)}>
-                Change Details
+                {t.common.back}
               </Button>
               <Button onClick={handleBookAppointment}>
-                Confirm Appointment
+                {t.appointments.book}
               </Button>
             </DialogFooter>
           </DialogContent>

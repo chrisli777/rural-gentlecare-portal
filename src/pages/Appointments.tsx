@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
+import { translations } from "@/utils/translations";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,6 +36,7 @@ const Appointments = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(null);
+  const t = translations.en; // For now using English, can be made dynamic later
 
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments'],
@@ -47,7 +48,7 @@ const Appointments = () => {
 
       if (error) {
         toast({
-          title: "Error loading appointments",
+          title: t.appointments.error,
           description: error.message,
           variant: "destructive",
         });
@@ -76,8 +77,8 @@ const Appointments = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Appointment cancelled successfully",
+        title: t.appointments.success,
+        description: t.appointments.successDesc,
         duration: 2000,
       });
     } catch (error: any) {
@@ -85,8 +86,8 @@ const Appointments = () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       
       toast({
-        title: "Error",
-        description: "Failed to cancel appointment",
+        title: t.appointments.error,
+        description: t.appointments.errorDesc,
         variant: "destructive",
         duration: 2000,
       });
@@ -132,20 +133,20 @@ const Appointments = () => {
               >
                 <path d="m15 18-6-6 6-6"/>
               </svg>
-              Back
+              {t.common.back}
             </Button>
           </div>
         </div>
       </div>
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">My Appointments</h1>
+          <h1 className="text-2xl font-bold">{t.common.appointments}</h1>
           {appointments && appointments.length > 0 && (
             <Button 
               onClick={() => navigate('/patient/book-appointment')}
               className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
             >
-              Book Appointment
+              {t.appointments.book}
             </Button>
           )}
         </div>
@@ -166,7 +167,7 @@ const Appointments = () => {
                     </div>
                     <div className="space-y-1">
                       <p className="text-gray-600">
-                        Type: {appointment.appointment_type}
+                        {t.appointments.details.type}: {appointment.appointment_type}
                       </p>
                       {appointment.body_part && (
                         <p className="text-gray-600">
@@ -175,7 +176,7 @@ const Appointments = () => {
                       )}
                       {appointment.description && (
                         <p className="text-gray-600">
-                          Description: {appointment.description}
+                          {t.appointments.description}: {appointment.description}
                         </p>
                       )}
                     </div>
@@ -199,12 +200,12 @@ const Appointments = () => {
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">You don't have any appointments yet</p>
+            <p className="text-gray-600 mb-4">{t.dashboard.noAppointments}</p>
             <Button 
               onClick={() => navigate('/patient/book-appointment')}
               className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
             >
-              Book Your First Appointment
+              {t.appointments.book}
             </Button>
           </div>
         )}
@@ -212,9 +213,9 @@ const Appointments = () => {
         <AlertDialog open={!!appointmentToDelete} onOpenChange={() => setAppointmentToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Cancel Appointment</AlertDialogTitle>
+              <AlertDialogTitle>{t.dialog.confirmCancelTitle}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to cancel this appointment? This action cannot be undone.
+                {t.dialog.confirmCancelDescription}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -222,13 +223,13 @@ const Appointments = () => {
                 onClick={() => setAppointmentToDelete(null)}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-900"
               >
-                Keep Appointment
+                {t.dialog.keepAppointment}
               </AlertDialogCancel>
               <AlertDialogAction 
                 onClick={handleCancelDialog}
                 className="bg-destructive hover:bg-destructive/90 text-white"
               >
-                Delete Appointment
+                {t.dialog.confirmCancel}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
