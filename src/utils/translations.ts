@@ -104,6 +104,15 @@ export const translations = {
         label: "Select Time",
         select: "Choose a time"
       },
+      bodyPart: {
+        label: "Select Body Part",
+        select: "Select body part"
+      },
+      additionalDescription: {
+        label: "Additional Description (Optional)",
+        placeholder: "Please describe your symptoms or reason for visit"
+      },
+      continueToSchedule: "Continue to Schedule",
       book: "Book Appointment",
       summary: "Appointment Summary",
       details: {
@@ -225,6 +234,15 @@ export const translations = {
         label: "Seleccionar Hora",
         select: "Elija una hora"
       },
+      bodyPart: {
+        label: "Seleccionar Parte del Cuerpo",
+        select: "Seleccionar parte del cuerpo"
+      },
+      additionalDescription: {
+        label: "Descripción Adicional (Opcional)",
+        placeholder: "Por favor describa sus síntomas o razón de la visita"
+      },
+      continueToSchedule: "Continuar a Programar",
       book: "Programar Cita",
       summary: "Resumen de la Cita",
       details: {
