@@ -1,26 +1,31 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { WebSocketClient } from "https://deno.land/x/websocket@v0.1.4/mod.ts"
+import "https://deno.land/x/xhr@0.1.0/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
-
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+  const { headers } = req;
+  const upgradeHeader = headers.get("upgrade") || "";
+  
+  if (upgradeHeader.toLowerCase() !== "websocket") {
+    return new Response("Expected WebSocket connection", { 
+      status: 400,
+      headers: corsHeaders
+    });
   }
 
   try {
-    const ws = new WebSocketClient('wss://api.openai.com/v1/audio/speech')
-    
-    // Connect to OpenAI's WebSocket API
-    ws.on('open', () => {
+    const { socket, response } = Deno.upgradeWebSocket(req);
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const openaiWs = new WebSocket('wss://api.openai.com/v1/audio/speech');
+
+    openaiWs.onopen = () => {
       console.log("Connected to OpenAI WebSocket");
-      ws.send(JSON.stringify({
+      openaiWs.send(JSON.stringify({
         type: 'session.create',
         model: 'gpt-4',
         session: {
@@ -45,50 +50,40 @@ serve(async (req) => {
 5. Add any additional description of your symptoms (optional)
 6. Choose your preferred date from the calendar
 7. Select an available time slot
-8. Review your appointment details and confirm
-
-For other queries, you can help with:
-- Medical advice and health information
-- General healthcare questions`
+8. Review your appointment details and confirm`
         }
-      }))
-    })
+      }));
+    };
 
-    ws.on('message', (message) => {
-      console.log("Received message from OpenAI:", message);
-      const data = JSON.parse(message)
+    openaiWs.onmessage = (event) => {
+      console.log("Message from OpenAI:", event.data);
+      socket.send(event.data);
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Message from client:", event.data);
+      const data = JSON.parse(event.data);
       
       if (data.type === 'session.created') {
-        console.log("Session created, updating settings");
-        ws.send(JSON.stringify({
+        openaiWs.send(JSON.stringify({
           type: 'session.update',
           session: {
             voice: 'alloy',
             temperature: 0.7,
             max_response_output_tokens: 100
           }
-        }))
+        }));
+      } else {
+        openaiWs.send(event.data);
       }
-      
-      // Forward messages to the client
-      return new Response(JSON.stringify(data), {
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
-      })
-    })
+    };
 
-    // Handle incoming audio from the client
-    const { audio } = await req.json()
-    if (audio) {
-      console.log("Sending audio to OpenAI");
-      ws.send(JSON.stringify({
-        type: 'input_audio_buffer.append',
-        audio: audio
-      }))
-    }
+    socket.onclose = () => {
+      console.log("Client disconnected");
+      openaiWs.close();
+    };
 
+    return response;
   } catch (error) {
     console.error("Error in realtime-chat:", error);
     return new Response(
@@ -97,6 +92,6 @@ For other queries, you can help with:
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
-    )
+    );
   }
-})
+});

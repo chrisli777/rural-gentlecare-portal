@@ -24,8 +24,14 @@ const PatientDashboard = () => {
   const { toast } = useToast();
 
   const handleVoiceProcessed = (text: string) => {
-    setMessage(text);
-    handleSendMessage(text);
+    const newMessage = {
+      role: text.startsWith('You: ') ? 'user' : 'assistant',
+      content: text,
+      isTranscript: true
+    };
+    setMessage('');
+    // Update conversation with transcript
+    conversation.push(newMessage);
   };
 
   const { isRecording, toggleRecording } = useVoiceRecording(handleVoiceProcessed);
@@ -59,13 +65,25 @@ const PatientDashboard = () => {
             >
               <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
                 <AnimatePresence>
-                  {conversation.map((msg, index) => (
-                    <ChatMessage
-                      key={index}
-                      message={msg}
-                      onOptionSelect={handleSendMessage}
-                    />
-                  ))}
+                  {isRealtimeMode ? (
+                    conversation
+                      .filter(msg => msg.isTranscript)
+                      .map((msg, index) => (
+                        <ChatMessage
+                          key={index}
+                          message={msg}
+                          onOptionSelect={handleSendMessage}
+                        />
+                      ))
+                  ) : (
+                    conversation.map((msg, index) => (
+                      <ChatMessage
+                        key={index}
+                        message={msg}
+                        onOptionSelect={handleSendMessage}
+                      />
+                    ))
+                  )}
                   <div ref={messagesEndRef} />
                 </AnimatePresence>
               </div>
