@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
@@ -35,11 +34,9 @@ const PatientDashboard = () => {
   const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
   const { toast } = useToast();
 
-  // Fetch appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        // Get the current user's session
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) {
           console.error('No authenticated user found');
@@ -62,7 +59,6 @@ const PatientDashboard = () => {
 
         if (appointments) {
           console.log('Fetched appointments:', appointments);
-          // Sort appointments by date and time
           const sortedAppointments = appointments.sort((a, b) => {
             const dateTimeA = new Date(`${a.appointment_date} ${a.appointment_time}`);
             const dateTimeB = new Date(`${b.appointment_date} ${b.appointment_time}`);
@@ -71,7 +67,6 @@ const PatientDashboard = () => {
           
           setRecentAppointments(sortedAppointments);
           
-          // Add appointment notifications to conversation without replacing existing messages
           const appointmentMessages = sortedAppointments
             .map(apt => ({
               role: "assistant",
@@ -103,7 +98,6 @@ const PatientDashboard = () => {
 
     fetchAppointments();
 
-    // Set up real-time subscription for appointments
     const appointmentsSubscription = supabase
       .channel('appointments_changes')
       .on(
@@ -120,7 +114,6 @@ const PatientDashboard = () => {
       )
       .subscribe();
 
-    // Cleanup subscription
     return () => {
       appointmentsSubscription.unsubscribe();
     };
@@ -135,12 +128,10 @@ const PatientDashboard = () => {
 
       if (error) throw error;
 
-      // Immediately update the local state by filtering out the cancelled appointment
       setRecentAppointments(prevAppointments => {
         const cancelledAppointment = prevAppointments.find(apt => apt.id === appointmentId);
         const updatedAppointments = prevAppointments.filter(apt => apt.id !== appointmentId);
         
-        // Add AI confirmation message about the cancellation
         if (cancelledAppointment) {
           const cancellationMessage = {
             role: "assistant",
@@ -252,7 +243,6 @@ const PatientDashboard = () => {
     }
   };
 
-  // Get the current user's ID
   useEffect(() => {
     const getCurrentUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -310,11 +300,8 @@ const PatientDashboard = () => {
       <Header />
       <main className="container mx-auto px-4 pt-20 pb-6 h-[calc(100vh-80px)]"> {/* Adjusted for Header height */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-          {/* Left Column - Appointments Section */}
           <div className="md:col-span-1 space-y-6 overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Appointments</h2>
-            
-            {/* Appointment Booking */}
             <Link to="/patient/appointment" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
@@ -324,8 +311,6 @@ const PatientDashboard = () => {
                 </CardContent>
               </Card>
             </Link>
-
-            {/* All Appointments */}
             <Card>
               <CardHeader>
                 <CardTitle>All Appointments</CardTitle>
@@ -379,8 +364,6 @@ const PatientDashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* Right Column - Chatbot Section */}
           <div className="md:col-span-2 flex flex-col h-full">
             <Card className="flex-1 flex flex-col">
               <CardHeader>
