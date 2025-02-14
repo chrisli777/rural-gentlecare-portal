@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,12 @@ const Appointments = () => {
     if (!appointmentToDelete) return;
 
     try {
+      // Optimistically update the UI
+      queryClient.setQueryData(['appointments'], (oldData: Appointment[] | undefined) => {
+        if (!oldData) return [];
+        return oldData.filter(appointment => appointment.id !== appointmentToDelete);
+      });
+
       const { error } = await supabase
         .from('appointments')
         .update({ status: 'cancelled' })
@@ -72,16 +79,17 @@ const Appointments = () => {
       toast({
         title: "Success",
         description: "Appointment cancelled successfully",
-        duration: 2000, // Set duration to 2 seconds
+        duration: 2000,
       });
-
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
     } catch (error: any) {
+      // Revert the optimistic update on error
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      
       toast({
         title: "Error",
         description: "Failed to cancel appointment",
         variant: "destructive",
-        duration: 2000, // Set duration to 2 seconds
+        duration: 2000,
       });
     } finally {
       setAppointmentToDelete(null);
