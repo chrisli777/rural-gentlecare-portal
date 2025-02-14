@@ -12,10 +12,17 @@ export class ResponseHandler {
         throw new Error('Invalid booking format');
       }
 
-      return [{
-        message: "Great! I've booked your appointment. Is there anything else you need help with?",
-        options: ["I have another question", "No, thank you"]
-      }];
+      try {
+        const bookingData = JSON.parse(bookingMatch[1]);
+        console.log('Booking data:', bookingData);
+        return [{
+          message: "Great! I've booked your appointment. Is there anything else you need help with?",
+          options: ["I have another question", "No, thank you"]
+        }];
+      } catch (error) {
+        console.error('Error parsing booking data:', error);
+        throw new Error('Invalid booking data format');
+      }
     }
 
     const messageMatch = aiResponse.match(/message:\s*"([^"]+)"/);
@@ -37,4 +44,3 @@ export class ResponseHandler {
     }];
   }
 }
-

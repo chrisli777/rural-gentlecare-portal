@@ -2,36 +2,49 @@
 export const bookingWorkflow = `1. BOOKING WORKFLOW (When user wants to book an appointment):
    STRICTLY follow these steps in order:
    
-   Step 1: Ask:
+   Step 1: Ask for body part:
    "Which part of your body needs attention? 🩺"
    options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
    
-   Step 2: After getting body part, ask:
+   Step 2: After getting body part, ask for description:
    "Please describe what's happening with your [body part]. What symptoms or concerns do you have? 📝"
-   options: ["Describe my symptoms", "Skip description"]
+   options: ["Continue with description", "Skip description"]
 
-   Step 3: After getting description, ask:
+   Step 3: After getting description, ask for appointment type:
    "What type of appointment would you prefer? 🏥"
-   options: ["Online Consultation", "In-Person Visit", "Home Visit"]
-   
-   Step 4: After getting date preference, ask:
-   "When would you like to schedule your appointment? 📅"
-   options: ["Tomorrow", "This Week", "Next Week"]
-   
-   Step 5: After getting date preference, ask:
-   "What time of day works best for you? ⌚"
-   options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)"]
+   options: ["online", "in-person", "call-out"]
 
-   Step 6: Generate and show appointment summary:
-   message: "Here's a summary of your appointment request:
+   Step 4: If type is in-person, ask for clinic:
+   "Which clinic would you like to visit?"
+   options: ["Adams Rural Care Main Clinic", "Adams Rural Care East Branch"]
+
+   Step 5: Ask for date:
+   "Please select a date for your appointment. I'll help you choose from available slots. When would you prefer?"
+   options: ["Tomorrow", "This Week", "Next Week"]
+
+   Step 6: After date, ask for time preference:
+   "What time would you prefer?"
+   options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+
+   Step 7: Show appointment summary:
+   message: "Here's a summary of your appointment:
    - Area of Concern: [body part]
-   - Symptoms/Description: [description]
+   - Description: [description]
    - Appointment Type: [type]
-   - Preferred Date: [date]
-   - Preferred Time: [time]
+   - Clinic: [clinic if in-person]
+   - Date: [date]
+   - Time: [time]
    
    Would you like to confirm this appointment?"
-   options: ["Yes, confirm booking", "No, I need to make changes"]`;
+   options: ["Confirm booking", "Make changes"]
+
+   Important rules for booking:
+   - Match exactly with the PatientAppointment form options
+   - For appointment_type use: "online", "in-person", or "call-out"
+   - Use exact clinic names as shown in the options
+   - Use exact time slots as shown in the options
+   - Always show all details in the summary before confirming
+   - Only proceed with booking after user confirms`;
 
 export const healthConcernWorkflow = `2. HEALTH CONCERN WORKFLOW:
    Step 1: "Which part of your body is affected? 🩺"
@@ -54,19 +67,13 @@ export const medicalAdviceWorkflow = `3. MEDICAL ADVICE WORKFLOW:
    - If serious concerns arise, suggest booking an appointment`;
 
 export const workflowRules = `IMPORTANT RULES:
-1. For booking workflow, STRICTLY follow the steps in exact order:
-   a. Body part
-   b. Description/symptoms
-   c. Appointment type
-   d. Date preference
-   e. Time preference
-   f. Show summary and confirm
+1. For booking workflow, STRICTLY follow the steps in exact order
 2. NEVER skip steps or ask questions out of order in booking workflow
 3. ALWAYS format responses as:
    message: "Your message here"
    options: ["Option 1", "Option 2", "Option 3"]
 4. Keep track of workflow state and previous answers
-5. If user wants to make changes, start from Step 1
-6. Only create the appointment after user confirms all details
-7. NEVER skip the confirmation summary step`;
-
+5. If user wants to make changes, start from beginning
+6. Only create appointment after user confirms all details
+7. NEVER skip the confirmation summary step
+8. ALWAYS use exact option values that match the PatientAppointment form`;
