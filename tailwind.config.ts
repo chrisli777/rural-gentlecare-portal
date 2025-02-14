@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -27,22 +28,22 @@ export default {
         primary: {
           DEFAULT: "#4A90E2",
           foreground: "#FFFFFF",
-          hover: "#357ABD",
+          hover: "#6BA5E9",
         },
         secondary: {
-          DEFAULT: "#F5F5DC",
+          DEFAULT: "#F8F9FF",
           foreground: "#333333",
         },
         destructive: {
-          DEFAULT: "#C0392B",
+          DEFAULT: "#FF6B6B",
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#EAEAEA",
+          DEFAULT: "#F0F4FF",
           foreground: "#666666",
         },
         accent: {
-          DEFAULT: "#A8D5BA",
+          DEFAULT: "#A8E6CF",
           foreground: "#2C3E50",
         },
         card: {
