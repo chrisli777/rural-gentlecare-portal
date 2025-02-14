@@ -12,7 +12,7 @@ export const Header = () => {
   // Add onboarding to the routes that should show only back button
   const showOnlyBackButton = location.pathname === '/provider/patients' || 
     location.pathname === '/provider/analytics' ||
-    location.pathname === '/patient/appointment' || 
+    location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
     location.pathname === '/patient/onboarding';
   
@@ -48,7 +48,7 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
+            <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
               Appointments
             </Link>
           </nav>
@@ -66,7 +66,7 @@ export const Header = () => {
         {isMenuOpen && (
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
-              <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
+              <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 Appointments
               </Link>
             </div>
