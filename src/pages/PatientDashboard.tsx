@@ -305,8 +305,8 @@ const PatientDashboard = () => {
             <Link to="/patient/appointment" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <Calendar className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Book an Appointment</h3>
+                  <Calendar className="w-12 h-12 text-[#1E5AAB] mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book an Appointment</h3>
                   <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
                 </CardContent>
               </Card>
@@ -314,7 +314,7 @@ const PatientDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>All Appointments</CardTitle>
+                <CardTitle className="text-[#1E5AAB]">All Appointments</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
@@ -326,7 +326,7 @@ const PatientDashboard = () => {
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <p className="font-medium">{appointment.appointment_type}</p>
+                            <p className="font-medium text-[#1E5AAB]">{appointment.appointment_type}</p>
                             <p className="text-sm text-muted-foreground">
                               {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
                             </p>
@@ -342,7 +342,7 @@ const PatientDashboard = () => {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogTitle className="text-[#1E5AAB]">Are you sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
                                   This action cannot be undone. This will permanently cancel your appointment.
                                 </AlertDialogDescription>
@@ -369,7 +369,7 @@ const PatientDashboard = () => {
           <div className="md:col-span-2 flex flex-col h-full">
             <Card className="flex-1 flex flex-col">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-[#1E5AAB]">
                   <Bot className="h-5 w-5" />
                   Healthcare Assistant
                 </CardTitle>
@@ -386,7 +386,7 @@ const PatientDashboard = () => {
                       <div
                         className={`max-w-[80%] p-3 rounded-lg ${
                           msg.role === "user"
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-[#1E5AAB] text-white"
                             : "bg-muted"
                         }`}
                       >
@@ -401,7 +401,7 @@ const PatientDashboard = () => {
                     size="icon"
                     onClick={toggleRecording}
                     disabled={isLoading}
-                    className={isRecording ? 'animate-pulse' : ''}
+                    className={`${isRecording ? 'animate-pulse' : ''} text-[#1E5AAB]`}
                   >
                     {isRecording ? (
                       <MicOff className="h-4 w-4" />
@@ -416,7 +416,11 @@ const PatientDashboard = () => {
                     onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                     disabled={isLoading || isRecording}
                   />
-                  <Button onClick={() => handleSendMessage()} disabled={isLoading || isRecording}>
+                  <Button 
+                    onClick={() => handleSendMessage()} 
+                    disabled={isLoading || isRecording}
+                    className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
+                  >
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
