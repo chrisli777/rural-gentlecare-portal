@@ -46,7 +46,7 @@ const PatientDashboard = () => {
               size="sm"
             >
               <MessageSquare className="h-4 w-4" />
-              Switch to Text Chat
+              Switch to Text Conversation
             </Button>
           </div>
           

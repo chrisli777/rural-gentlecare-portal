@@ -46,7 +46,7 @@ const AIAssistant = () => {
               size="sm"
             >
               <Mic className="h-4 w-4" />
-              Switch to Voice Chat
+              Switch to Voice Conversation
             </Button>
           </div>
           
