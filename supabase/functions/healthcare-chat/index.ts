@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -41,41 +40,39 @@ serve(async (req) => {
             role: "system",
             content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
 
-1. In your FIRST response to any health concern:
-   SPLIT your response into TWO separate parts using [SPLIT] marker:
-   PART 1: Ask only ONE key question about their main symptom/concern
-   PART 2: "Or, I can help you book an appointment with a doctor right away. Would you like that? 🗓️"
+1. If user mentions a health concern, follow this sequence:
+   a. Ask about the main concern/symptoms and which part of body is affected
+   b. Ask about duration
+   c. Ask about severity
+   d. Ask about additional symptoms
+   e. Generate a summary report
+   f. ONLY AFTER the report, suggest booking an appointment
 
-2. For appointment booking:
-   • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ask:
-   "Online or in-person appointment? 🏥"
+2. For health concerns, ALWAYS provide options in your questions:
+   • For body parts: "Which part of your body is affected? 🩺"
+   Options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
 
-   • Accept ANY variation of these answers:
-     - For online: "online", "virtual", "video", "remote", "tele", etc.
-     - For in-person: "in person", "office", "clinic", "physical", "in-person", etc.
+   • For duration: "How long have you been experiencing this? ⏱️"
+   Options: ["Just started", "Few days", "About a week", "More than a week"]
 
-   • Then immediately suggest a time:
-   "Perfect! How about tomorrow at 10:00 AM? Or I can check other times if this doesn't work for you. 📅"
+   • For severity: "How severe is your condition? 📊"
+   Options: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
 
-Then use this format to book it (IMPORTANT: date must be in YYYY-MM-DD format and must be today or a future date):
-!BOOK_APPOINTMENT:
-{
-  "appointment_type": "in-person",
-  "appointment_date": "${new Date(Date.now() + 86400000).toISOString().split('T')[0]}",
-  "appointment_time": "10:00 AM",
-  "notification_methods": ["app"],
-  "doctor_id": 1
-}
+   • For time slots:
+   Options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
 
-For serious symptoms (severe pain, breathing issues, high fever, sudden changes in vision/speech), immediately say:
-"This sounds serious. Let me help you book an appointment right away. Online or in-person? 🚨"
+3. For appointments:
+   • First ask: "Would you prefer an online or in-person appointment? 🏥"
+   Options: ["Online Appointment", "In-Person Appointment"]
+
+   • For time slots, always show multiple options
+   Options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
 
 Remember:
-• Be VERY flexible with user inputs - accept short/informal answers
-• Immediately proceed with booking when user shows any interest
+• ALWAYS provide clickable options when the question includes "or"
+• Only suggest booking an appointment AFTER completing the health assessment
 • Keep messages short and clear
-• Use emojis to keep it friendly 😊
-• ALWAYS suggest tomorrow's date for appointments`
+• Use emojis to keep it friendly 😊`
           },
           {
             role: "user",
@@ -149,7 +146,7 @@ Remember:
         finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
+        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different time slot."];
       }
     } else {
       finalResponses = [aiResponse];
