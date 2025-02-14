@@ -9,6 +9,16 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Appointment {
   id: string;
@@ -25,6 +35,7 @@ const Appointments = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(null);
 
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments'],
@@ -47,12 +58,14 @@ const Appointments = () => {
     },
   });
 
-  const handleCancelAppointment = async (id: string) => {
+  const handleDeleteConfirm = async () => {
+    if (!appointmentToDelete) return;
+
     try {
       const { error } = await supabase
         .from('appointments')
         .delete()
-        .eq('id', id);
+        .eq('id', appointmentToDelete);
 
       if (error) throw error;
 
@@ -67,6 +80,33 @@ const Appointments = () => {
       toast({
         title: "Error",
         description: "Failed to cancel appointment",
+        variant: "destructive",
+      });
+    } finally {
+      setAppointmentToDelete(null);
+    }
+  };
+
+  const handleClearAllAppointments = async () => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .neq('id', ''); // This will delete all appointments
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "All appointments cleared successfully",
+      });
+
+      // Refresh appointments data
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to clear appointments",
         variant: "destructive",
       });
     }
@@ -91,12 +131,22 @@ const Appointments = () => {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">My Appointments</h1>
-          <Button 
-            onClick={() => navigate('/patient/book-appointment')}
-            className="bg-primary hover:bg-primary/90"
-          >
-            Book Appointment
-          </Button>
+          <div className="flex gap-4">
+            {appointments?.length > 0 && (
+              <Button 
+                variant="destructive"
+                onClick={handleClearAllAppointments}
+              >
+                Clear All
+              </Button>
+            )}
+            <Button 
+              onClick={() => navigate('/patient/book-appointment')}
+              className="bg-primary hover:bg-primary/90"
+            >
+              Book Appointment
+            </Button>
+          </div>
         </div>
 
         {isLoading ? (
@@ -136,7 +186,7 @@ const Appointments = () => {
                     <Button
                       variant="destructive"
                       size="icon"
-                      onClick={() => handleCancelAppointment(appointment.id)}
+                      onClick={() => setAppointmentToDelete(appointment.id)}
                       className="h-8 w-8"
                     >
                       <Trash className="h-4 w-4" />
@@ -157,6 +207,21 @@ const Appointments = () => {
             </Button>
           </div>
         )}
+
+        <AlertDialog open={!!appointmentToDelete} onOpenChange={() => setAppointmentToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancel Appointment</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to cancel this appointment? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteConfirm}>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
