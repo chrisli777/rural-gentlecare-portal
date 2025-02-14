@@ -18,8 +18,9 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const { message, appointmentInfo } = await req.json();
     console.log('Received message:', message);
+    console.log('Current appointment info:', appointmentInfo);
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
@@ -39,40 +40,35 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
+            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Guide users through booking appointments step by step.
 
-Key Instructions for Date/Time Understanding:
-1. Be EXTREMELY flexible in understanding dates:
-   - Accept dates in ANY format (MM/DD, YYYY-MM-DD, "tomorrow", "next week", etc.)
-   - When user provides a date, IMMEDIATELY respond with available times for that date
-   - Recognize simple date inputs like "02/20" or "Feb 20"
+Current appointment info: ${JSON.stringify(appointmentInfo)}
 
-2. For appointment booking:
-   • When a date is mentioned, IMMEDIATELY show available times:
-   "For [mentioned date], these times are available:
-   9:00 AM
-   10:00 AM
-   11:00 AM
-   2:00 PM
-   3:00 PM
-   4:00 PM
-   Which time works best for you?"
+Step-by-Step Booking Process:
+1. If no appointmentType: Ask if they prefer online or in-person appointment
+2. If no appointmentDate: Ask for preferred date
+3. If have date but no time: Show available times
+4. If no symptoms: Ask about symptoms
+5. If no duration: Ask how long they've had symptoms
+6. If no severity: Ask about severity
+7. If all info collected: Show summary and ask for confirmation
 
-3. When both date AND time are provided, use this format to book:
+For appointment booking, use:
 !BOOK_APPOINTMENT:
 {
-  "appointment_type": "in-person",
+  "appointment_type": "[type]",
   "appointment_date": "YYYY-MM-DD",
   "appointment_time": "HH:MM AM/PM",
   "notification_methods": ["app"],
-  "doctor_id": 1
+  "doctor_id": 1,
+  "symptoms": "[symptoms]",
+  "duration": "[duration]",
+  "severity": "[severity]"
 }
 
-Remember:
-• Be VERY flexible with date/time inputs
-• IMMEDIATELY show time slots when a date is mentioned
-• Keep responses focused and clear
-• Use emojis to keep it friendly 😊`
+Always provide relevant quick-select options for users to click.
+Keep responses focused and clear.
+Use emojis to keep it friendly 😊`
           },
           {
             role: "user",
@@ -95,13 +91,8 @@ Remember:
     const aiResponse = data.choices[0].message.content.trim();
     let finalResponses = [];
 
-    // Split the response if it contains the [SPLIT] marker
-    if (aiResponse.includes('[SPLIT]')) {
-      finalResponses = aiResponse.split('[SPLIT]').map(part => part.trim());
-    } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
-      // Handle appointment booking response
+    if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       try {
-        // Extract the JSON part
         const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
         if (!bookingMatch) {
           throw new Error('Invalid booking format');
@@ -110,7 +101,6 @@ Remember:
         const appointmentDetails = JSON.parse(bookingMatch[1]);
         console.log('Booking appointment with details:', appointmentDetails);
 
-        // Validate appointment date
         const appointmentDate = new Date(appointmentDetails.appointment_date);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -119,7 +109,6 @@ Remember:
           throw new Error('Appointment date must be today or in the future');
         }
 
-        // Insert the appointment into the database
         const { data: appointment, error: appointmentError } = await supabase
           .from('appointments')
           .insert([
@@ -129,6 +118,11 @@ Remember:
               appointment_time: appointmentDetails.appointment_time,
               notification_methods: appointmentDetails.notification_methods,
               doctor_id: appointmentDetails.doctor_id,
+              description: JSON.stringify({
+                symptoms: appointmentDetails.symptoms,
+                duration: appointmentDetails.duration,
+                severity: appointmentDetails.severity
+              }),
               status: 'pending'
             }
           ])
@@ -142,7 +136,6 @@ Remember:
 
         console.log('Successfully booked appointment:', appointment);
         
-        // Keep only the human-readable part of the response
         finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
         console.error('Error processing appointment booking:', error);

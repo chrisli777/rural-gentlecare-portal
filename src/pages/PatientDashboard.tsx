@@ -9,16 +9,26 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface AppointmentInfo {
+  appointmentType?: string;
+  appointmentDate?: string;
+  appointmentTime?: string;
+  symptoms?: string;
+  duration?: string;
+  severity?: string;
+}
+
 const PatientDashboard = () => {
   const [message, setMessage] = useState("");
+  const [appointmentInfo, setAppointmentInfo] = useState<AppointmentInfo>({});
   const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
-      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can describe your health concern, and I'll guide you through the process. 🏥",
+      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can book an appointment or discuss your health concerns.",
       options: [
-        "I need to book an appointment",
-        "I have a health concern",
-        "I need medical advice"
+        "Book an appointment",
+        "Discuss health concerns",
+        "Get medical advice"
       ]
     },
   ]);
@@ -41,6 +51,51 @@ const PatientDashboard = () => {
     handleSendMessage(option);
   };
 
+  const getOptionsForResponse = (content: string, currentInfo: AppointmentInfo): string[] => {
+    if (content.toLowerCase().includes("online or in-person")) {
+      return ["Online Appointment", "In-Person Appointment"];
+    }
+    if (content.toLowerCase().includes("what date")) {
+      return ["Today", "Tomorrow", "Next Week", "Choose specific date"];
+    }
+    if (content.toLowerCase().includes("available times") || content.toLowerCase().includes("time works")) {
+      return ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
+    }
+    if (content.toLowerCase().includes("what symptoms")) {
+      return ["Fever", "Headache", "Cough", "Sore throat", "Other symptoms"];
+    }
+    if (content.toLowerCase().includes("how long")) {
+      return ["Just started", "Few days", "About a week", "More than a week"];
+    }
+    if (content.toLowerCase().includes("severity")) {
+      return ["Mild", "Moderate", "Severe"];
+    }
+    if (content.toLowerCase().includes("confirm")) {
+      return ["Confirm Appointment", "Change Details"];
+    }
+    return [];
+  };
+
+  const updateAppointmentInfo = (response: string, selectedOption: string) => {
+    const newInfo = { ...appointmentInfo };
+    
+    if (response.toLowerCase().includes("online or in-person")) {
+      newInfo.appointmentType = selectedOption.toLowerCase().includes("online") ? "online" : "in-person";
+    } else if (response.toLowerCase().includes("what date")) {
+      newInfo.appointmentDate = selectedOption;
+    } else if (response.toLowerCase().includes("time works")) {
+      newInfo.appointmentTime = selectedOption;
+    } else if (response.toLowerCase().includes("what symptoms")) {
+      newInfo.symptoms = selectedOption;
+    } else if (response.toLowerCase().includes("how long")) {
+      newInfo.duration = selectedOption;
+    } else if (response.toLowerCase().includes("severity")) {
+      newInfo.severity = selectedOption;
+    }
+
+    setAppointmentInfo(newInfo);
+  };
+
   const handleSendMessage = async (manualMessage?: string) => {
     const messageToSend = manualMessage || message;
     if (!messageToSend.trim()) return;
@@ -52,62 +107,31 @@ const PatientDashboard = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { message: userMessage.content }
+        body: { 
+          message: userMessage.content,
+          appointmentInfo: appointmentInfo 
+        }
       });
 
       if (error) throw error;
 
       if (data.responses) {
         const newMessages = data.responses.map((response: string) => {
-          const message: { role: string; content: string; options?: string[] } = {
+          const options = getOptionsForResponse(response, appointmentInfo);
+          const message = {
             role: "assistant",
             content: response,
+            options: options
           };
 
-          // Add common response options based on message content
-          if (response.toLowerCase().includes("online or in-person")) {
-            message.options = ["Online Appointment", "In-Person Appointment"];
-          }
-          else if (response.toLowerCase().includes("how about") && response.toLowerCase().includes("am?")) {
-            message.options = [
-              "Yes, that time works",
-              "No, show me other times",
-              "Different day please"
-            ];
-          }
-          else if (response.toLowerCase().includes("what symptoms")) {
-            message.options = [
-              "Fever",
-              "Headache",
-              "Cough",
-              "Sore throat",
-              "Other symptoms"
-            ];
-          }
-          else if (response.toLowerCase().includes("how long")) {
-            message.options = [
-              "Just started",
-              "Few days",
-              "About a week",
-              "More than a week"
-            ];
-          }
-          else if (response.toLowerCase().includes("severity")) {
-            message.options = [
-              "Mild",
-              "Moderate",
-              "Severe"
-            ];
+          // Update appointment info based on the response and previous selection
+          if (userMessage.content) {
+            updateAppointmentInfo(response, userMessage.content);
           }
 
           return message;
         });
         setConversation(prev => [...prev, ...newMessages]);
-      } else if (data.response) {
-        setConversation(prev => [...prev, {
-          role: "assistant",
-          content: data.response
-        }]);
       }
     } catch (error: any) {
       toast({
@@ -157,7 +181,7 @@ const PatientDashboard = () => {
 
               if (data.text) {
                 setMessage(data.text);
-                await handleSendMessage();
+                await handleSendMessage(data.text);
               }
             } catch (error: any) {
               console.error('Voice to text error:', error);
