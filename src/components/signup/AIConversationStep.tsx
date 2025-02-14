@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
-import { useConversation } from "@11labs/react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
@@ -207,23 +205,22 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
             <p className="text-muted-foreground">Click the button below to start speaking with your AI medical assistant</p>
           </motion.div>
           
-          <motion.button
+          <Button
             onClick={toggleVoiceRecording}
-            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
-              isRecording 
-                ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
-                : 'bg-primary hover:bg-primary/90'
+            className={`rounded-full w-20 h-20 p-0 ${
+              isRecording
+                ? "bg-red-500 hover:bg-red-600"
+                : "bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
             }`}
             disabled={isLoading}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             {isRecording ? (
               <MicOff className="h-14 w-14 text-white" />
             ) : (
               <Mic className="h-14 w-14 text-white" />
             )}
-          </motion.button>
+          </Button>
+          <span className="text-sm text-gray-600 font-medium mt-2">Talk to us</span>
 
           {conversationEnded && (
             <motion.div
