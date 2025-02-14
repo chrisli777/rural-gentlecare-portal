@@ -12,7 +12,7 @@ export const Header = () => {
   // Check if we're on provider patients or analytics page
   const isProviderPatientsOrAnalytics = location.pathname === '/provider/patients' || location.pathname === '/provider/analytics';
   // Check if we're on appointment or messages page
-  const isAppointmentOrMessages = location.pathname === '/patient/appointment' || location.pathname === '/patient/messages' || location.pathname === '/patient/ai-assistant';
+  const isAppointmentOrMessages = location.pathname === '/patient/appointment' || location.pathname === '/patient/messages';
   
   if (isProviderPatientsOrAnalytics || isAppointmentOrMessages) {
     return (
