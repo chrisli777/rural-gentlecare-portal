@@ -58,9 +58,20 @@ serve(async (req) => {
    "Please select your preferred date: 📅"
    options: ["Tomorrow", "Day After Tomorrow", "This Week", "Next Week"]
    
-   Step 5: Finally, ask:
+   Step 5: Ask:
    "What time works best for you? ⌚"
    options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
+
+   Step 6: Finally, show appointment summary and ask for confirmation:
+   message: "Please confirm your appointment details:
+   - Body Part: [body part]
+   - Severity: [severity]
+   - Appointment Type: [online/in-person]
+   - Date: [date]
+   - Time: [time]
+   
+   Would you like to confirm this appointment?"
+   options: ["Yes, confirm booking", "No, I need to make changes"]
 
 2. HEALTH CONCERN WORKFLOW:
    Step 1: "Which part of your body is affected? 🩺"
@@ -89,13 +100,16 @@ IMPORTANT RULES:
    c. Appointment type (online/in-person)
    d. Date
    e. Time
+   f. Confirmation
 2. NEVER repeat questions that have been answered
 3. ALWAYS format responses as:
    message: "Your message here"
    options: ["Option 1", "Option 2", "Option 3"]
 4. Keep track of workflow state and previous answers
 5. If user says "I need to book an appointment", start booking workflow from Step 1
-6. NEVER skip steps or ask questions out of order in booking workflow`
+6. If user needs to make changes to appointment details, start booking workflow from Step 1
+7. Only create the appointment after user confirms the details
+8. NEVER skip steps or ask questions out of order in booking workflow`
           },
           {
             role: "user",
