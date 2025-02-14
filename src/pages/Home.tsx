@@ -103,7 +103,7 @@ const Home = () => {
               className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
                          bg-gradient-to-r from-primary to-primary/90 hover:scale-105
                          border-2 border-white/50"
-              onClick={() => navigate("/patient/login")}
+              onClick={() => navigate("/patient/dashboard")}
             >
               Get Started
             </Button>
