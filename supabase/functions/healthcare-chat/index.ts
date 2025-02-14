@@ -71,17 +71,10 @@ For severity:
   "options": ["Mild", "Moderate", "Severe"]
 }
 
-For appointments:
-{
-  "message": "What time works best for you?",
-  "options": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
-}
-
 Remember:
 • ALWAYS provide options in your response
 • Keep messages clear and concise
-• Use emojis for friendly tone 😊
-• Show ALL time slots for appointments`
+• Use emojis for friendly tone 😊`
           },
           {
             role: "user",
@@ -111,12 +104,6 @@ Remember:
       
       if (!parsedResponse.message || !parsedResponse.options) {
         throw new Error('Invalid response structure');
-      }
-      
-      // For appointment-related messages, ensure all time slots are shown
-      if (parsedResponse.message.toLowerCase().includes('time') || 
-          parsedResponse.message.toLowerCase().includes('appointment')) {
-        parsedResponse.options = ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
       }
       
       return new Response(JSON.stringify({
