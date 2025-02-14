@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -56,12 +57,12 @@ serve(async (req) => {
    • Then immediately suggest a time:
    "Perfect! How about tomorrow at 10:00 AM? Or I can check other times if this doesn't work for you. 📅"
 
-Then use this format to book it:
+Then use this format to book it (IMPORTANT: date must be in YYYY-MM-DD format and must be today or a future date):
 !BOOK_APPOINTMENT:
 {
   "appointment_type": "in-person",
-  "appointment_date": "2024-03-20",
-  "appointment_time": "9:00 AM",
+  "appointment_date": "${new Date(Date.now() + 86400000).toISOString().split('T')[0]}",
+  "appointment_time": "10:00 AM",
   "notification_methods": ["app"],
   "doctor_id": 1
 }
@@ -73,7 +74,8 @@ Remember:
 • Be VERY flexible with user inputs - accept short/informal answers
 • Immediately proceed with booking when user shows any interest
 • Keep messages short and clear
-• Use emojis to keep it friendly 😊`
+• Use emojis to keep it friendly 😊
+• ALWAYS suggest tomorrow's date for appointments`
           },
           {
             role: "user",
@@ -111,6 +113,15 @@ Remember:
         const appointmentDetails = JSON.parse(bookingMatch[1]);
         console.log('Booking appointment with details:', appointmentDetails);
 
+        // Validate appointment date
+        const appointmentDate = new Date(appointmentDetails.appointment_date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (appointmentDate < today) {
+          throw new Error('Appointment date must be today or in the future');
+        }
+
         // Insert the appointment into the database
         const { data: appointment, error: appointmentError } = await supabase
           .from('appointments')
@@ -138,7 +149,7 @@ Remember:
         finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Could you please try again with the appointment details?"];
+        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
       }
     } else {
       finalResponses = [aiResponse];
