@@ -31,6 +31,7 @@ export const translations = {
       providerPortal: "Provider Portal",
       myProfile: "My Profile",
       back: "Back",
+      cancel: "Cancel",
       dashboard: "Dashboard",
       appointments: "Appointments",
       medications: "Medications",
@@ -38,19 +39,18 @@ export const translations = {
       settings: "Settings",
       logout: "Logout",
     },
-    accessibility: {
-      voiceAssistant: "Voice Assistant",
-      listening: "Listening for commands...",
-      notSupported: "Voice recognition not supported",
-      commandRecognized: "Command recognized",
-      fontSize: "Font Size",
-      language: "Language",
+    dialog: {
+      confirmCancelTitle: "Are you sure?",
+      confirmCancelDescription: "This action cannot be undone. This will permanently cancel your appointment.",
+      keepAppointment: "No, keep appointment",
+      confirmCancel: "Yes, cancel appointment"
     },
     dashboard: {
       upcomingAppointments: "Upcoming Appointments",
       recentMedications: "Recent Medications",
       healthMetrics: "Health Metrics",
       notifications: "Notifications",
+      noAppointments: "No appointments found",
     },
     messages: {
       title: "Messages & Notifications",
@@ -62,11 +62,11 @@ export const translations = {
       back: "Back"
     },
     aiAssistant: {
-      title: "AI Health Assistant",
+      title: "Healthcare Assistant",
       chat: "Chat",
       analysis: "Analysis",
       reports: "Reports",
-      inputPlaceholder: "Type your health-related question...",
+      inputPlaceholder: "Type your message...",
       monthlyReport: "Monthly Health Summary",
       recommendations: "Recommendations",
       metrics: {
@@ -74,7 +74,15 @@ export const translations = {
         bloodSugar: "Blood Sugar",
         weight: "Weight"
       }
-    }
+    },
+    accessibility: {
+      voiceAssistant: "Voice Assistant",
+      listening: "Listening...",
+      notSupported: "Voice recognition not supported",
+      commandRecognized: "Command recognized",
+      fontSize: "Font Size",
+      language: "Language",
+    },
   },
   es: {
     common: {
@@ -108,6 +116,7 @@ export const translations = {
       providerPortal: "Portal del Proveedor",
       myProfile: "Mi Perfil",
       back: "Volver",
+      cancel: "Cancelar",
       dashboard: "Tablero",
       appointments: "Citas",
       medications: "Medicamentos",
@@ -115,19 +124,18 @@ export const translations = {
       settings: "Configuración",
       logout: "Cerrar Sesión",
     },
-    accessibility: {
-      voiceAssistant: "Asistente de Voz",
-      listening: "Escuchando comandos...",
-      notSupported: "Reconocimiento de voz no soportado",
-      commandRecognized: "Comando reconocido",
-      fontSize: "Tamaño de Fuente",
-      language: "Idioma",
+    dialog: {
+      confirmCancelTitle: "¿Está seguro?",
+      confirmCancelDescription: "Esta acción no se puede deshacer. Esto cancelará permanentemente su cita.",
+      keepAppointment: "No, mantener cita",
+      confirmCancel: "Sí, cancelar cita"
     },
     dashboard: {
       upcomingAppointments: "Próximas Citas",
       recentMedications: "Medicamentos Recientes",
       healthMetrics: "Métricas de Salud",
       notifications: "Notificaciones",
+      noAppointments: "No se encontraron citas",
     },
     messages: {
       title: "Mensajes y Notificaciones",
@@ -139,11 +147,11 @@ export const translations = {
       back: "Volver"
     },
     aiAssistant: {
-      title: "Asistente de Salud IA",
+      title: "Asistente de Salud",
       chat: "Chat",
       analysis: "Análisis",
       reports: "Informes",
-      inputPlaceholder: "Escribe tu pregunta relacionada con la salud...",
+      inputPlaceholder: "Escribe tu mensaje...",
       monthlyReport: "Resumen Mensual de Salud",
       recommendations: "Recomendaciones",
       metrics: {
@@ -151,7 +159,15 @@ export const translations = {
         bloodSugar: "Azúcar en Sangre",
         weight: "Peso"
       }
-    }
+    },
+    accessibility: {
+      voiceAssistant: "Asistente de Voz",
+      listening: "Escuchando...",
+      notSupported: "Reconocimiento de voz no soportado",
+      commandRecognized: "Comando reconocido",
+      fontSize: "Tamaño de Fuente",
+      language: "Idioma",
+    },
   }
 };
 

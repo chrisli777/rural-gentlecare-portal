@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Bot, Send, Loader2, Mic, MicOff, Headphones, ClipboardList } from "lucide-react";
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +34,7 @@ const PatientDashboard = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
   const { toast } = useToast();
+  const { translate } = useAccessibility();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -308,8 +309,12 @@ const PatientDashboard = () => {
                   <div className="flex items-start gap-4">
                     <Headphones className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Voice Assistant</h3>
-                      <p className="text-gray-600 hidden sm:block">Experience hands-free interaction with our voice-enabled features.</p>
+                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">
+                        {translate('accessibility.voiceAssistant')}
+                      </h3>
+                      <p className="text-gray-600 hidden sm:block">
+                        {translate('common.features.voiceAssistant.description')}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -322,8 +327,12 @@ const PatientDashboard = () => {
                   <div className="flex items-start gap-4">
                     <Calendar className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book Appointments</h3>
-                      <p className="text-gray-600 hidden sm:block">Schedule your next visit with our healthcare providers.</p>
+                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">
+                        {translate('common.appointments')}
+                      </h3>
+                      <p className="text-gray-600 hidden sm:block">
+                        {translate('common.features.appointments.description')}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -335,7 +344,7 @@ const PatientDashboard = () => {
                 <div className="flex items-start gap-4">
                   <ClipboardList className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                   <div>
-                    <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">All Appointments</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">{translate('dashboard.upcomingAppointments')}</h3>
                     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                       {recentAppointments.length > 0 ? (
                         recentAppointments.map((appointment) => (
@@ -359,20 +368,22 @@ const PatientDashboard = () => {
                                     variant="destructive" 
                                     size="sm"
                                   >
-                                    Cancel
+                                    {translate('common.cancel')}
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-[#1E5AAB]">Are you sure?</AlertDialogTitle>
+                                    <AlertDialogTitle className="text-[#1E5AAB]">
+                                      {translate('dialog.confirmCancelTitle')}
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      This action cannot be undone. This will permanently cancel your appointment.
+                                      {translate('dialog.confirmCancelDescription')}
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
+                                    <AlertDialogCancel>{translate('dialog.keepAppointment')}</AlertDialogCancel>
                                     <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
-                                      Yes, cancel appointment
+                                      {translate('dialog.confirmCancel')}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
@@ -381,7 +392,7 @@ const PatientDashboard = () => {
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted-foreground text-center py-4">No appointments found</p>
+                        <p className="text-muted-foreground text-center py-4">{translate('dashboard.noAppointments')}</p>
                       )}
                     </div>
                   </div>
@@ -395,7 +406,7 @@ const PatientDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-[#1E5AAB]">
                   <Bot className="h-5 w-5" />
-                  Healthcare Assistant
+                  {translate('aiAssistant.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
@@ -436,7 +447,7 @@ const PatientDashboard = () => {
                   <Input
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder={isRecording ? "Recording..." : "Type your message..."}
+                    placeholder={isRecording ? translate('accessibility.listening') : translate('aiAssistant.inputPlaceholder')}
                     onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                     disabled={isLoading || isRecording}
                   />
