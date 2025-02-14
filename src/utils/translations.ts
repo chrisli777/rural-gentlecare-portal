@@ -83,6 +83,41 @@ export const translations = {
       fontSize: "Font Size",
       language: "Language",
     },
+    appointments: {
+      title: "Book an Appointment",
+      type: {
+        label: "Appointment Type",
+        select: "Select appointment type",
+        online: "Online Consultation",
+        inPerson: "In-Person Visit",
+        homeVisit: "Home Visit"
+      },
+      clinic: {
+        label: "Select Clinic",
+        select: "Choose a clinic"
+      },
+      date: {
+        label: "Select Date"
+      },
+      time: {
+        label: "Select Time",
+        select: "Choose a time"
+      },
+      book: "Book Appointment",
+      summary: "Appointment Summary",
+      details: {
+        type: "Type",
+        clinic: "Clinic",
+        date: "Date",
+        time: "Time"
+      },
+      missingInfo: "Missing Information",
+      missingInfoDesc: "Please fill in all required fields",
+      success: "Success",
+      successDesc: "Your appointment has been successfully scheduled",
+      error: "Error",
+      errorDesc: "Failed to book appointment. Please try again."
+    }
   },
   es: {
     common: {
@@ -168,6 +203,41 @@ export const translations = {
       fontSize: "Tamaño de Fuente",
       language: "Idioma",
     },
+    appointments: {
+      title: "Programar una Cita",
+      type: {
+        label: "Tipo de Cita",
+        select: "Seleccione el tipo de cita",
+        online: "Consulta en Línea",
+        inPerson: "Visita Presencial",
+        homeVisit: "Visita a Domicilio"
+      },
+      clinic: {
+        label: "Seleccionar Clínica",
+        select: "Elija una clínica"
+      },
+      date: {
+        label: "Seleccionar Fecha"
+      },
+      time: {
+        label: "Seleccionar Hora",
+        select: "Elija una hora"
+      },
+      book: "Programar Cita",
+      summary: "Resumen de la Cita",
+      details: {
+        type: "Tipo",
+        clinic: "Clínica",
+        date: "Fecha",
+        time: "Hora"
+      },
+      missingInfo: "Información Faltante",
+      missingInfoDesc: "Por favor complete todos los campos requeridos",
+      success: "Éxito",
+      successDesc: "Su cita ha sido programada exitosamente",
+      error: "Error",
+      errorDesc: "Error al programar la cita. Por favor intente nuevamente."
+    }
   }
 };
 

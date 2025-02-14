@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   Select,
   SelectContent,
@@ -33,26 +34,25 @@ const PatientAppointment = () => {
   const [selectedClinic, setSelectedClinic] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { translate } = useAccessibility();
 
   const handleBookAppointment = async () => {
     if (!date || !selectedTime || !appointmentType) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
+        title: translate('appointments.missingInfo'),
+        description: translate('appointments.missingInfoDesc'),
         variant: "destructive",
       });
       return;
     }
 
     try {
-      // Get the current user's session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.user?.id) {
         throw new Error('No authenticated user found');
       }
 
-      // Create the appointment
       const { error } = await supabase
         .from('appointments')
         .insert({
@@ -68,18 +68,17 @@ const PatientAppointment = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Your appointment has been successfully scheduled",
+        title: translate('appointments.success'),
+        description: translate('appointments.successDesc'),
       });
 
-      // Navigate back to dashboard
       navigate('/patient/dashboard');
 
     } catch (error: any) {
       console.error('Error booking appointment:', error);
       toast({
-        title: "Error",
-        description: "Failed to book appointment. Please try again.",
+        title: translate('appointments.error'),
+        description: translate('appointments.errorDesc'),
         variant: "destructive",
       });
     }
@@ -89,37 +88,37 @@ const PatientAppointment = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <h1 className="text-3xl font-bold mb-8">Book an Appointment</h1>
+        <h1 className="text-3xl font-bold mb-8">{translate('appointments.title')}</h1>
         
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="p-6">
             <div className="space-y-6">
               <div>
-                <Label>Appointment Type</Label>
+                <Label>{translate('appointments.type.label')}</Label>
                 <Select
                   value={appointmentType}
                   onValueChange={setAppointmentType}
                 >
                   <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Select appointment type" />
+                    <SelectValue placeholder={translate('appointments.type.select')} />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    <SelectItem value="online">Online Consultation</SelectItem>
-                    <SelectItem value="in-person">In-Person Visit</SelectItem>
-                    <SelectItem value="call-out">Home Visit</SelectItem>
+                    <SelectItem value="online">{translate('appointments.type.online')}</SelectItem>
+                    <SelectItem value="in-person">{translate('appointments.type.inPerson')}</SelectItem>
+                    <SelectItem value="call-out">{translate('appointments.type.homeVisit')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {appointmentType === "in-person" && (
                 <div>
-                  <Label>Select Clinic</Label>
+                  <Label>{translate('appointments.clinic.label')}</Label>
                   <Select
                     value={selectedClinic}
                     onValueChange={setSelectedClinic}
                   >
                     <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Choose a clinic" />
+                      <SelectValue placeholder={translate('appointments.clinic.select')} />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {clinics.map((clinic) => (
@@ -133,7 +132,7 @@ const PatientAppointment = () => {
               )}
 
               <div>
-                <Label>Select Date</Label>
+                <Label>{translate('appointments.date.label')}</Label>
                 <Calendar
                   mode="single"
                   selected={date}
@@ -144,13 +143,13 @@ const PatientAppointment = () => {
               </div>
 
               <div>
-                <Label>Select Time</Label>
+                <Label>{translate('appointments.time.label')}</Label>
                 <Select
                   value={selectedTime}
                   onValueChange={setSelectedTime}
                 >
                   <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Choose a time" />
+                    <SelectValue placeholder={translate('appointments.time.select')} />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {timeSlots.map((time) => (
@@ -166,36 +165,37 @@ const PatientAppointment = () => {
                 className="w-full"
                 onClick={handleBookAppointment}
               >
-                Book Appointment
+                {translate('appointments.book')}
               </Button>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Appointment Summary</h2>
+            <h2 className="text-xl font-semibold mb-4">{translate('appointments.summary')}</h2>
             <div className="space-y-4">
               {appointmentType && (
                 <p>
-                  <span className="font-medium">Type: </span>
-                  {appointmentType === "online" ? "Online Consultation" : 
-                   appointmentType === "in-person" ? "In-Person Visit" : "Home Visit"}
+                  <span className="font-medium">{translate('appointments.details.type')}: </span>
+                  {appointmentType === "online" ? translate('appointments.type.online') : 
+                   appointmentType === "in-person" ? translate('appointments.type.inPerson') : 
+                   translate('appointments.type.homeVisit')}
                 </p>
               )}
               {selectedClinic && appointmentType === "in-person" && (
                 <p>
-                  <span className="font-medium">Clinic: </span>
+                  <span className="font-medium">{translate('appointments.details.clinic')}: </span>
                   {clinics.find(c => c.id.toString() === selectedClinic)?.name}
                 </p>
               )}
               {date && (
                 <p>
-                  <span className="font-medium">Date: </span>
+                  <span className="font-medium">{translate('appointments.details.date')}: </span>
                   {date.toLocaleDateString()}
                 </p>
               )}
               {selectedTime && (
                 <p>
-                  <span className="font-medium">Time: </span>
+                  <span className="font-medium">{translate('appointments.details.time')}: </span>
                   {selectedTime}
                 </p>
               )}
