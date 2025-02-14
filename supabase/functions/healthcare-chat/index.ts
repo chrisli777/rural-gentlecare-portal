@@ -43,10 +43,13 @@ serve(async (req) => {
 3. Finally, guide them to book using this format:
 
 "Based on what you've described, I recommend [appointment type] appointment. You can book this right away by:
-1. Clicking on 'Book Appointments' in the menu
-2. Selecting [appointment type]
-3. Choosing a convenient time
-4. Providing your symptoms details
+1. Click 'Appointments' in the top right corner of the page
+2. Select your preferred appointment type (online/in-person/home visit)
+3. If choosing in-person visit, select your preferred clinic
+4. Select which part of your body is affected
+5. Add any additional description of your symptoms
+6. Choose your preferred date and time
+7. Review your appointment details and confirm
 
 Would you like me to help you with any other health-related questions?"
 
