@@ -7,7 +7,7 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { AnimatePresence } from "framer-motion";
-import { Mic } from "lucide-react";
+import { Mic, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AIAssistant = () => {
