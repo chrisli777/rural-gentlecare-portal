@@ -21,7 +21,7 @@ export const useChat = () => {
   const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
-      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can book an appointment or discuss your health concerns.",
+      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today?",
       options: [
         "Book an appointment",
         "Discuss health concerns",
@@ -33,10 +33,10 @@ export const useChat = () => {
   const { toast } = useToast();
 
   const getOptionsForResponse = (content: string, currentInfo: AppointmentInfo): string[] => {
-    if (content.toLowerCase().includes("online or in-person")) {
+    if (content.toLowerCase().includes("book an appointment") || content.toLowerCase().includes("let's get started")) {
       return ["Online Appointment", "In-Person Appointment", "Home Visit"];
     }
-    if (content.toLowerCase().includes("what date")) {
+    if (content.toLowerCase().includes("what date") || content.toLowerCase().includes("which date")) {
       return ["Today", "Tomorrow", "Next Week", "Choose specific date"];
     }
     if (content.toLowerCase().includes("available times") || content.toLowerCase().includes("time works")) {
@@ -57,20 +57,26 @@ export const useChat = () => {
     if (content.toLowerCase().includes("confirm")) {
       return ["Confirm Appointment", "Change Details"];
     }
-    return [];
+    // Default options for any other case
+    return ["Book an appointment", "Discuss health concerns", "Get medical advice"];
   };
 
-  const updateAppointmentInfo = (response: string, selectedOption: string) => {
-    const newInfo = { ...appointmentInfo };
+  const updateAppointmentInfo = async (response: string, selectedOption: string) => {
+    let newInfo = { ...appointmentInfo };
+    let updated = false;
     
-    if (response.toLowerCase().includes("online or in-person")) {
+    // Handle appointment type selection
+    if (selectedOption.toLowerCase().includes("appointment")) {
       newInfo.appointmentType = selectedOption.toLowerCase().includes("online") 
         ? "online" 
         : selectedOption.toLowerCase().includes("home") 
           ? "call-out"
           : "in-person";
-    } else if (response.toLowerCase().includes("what date")) {
-      // Handle date selection
+      updated = true;
+    }
+    
+    // Handle date selection
+    else if (["Today", "Tomorrow", "Next Week"].includes(selectedOption)) {
       let date = new Date();
       if (selectedOption === "Tomorrow") {
         date.setDate(date.getDate() + 1);
@@ -78,28 +84,53 @@ export const useChat = () => {
         date.setDate(date.getDate() + 7);
       }
       newInfo.appointmentDate = date.toISOString().split('T')[0];
-    } else if (response.toLowerCase().includes("time works")) {
+      updated = true;
+    }
+    
+    // Handle time selection
+    else if (selectedOption.includes("AM") || selectedOption.includes("PM")) {
       newInfo.appointmentTime = selectedOption;
-    } else if (response.toLowerCase().includes("which clinic")) {
+      updated = true;
+    }
+    
+    // Handle clinic selection
+    else if (selectedOption.includes("Clinic")) {
       newInfo.clinicId = selectedOption.includes("Main") ? 1 : 2;
-    } else if (response.toLowerCase().includes("body part") || response.toLowerCase().includes("what symptoms")) {
+      updated = true;
+    }
+    
+    // Handle body part/symptoms selection
+    else if (["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"].includes(selectedOption)) {
       newInfo.bodyPart = selectedOption;
       newInfo.symptoms = selectedOption;
-    } else if (response.toLowerCase().includes("how long")) {
+      updated = true;
+    }
+    
+    // Handle duration selection
+    else if (["Just started", "Few days", "About a week", "More than a week"].includes(selectedOption)) {
       newInfo.duration = selectedOption;
       if (!newInfo.description) {
         newInfo.description = '';
       }
       newInfo.description += `Duration: ${selectedOption}. `;
-    } else if (response.toLowerCase().includes("severity")) {
-      newInfo.severity = selectedOption;
+      updated = true;
+    }
+    
+    // Handle severity selection
+    else if (["Mild", "Moderate", "Severe"].includes(selectedOption)) {
       if (!newInfo.description) {
         newInfo.description = '';
       }
       newInfo.description += `Severity: ${selectedOption}.`;
+      updated = true;
     }
 
-    setAppointmentInfo(newInfo);
+    if (updated) {
+      setAppointmentInfo(newInfo);
+      console.log("Updated appointment info:", newInfo);
+    }
+
+    return newInfo;
   };
 
   const handleSendMessage = async (manualMessage?: string) => {
@@ -112,10 +143,13 @@ export const useChat = () => {
     setMessage("");
 
     try {
+      // First update the appointment info based on the user's selection
+      const updatedInfo = await updateAppointmentInfo(message, messageToSend);
+
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
         body: { 
           message: userMessage.content,
-          appointmentInfo: appointmentInfo 
+          appointmentInfo: updatedInfo 
         }
       });
 
@@ -123,18 +157,12 @@ export const useChat = () => {
 
       if (data.responses) {
         const newMessages = data.responses.map((response: string) => {
-          const options = getOptionsForResponse(response, appointmentInfo);
-          const message = {
+          const options = getOptionsForResponse(response, updatedInfo);
+          return {
             role: "assistant",
             content: response,
             options: options
           };
-
-          if (userMessage.content) {
-            updateAppointmentInfo(response, userMessage.content);
-          }
-
-          return message;
         });
         setConversation(prev => [...prev, ...newMessages]);
       }
