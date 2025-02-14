@@ -39,52 +39,8 @@ export const translations = {
       settings: "Settings",
       logout: "Logout",
     },
-    dialog: {
-      confirmCancelTitle: "Are you sure?",
-      confirmCancelDescription: "This action cannot be undone. This will permanently cancel your appointment.",
-      keepAppointment: "No, keep appointment",
-      confirmCancel: "Yes, cancel appointment"
-    },
-    dashboard: {
-      upcomingAppointments: "Upcoming Appointments",
-      recentMedications: "Recent Medications",
-      healthMetrics: "Health Metrics",
-      notifications: "Notifications",
-      noAppointments: "No appointments found",
-    },
-    messages: {
-      title: "Messages & Notifications",
-      noMessages: "No messages to display",
-      medicationAlerts: "Medication Alerts",
-      appointmentAlerts: "Appointment Alerts",
-      doctorsMessages: "Doctor's Messages",
-      generalNotifications: "General Notifications",
-      back: "Back"
-    },
-    aiAssistant: {
-      title: "AI Health Assistant",
-      chat: "Chat",
-      analysis: "Analysis",
-      reports: "Reports",
-      inputPlaceholder: "Type your message...",
-      monthlyReport: "Monthly Health Summary",
-      recommendations: "Recommendations",
-      metrics: {
-        bloodPressure: "Blood Pressure",
-        bloodSugar: "Blood Sugar",
-        weight: "Weight"
-      }
-    },
-    accessibility: {
-      voiceAssistant: "Voice Assistant",
-      listening: "Listening...",
-      notSupported: "Voice recognition not supported",
-      commandRecognized: "Command recognized",
-      fontSize: "Font Size",
-      language: "Language",
-    },
     appointments: {
-      title: "Book an Appointment",
+      title: "Book Appointments",
       type: {
         label: "Appointment Type",
         select: "Select appointment type",
@@ -117,7 +73,7 @@ export const translations = {
       successDesc: "Your appointment has been successfully scheduled",
       error: "Error",
       errorDesc: "Failed to book appointment. Please try again."
-    }
+    },
   },
   es: {
     common: {
@@ -159,52 +115,8 @@ export const translations = {
       settings: "Configuración",
       logout: "Cerrar Sesión",
     },
-    dialog: {
-      confirmCancelTitle: "¿Está seguro?",
-      confirmCancelDescription: "Esta acción no se puede deshacer. Esto cancelará permanentemente su cita.",
-      keepAppointment: "No, mantener cita",
-      confirmCancel: "Sí, cancelar cita"
-    },
-    dashboard: {
-      upcomingAppointments: "Próximas Citas",
-      recentMedications: "Medicamentos Recientes",
-      healthMetrics: "Métricas de Salud",
-      notifications: "Notificaciones",
-      noAppointments: "No se encontraron citas",
-    },
-    messages: {
-      title: "Mensajes y Notificaciones",
-      noMessages: "No hay mensajes para mostrar",
-      medicationAlerts: "Alertas de Medicamentos",
-      appointmentAlerts: "Alertas de Citas",
-      doctorsMessages: "Mensajes del Doctor",
-      generalNotifications: "Notificaciones Generales",
-      back: "Volver"
-    },
-    aiAssistant: {
-      title: "Asistente de Salud IA",
-      chat: "Chat",
-      analysis: "Análisis",
-      reports: "Informes",
-      inputPlaceholder: "Escribe tu mensaje...",
-      monthlyReport: "Resumen Mensual de Salud",
-      recommendations: "Recomendaciones",
-      metrics: {
-        bloodPressure: "Presión Arterial",
-        bloodSugar: "Azúcar en Sangre",
-        weight: "Peso"
-      }
-    },
-    accessibility: {
-      voiceAssistant: "Asistente de Voz",
-      listening: "Escuchando...",
-      notSupported: "Reconocimiento de voz no soportado",
-      commandRecognized: "Comando reconocido",
-      fontSize: "Tamaño de Fuente",
-      language: "Idioma",
-    },
     appointments: {
-      title: "Programar una Cita",
+      title: "Programar Citas",
       type: {
         label: "Tipo de Cita",
         select: "Seleccione el tipo de cita",
