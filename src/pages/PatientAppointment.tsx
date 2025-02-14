@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
@@ -24,43 +25,27 @@ import {
 } from "@/components/ui/dialog";
 
 const timeSlots = [
-  "09:00", "10:00", "11:00", "14:00", "15:00", "16:00"
+  "9:00 AM", "10:00 AM", "11:00 AM",
+  "2:00 PM", "3:00 PM", "4:00 PM"
 ];
 
 const clinics = [
-  { value: "clinic-a", label: "Clinic A" },
-  { value: "clinic-b", label: "Clinic B" },
-  { value: "clinic-c", label: "Clinic C" },
+  { id: 1, name: "Adams Rural Care Main Clinic", address: "123 Main St, Adams County" },
+  { id: 2, name: "Adams Rural Care East Branch", address: "456 East Ave, Adams County" },
 ];
 
 const PatientAppointment = () => {
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedClinic, setSelectedClinic] = useState("");
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
-  const [open, setOpen] = useState(false);
+  const [appointmentType, setAppointmentType] = useState("");
+  const [selectedClinic, setSelectedClinic] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translate } = useAccessibility();
 
-  const handleTypeChange = (value: string) => {
-    setSelectedType(value);
-  };
-
-  const handleClinicChange = (value: string) => {
-    setSelectedClinic(value);
-  };
-
-  const handleDateChange = (date: Date | undefined) => {
-    setSelectedDate(date);
-  };
-
-  const handleTimeChange = (time: string) => {
-    setSelectedTime(time);
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedType || !selectedClinic || !selectedDate || !selectedTime) {
+  const handleShowConfirmation = () => {
+    if (!date || !selectedTime || !appointmentType) {
       toast({
         title: translate('appointments.missingInfo'),
         description: translate('appointments.missingInfoDesc'),
@@ -68,134 +53,175 @@ const PatientAppointment = () => {
       });
       return;
     }
+    setShowConfirmation(true);
+  };
 
+  const handleBookAppointment = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session?.user?.id) {
         throw new Error('No authenticated user found');
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('appointments')
-        .insert([
-          {
-            patient_id: session.user.id,
-            appointment_type: selectedType,
-            clinic: selectedClinic,
-            appointment_date: selectedDate.toISOString().split('T')[0],
-            appointment_time: selectedTime,
-            status: 'scheduled',
-          },
-        ]);
+        .insert({
+          patient_id: session.user.id,
+          appointment_date: date.toISOString().split('T')[0],
+          appointment_time: selectedTime,
+          appointment_type: appointmentType,
+          clinic_id: selectedClinic ? parseInt(selectedClinic) : null,
+          notification_methods: ["app"],
+          status: 'pending'
+        });
 
-      if (error) {
-        console.error('Error booking appointment:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      setOpen(true);
-    } catch (error) {
+      toast({
+        title: translate('appointments.success'),
+        description: translate('appointments.successDesc'),
+      });
+
+      navigate('/patient/dashboard');
+
+    } catch (error: any) {
+      console.error('Error booking appointment:', error);
       toast({
         title: translate('appointments.error'),
         description: translate('appointments.errorDesc'),
         variant: "destructive",
       });
     }
-  };
-
-  const handleConfirm = () => {
-    setOpen(false);
-    navigate('/patient/dashboard');
+    setShowConfirmation(false);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-12">
+        <h1 className="text-3xl font-bold mb-8 text-center">{translate('appointments.title')}</h1>
+        
         <div className="max-w-md mx-auto">
           <Card className="p-6">
             <div className="space-y-6">
               <div>
                 <Label>{translate('appointments.type.label')}</Label>
-                <Select onValueChange={handleTypeChange}>
-                  <SelectTrigger className="w-full">
+                <Select
+                  value={appointmentType}
+                  onValueChange={setAppointmentType}
+                >
+                  <SelectTrigger className="w-full bg-white">
                     <SelectValue placeholder={translate('appointments.type.select')} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="online">{translate('appointments.type.online')}</SelectItem>
                     <SelectItem value="in-person">{translate('appointments.type.inPerson')}</SelectItem>
-                    <SelectItem value="home-visit">{translate('appointments.type.homeVisit')}</SelectItem>
+                    <SelectItem value="call-out">{translate('appointments.type.homeVisit')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label>{translate('appointments.clinic.label')}</Label>
-                <Select onValueChange={handleClinicChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={translate('appointments.clinic.select')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clinics.map((clinic) => (
-                      <SelectItem key={clinic.value} value={clinic.value}>{clinic.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+
+              {appointmentType === "in-person" && (
+                <div>
+                  <Label>{translate('appointments.clinic.label')}</Label>
+                  <Select
+                    value={selectedClinic}
+                    onValueChange={setSelectedClinic}
+                  >
+                    <SelectTrigger className="w-full bg-white">
+                      <SelectValue placeholder={translate('appointments.clinic.select')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {clinics.map((clinic) => (
+                        <SelectItem key={clinic.id} value={clinic.id.toString()}>
+                          {clinic.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div>
                 <Label>{translate('appointments.date.label')}</Label>
                 <Calendar
                   mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateChange}
-                  className="rounded-md border w-full"
+                  selected={date}
+                  onSelect={setDate}
+                  className="rounded-md border"
+                  disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
                 />
               </div>
+
               <div>
                 <Label>{translate('appointments.time.label')}</Label>
-                <Select onValueChange={handleTimeChange}>
-                  <SelectTrigger className="w-full">
+                <Select
+                  value={selectedTime}
+                  onValueChange={setSelectedTime}
+                >
+                  <SelectTrigger className="w-full bg-white">
                     <SelectValue placeholder={translate('appointments.time.select')} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {timeSlots.map((time) => (
-                      <SelectItem key={time} value={time}>{time}</SelectItem>
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white" onClick={handleSubmit}>
+
+              <Button
+                className="w-full"
+                onClick={handleShowConfirmation}
+              >
                 {translate('appointments.book')}
               </Button>
             </div>
           </Card>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="sm:max-w-[425px]">
+        <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+          <DialogContent>
             <DialogHeader>
-              <DialogTitle>{translate('appointments.success')}</DialogTitle>
+              <DialogTitle>{translate('appointments.summary')}</DialogTitle>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="type" className="text-right">{translate('appointments.details.type')}</Label>
-                <div className="col-span-3 font-medium">{selectedType}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="clinic" className="text-right">{translate('appointments.details.clinic')}</Label>
-                <div className="col-span-3 font-medium">{selectedClinic}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="date" className="text-right">{translate('appointments.details.date')}</Label>
-                <div className="col-span-3 font-medium">{selectedDate?.toLocaleDateString()}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="time" className="text-right">{translate('appointments.details.time')}</Label>
-                <div className="col-span-3 font-medium">{selectedTime}</div>
-              </div>
+            <div className="space-y-4 py-4">
+              {appointmentType && (
+                <p>
+                  <span className="font-medium">{translate('appointments.details.type')}: </span>
+                  {appointmentType === "online" ? translate('appointments.type.online') : 
+                   appointmentType === "in-person" ? translate('appointments.type.inPerson') : 
+                   translate('appointments.type.homeVisit')}
+                </p>
+              )}
+              {selectedClinic && appointmentType === "in-person" && (
+                <p>
+                  <span className="font-medium">{translate('appointments.details.clinic')}: </span>
+                  {clinics.find(c => c.id.toString() === selectedClinic)?.name}
+                </p>
+              )}
+              {date && (
+                <p>
+                  <span className="font-medium">{translate('appointments.details.date')}: </span>
+                  {date.toLocaleDateString()}
+                </p>
+              )}
+              {selectedTime && (
+                <p>
+                  <span className="font-medium">{translate('appointments.details.time')}: </span>
+                  {selectedTime}
+                </p>
+              )}
             </div>
             <DialogFooter>
-              <Button type="submit" className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white" onClick={handleConfirm}>
-                {translate('common.continueToDashboard')}
+              <Button variant="outline" onClick={() => setShowConfirmation(false)}>
+                {translate('common.cancel')}
+              </Button>
+              <Button onClick={handleBookAppointment}>
+                {translate('appointments.book')}
               </Button>
             </DialogFooter>
           </DialogContent>
