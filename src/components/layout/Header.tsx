@@ -48,11 +48,11 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-              About Us
-            </Link>
             <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
               Appointments
+            </Link>
+            <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
+              About Us
             </Link>
           </nav>
 
@@ -69,11 +69,11 @@ export const Header = () => {
         {isMenuOpen && (
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
-              <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-                About Us
-              </Link>
               <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 Appointments
+              </Link>
+              <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
+                About Us
               </Link>
             </div>
           </nav>
