@@ -79,12 +79,12 @@ const Home = () => {
               Your virtual health companion—guiding you to the right care, when you need it.
             </p>
             
-            {/* Get Started Button moved here */}
+            {/* Get Started Button with darker blue and matching border */}
             <Button
               size="lg"
               className="text-xl px-8 py-6 mt-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-                         bg-gradient-to-r from-primary to-primary/90 hover:scale-105
-                         border-2 border-white/50"
+                         bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
+                         border-2 border-[#1E5AAB]"
               onClick={() => navigate("/patient/dashboard")}
             >
               Get Started
