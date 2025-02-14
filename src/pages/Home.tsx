@@ -1,16 +1,14 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { HandHeart, Mic, Volume2 } from "lucide-react";
+import { HandHeart, Volume2 } from "lucide-react";
 import { useState } from "react";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { isListening, startListening, stopListening, translate } = useAccessibility();
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const welcomeText = "Welcome to Adams Rural Care. We're here to help you get the care you need, when you need it. Click below to get started, or use the microphone to navigate by voice.";
+  const welcomeText = "Welcome! Looking for a simpler way to book appointments? Your health matters, and we're here to listen. For further assistance, just click get started below.";
 
   const handleReadAloud = () => {
     if ('speechSynthesis' in window) {
@@ -34,7 +32,7 @@ const Home = () => {
           <div className="space-y-6 mb-12">
             <HandHeart className="w-16 h-16 text-primary mx-auto animate-float" />
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-              Welcome, looking for a simpler way to book appointments
+              Welcome! Looking for a simpler way to book appointments?
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Your health matters, and we're here to listen.
@@ -44,8 +42,8 @@ const Home = () => {
           {/* Main Image */}
           <div className="relative rounded-2xl overflow-hidden shadow-xl mb-12">
             <img
-              src="/rural-landscape.jpg"
-              alt="Peaceful view of Adams County countryside"
+              src="https://images.unsplash.com/photo-1472396961693-142e6e269027"
+              alt="Peaceful rural landscape"
               className="w-full h-[300px] md:h-[400px] object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
@@ -62,15 +60,6 @@ const Home = () => {
               <Volume2 className={`h-5 w-5 ${isPlaying ? 'animate-pulse' : ''}`} />
               Read Aloud
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={isListening ? stopListening : startListening}
-              className={`flex items-center gap-2 ${isListening ? 'bg-primary text-white' : ''}`}
-            >
-              <Mic className="h-5 w-5" />
-              {isListening ? 'Listening...' : 'Voice Commands'}
-            </Button>
           </div>
 
           {/* Call to Action */}
@@ -83,7 +72,7 @@ const Home = () => {
               Get Started
             </Button>
             <p className="text-gray-600 text-lg">
-              Click above, and we'll guide you through everything step by step.
+              Click above, and we're here to support you every step of the way.
             </p>
           </div>
         </div>
