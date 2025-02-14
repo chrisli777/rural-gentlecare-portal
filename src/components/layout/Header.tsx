@@ -51,9 +51,6 @@ export const Header = () => {
             <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
               Appointments
             </Link>
-            <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-              About Us
-            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -71,9 +68,6 @@ export const Header = () => {
             <div className="flex flex-col space-y-4">
               <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 Appointments
-              </Link>
-              <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-                About Us
               </Link>
             </div>
           </nav>
