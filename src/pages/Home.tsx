@@ -99,17 +99,28 @@ const Home = () => {
             
             {/* Action Buttons */}
             <div className="flex flex-col items-center gap-4">
+              <Button
+                size="lg"
+                className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
+                           bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
+                           border-2 border-[#1E5AAB]"
+                onClick={handleGetStarted}
+              >
+                Get Started
+              </Button>
+
               <div className="flex justify-center items-center gap-4">
                 <Button
+                  variant="outline"
                   size="lg"
-                  className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-                             bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
-                             border-2 border-[#1E5AAB]"
-                  onClick={handleGetStarted}
+                  onClick={() => setShowFeatures(true)}
+                  className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
+                            text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
                 >
-                  Get Started
+                  <HelpCircle className="h-6 w-6" />
+                  Learn More
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="lg"
@@ -121,17 +132,6 @@ const Home = () => {
                   {language === 'en' ? 'Español' : 'English'}
                 </Button>
               </div>
-
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => setShowFeatures(true)}
-                className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
-                          text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
-              >
-                <HelpCircle className="h-6 w-6" />
-                Learn More
-              </Button>
             </div>
           </div>
         </div>
