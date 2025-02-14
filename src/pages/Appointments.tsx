@@ -59,14 +59,18 @@ const Appointments = () => {
     },
   });
 
-  const handleDeleteConfirm = async () => {
+  const handleCancelDialog = async () => {
     if (!appointmentToDelete) return;
 
     try {
       // Optimistically update the UI
       queryClient.setQueryData(['appointments'], (oldData: Appointment[] | undefined) => {
         if (!oldData) return [];
-        return oldData.filter(appointment => appointment.id !== appointmentToDelete);
+        return oldData.map(appointment => 
+          appointment.id === appointmentToDelete 
+            ? { ...appointment, status: 'cancelled' } 
+            : appointment
+        );
       });
 
       const { error } = await supabase
@@ -217,8 +221,8 @@ const Appointments = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteConfirm}>Continue</AlertDialogAction>
+              <AlertDialogCancel onClick={handleCancelDialog}>Cancel Appointment</AlertDialogCancel>
+              <AlertDialogAction onClick={() => setAppointmentToDelete(null)}>Keep Appointment</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
