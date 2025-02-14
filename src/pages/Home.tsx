@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe, TextSize } from "lucide-react";
+import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe, ALargeSmall } from "lucide-react";
 import { useState } from "react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
@@ -146,7 +146,7 @@ const Home = () => {
                   className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
                             text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
                 >
-                  <TextSize className="h-6 w-6" />
+                  <ALargeSmall className="h-6 w-6" />
                   {fontSize === 'normal' ? 'Larger Text' : 'Normal Text'}
                 </Button>
               </div>
