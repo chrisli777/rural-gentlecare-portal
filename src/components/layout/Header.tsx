@@ -51,9 +51,9 @@ export const Header = () => {
             <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
               About Us
             </Link>
-            <a href="#contact" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-              Contact Us
-            </a>
+            <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
+              Appointments
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -72,9 +72,9 @@ export const Header = () => {
               <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 About Us
               </Link>
-              <a href="#contact" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-                Contact Us
-              </a>
+              <Link to="/patient/appointment" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
+                Appointments
+              </Link>
             </div>
           </nav>
         )}
