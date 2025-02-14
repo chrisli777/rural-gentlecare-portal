@@ -219,9 +219,9 @@ Be friendly and conversational. Don't be too rigid about information formats.`,
             whileTap={{ scale: 0.95 }}
           >
             {isRecording ? (
-              <MicOff className="h-12 w-12 text-white" />
+              <MicOff className="h-14 w-14 text-white" />
             ) : (
-              <Mic className="h-12 w-12 text-white" />
+              <Mic className="h-14 w-14 text-white" />
             )}
           </motion.button>
 
