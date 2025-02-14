@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
@@ -12,6 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useConversation } from "@11labs/react";
 import { supabase } from "@/lib/supabase";
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -20,6 +24,7 @@ const PatientDashboard = () => {
   const [conversationStarted, setConversationStarted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const {
     conversation: chatConversation,
     handleSendMessage,
@@ -52,6 +57,14 @@ Be friendly and conversational while maintaining professionalism.`,
       tts: {
         modelId: "eleven_multilingual_v2",
         voiceId: "EXAVITQu4vr4xnSDxMaL", // Lisa voice
+      }
+    },
+    onMessage: (message) => {
+      if (message.type === 'transcript' || message.type === 'response') {
+        setMessages(prev => [...prev, {
+          role: message.type === 'transcript' ? 'user' : 'assistant',
+          content: message.content
+        }]);
       }
     }
   });
@@ -188,7 +201,7 @@ Be friendly and conversational while maintaining professionalism.`,
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatConversation]);
+  }, [messages]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -212,7 +225,7 @@ Be friendly and conversational while maintaining professionalism.`,
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
-              {conversation.messages?.map((msg, index) => (
+              {messages.map((msg, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
