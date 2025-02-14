@@ -1,8 +1,10 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe } from "lucide-react";
 import { useState } from "react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { AccessibilityControls } from "@/components/accessibility/AccessibilityControls";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +59,9 @@ const Home = () => {
     >
       {/* Overlay for better text readability */}
       <div className="absolute inset-0 bg-black/40" />
+
+      {/* Accessibility Controls */}
+      <AccessibilityControls />
 
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
