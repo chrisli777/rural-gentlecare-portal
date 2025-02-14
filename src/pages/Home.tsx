@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe } from "lucide-react";
@@ -28,23 +29,23 @@ const Home = () => {
   const features = [
     {
       icon: <CalendarCheck className="w-6 h-6 text-[#1E5AAB]" />,
-      title: "Book Appointments",
-      description: "Schedule in-person, online, or home visit appointments with our healthcare providers."
+      title: translate('common.features.appointments.title'),
+      description: translate('common.features.appointments.description')
     },
     {
       icon: <Bot className="w-6 h-6 text-[#1E5AAB]" />,
-      title: "AI Health Assistant",
-      description: "Get instant health guidance and preliminary assessments through our advanced AI system."
+      title: translate('common.features.aiAssistant.title'),
+      description: translate('common.features.aiAssistant.description')
     },
     {
       icon: <Video className="w-6 h-6 text-[#1E5AAB]" />,
-      title: "Virtual Consultations",
-      description: "Connect with healthcare providers through video calls from the comfort of your home."
+      title: translate('common.features.virtualConsultations.title'),
+      description: translate('common.features.virtualConsultations.description')
     },
     {
       icon: <Headphones className="w-6 h-6 text-[#1E5AAB]" />,
-      title: "Voice Assistant",
-      description: "Interact with our platform using voice commands for a hands-free healthcare experience."
+      title: translate('common.features.voiceAssistant.title'),
+      description: translate('common.features.voiceAssistant.description')
     }
   ];
 
@@ -92,10 +93,10 @@ const Home = () => {
             </div>
             <div className="space-y-12">
               <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-                Welcome to Rural Healthcare Portal
+                {translate('common.welcome')}
               </h1>
               <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-                Your virtual health companion—guiding you to the right care, when you need it.
+                {translate('common.subtitle')}
               </p>
             </div>
             
@@ -108,7 +109,7 @@ const Home = () => {
                            border-2 border-[#1E5AAB]"
                 onClick={handleGetStarted}
               >
-                Get Started
+                {translate('common.getStarted')}
               </Button>
 
               <div className="flex justify-center items-center gap-4">
@@ -120,7 +121,7 @@ const Home = () => {
                             text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
                 >
                   <HelpCircle className="h-6 w-6" />
-                  Learn More
+                  {translate('common.learnMore')}
                 </Button>
 
                 <Button
@@ -144,10 +145,10 @@ const Home = () => {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center mb-2 text-[#1E5AAB]">
-              Welcome to Your Virtual Healthcare Journey
+              {translate('common.welcomeDialog')}
             </DialogTitle>
             <DialogDescription className="text-center text-lg">
-              Here's what you can do with our virtual clinic platform
+              {translate('common.dialogDescription')}
             </DialogDescription>
           </DialogHeader>
 
@@ -174,7 +175,7 @@ const Home = () => {
               }}
               className="w-full sm:w-auto bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
             >
-              Continue to Dashboard
+              {translate('common.continueToDashboard')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -184,3 +185,4 @@ const Home = () => {
 };
 
 export default Home;
+
