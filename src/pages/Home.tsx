@@ -85,17 +85,19 @@ const Home = () => {
       <div className="container mx-auto px-4 py-12 md:py-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Hero Section */}
-          <div className="space-y-12 mb-12 animate-fade-in">
+          <div className="space-y-12 mb-12 animate-fade-in flex flex-col justify-center min-h-[50vh]">
             <div className="relative">
               <HandHeart className="w-16 h-16 text-white mx-auto animate-float hover:scale-110 transition-transform duration-300" />
               <div className="absolute -inset-4 bg-[#1E5AAB]/5 rounded-full blur-xl -z-10" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-              {translate('common.welcome')}
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-              Your virtual health companion—guiding you to the right care, when you need it.
-            </p>
+            <div className="space-y-12">
+              <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
+                Welcome to Rural Healthcare Portal
+              </h1>
+              <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+                Your virtual health companion—guiding you to the right care, when you need it.
+              </p>
+            </div>
             
             {/* Action Buttons */}
             <div className="flex flex-col items-center gap-8">
