@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -9,8 +8,6 @@ interface AppointmentInfo {
   appointmentDate?: string;
   appointmentTime?: string;
   symptoms?: string;
-  duration?: string;
-  severity?: string;
   clinicId?: number;
   bodyPart?: string;
   description?: string;
@@ -37,7 +34,9 @@ export const useChat = () => {
 
   const getOptionsForResponse = (content: string, currentInfo: AppointmentInfo): string[] => {
     // Only return options that are specifically related to the current context
-    if (content.toLowerCase().includes("book an appointment") || content.toLowerCase().includes("let's get started")) {
+    if (content.toLowerCase().includes("what type of appointment") || 
+        content.toLowerCase().includes("appointment type") ||
+        content.toLowerCase().includes("let's get started")) {
       return ["Online Appointment", "In-Person Appointment", "Home Visit"];
     }
     if (content.toLowerCase().includes("what date") || content.toLowerCase().includes("which date")) {
@@ -52,16 +51,10 @@ export const useChat = () => {
     if (content.toLowerCase().includes("what symptoms") || content.toLowerCase().includes("body part")) {
       return ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"];
     }
-    if (content.toLowerCase().includes("how long")) {
-      return ["Just started", "Few days", "About a week", "More than a week"];
-    }
-    if (content.toLowerCase().includes("severity")) {
-      return ["Mild", "Moderate", "Severe"];
-    }
     if (content.toLowerCase().includes("confirm")) {
       return ["Confirm Appointment", "Change Details"];
     }
-    // Don't return default options anymore
+    // Don't return any options if no matching context
     return [];
   };
 
@@ -140,25 +133,6 @@ export const useChat = () => {
     if (!updated && ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"].includes(selectedOption)) {
       newInfo.bodyPart = selectedOption;
       newInfo.symptoms = selectedOption;
-      updated = true;
-    }
-    
-    // Handle duration selection
-    if (!updated && ["Just started", "Few days", "About a week", "More than a week"].includes(selectedOption)) {
-      newInfo.duration = selectedOption;
-      if (!newInfo.description) {
-        newInfo.description = '';
-      }
-      newInfo.description += `Duration: ${selectedOption}. `;
-      updated = true;
-    }
-    
-    // Handle severity selection
-    if (!updated && ["Mild", "Moderate", "Severe"].includes(selectedOption)) {
-      if (!newInfo.description) {
-        newInfo.description = '';
-      }
-      newInfo.description += `Severity: ${selectedOption}.`;
       updated = true;
     }
 
