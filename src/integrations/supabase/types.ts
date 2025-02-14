@@ -34,7 +34,7 @@ export type Database = {
           description?: string | null
           doctor_id?: number | null
           id?: string
-          notification_methods: string[]
+          notification_methods?: string[]
           patient_id?: string | null
           status?: string | null
         }
