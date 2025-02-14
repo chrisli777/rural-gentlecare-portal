@@ -1,8 +1,9 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HandHeart, Volume2, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones } from "lucide-react";
+import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe } from "lucide-react";
 import { useState } from "react";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   Dialog,
   DialogContent,
@@ -14,33 +15,15 @@ import {
 
 const Home = () => {
   const navigate = useNavigate();
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
-
-  const welcomeText = "Welcome to the Virtual Clinic of Adams County, Washington. Your virtual health companion—guiding you to the right care, when you need it.";
-
-  const handleReadAloud = () => {
-    if ('speechSynthesis' in window) {
-      const speech = new SpeechSynthesisUtterance(welcomeText);
-      speech.rate = 0.85;
-      speech.pitch = 1.1;
-      speech.volume = 1;
-      
-      const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(voice => 
-        voice.name.includes('female') || voice.name.includes('woman')
-      );
-      if (femaleVoice) speech.voice = femaleVoice;
-      
-      speech.onstart = () => setIsPlaying(true);
-      speech.onend = () => setIsPlaying(false);
-      
-      window.speechSynthesis.speak(speech);
-    }
-  };
+  const { language, setLanguage, translate } = useAccessibility();
 
   const handleGetStarted = () => {
-    setShowFeatures(true);
+    navigate("/patient/dashboard");
+  };
+
+  const handleLanguageChange = () => {
+    setLanguage(language === 'en' ? 'es' : 'en');
   };
 
   const features = [
@@ -109,36 +92,46 @@ const Home = () => {
               <div className="absolute -inset-4 bg-[#1E5AAB]/5 rounded-full blur-xl -z-10" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-              Welcome to the Virtual Clinic of Adams County
+              {translate('common.welcome')}
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
               Your virtual health companion—guiding you to the right care, when you need it.
             </p>
             
-            {/* Get Started Button */}
-            <Button
-              size="lg"
-              className="text-xl px-8 py-6 mt-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-                         bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
-                         border-2 border-[#1E5AAB]"
-              onClick={handleGetStarted}
-            >
-              Get Started
-            </Button>
-          </div>
+            {/* Action Buttons */}
+            <div className="flex justify-center items-center gap-4">
+              <Button
+                size="lg"
+                className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
+                           bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
+                           border-2 border-[#1E5AAB]"
+                onClick={handleGetStarted}
+              >
+                {translate('common.patientPortal')}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleLanguageChange}
+                className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
+                          text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
+              >
+                <Globe className="h-6 w-6" />
+                {language === 'en' ? 'Español' : 'English'}
+              </Button>
 
-          {/* Accessibility Controls */}
-          <div className="flex justify-center gap-4 mb-8">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={handleReadAloud}
-              className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
-                        text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
-            >
-              <Volume2 className={`h-6 w-6 ${isPlaying ? 'animate-pulse' : ''}`} />
-              Read Aloud
-            </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setShowFeatures(true)}
+                className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
+                          text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
+              >
+                <HelpCircle className="h-6 w-6" />
+                {translate('accessibility.voiceAssistant')}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
