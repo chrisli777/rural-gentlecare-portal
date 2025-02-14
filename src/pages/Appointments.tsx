@@ -43,7 +43,6 @@ const Appointments = () => {
       const { data, error } = await supabase
         .from('appointments')
         .select('*')
-        .neq('status', 'cancelled')
         .order('appointment_date', { ascending: true });
 
       if (error) {
@@ -220,19 +219,19 @@ const Appointments = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel 
+                onClick={() => setAppointmentToDelete(null)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-900"
+              >
+                Keep Appointment
+              </AlertDialogCancel>
+              <AlertDialogAction 
                 onClick={handleCancelDialog}
                 className="bg-destructive hover:bg-destructive/90 text-white"
               >
-                Cancel Appointment
-              </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={() => setAppointmentToDelete(null)}
-                className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
-              >
-                Keep Appointment
+                Delete Appointment
               </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
+            </DialogFooter>
+          </DialogContent>
         </AlertDialog>
       </main>
     </div>
