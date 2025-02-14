@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { RealtimeChat } from '@/utils/RealtimeAudio';
 import { supabase } from '@/lib/supabase';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 
 interface VoiceInterfaceProps {
   onSpeakingChange: (speaking: boolean) => void;
@@ -11,6 +12,7 @@ interface VoiceInterfaceProps {
 
 const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onSpeakingChange }) => {
   const { toast } = useToast();
+  const { language } = useAccessibility();
   const [isConnected, setIsConnected] = useState(false);
   const chatRef = useRef<RealtimeChat | null>(null);
 
@@ -28,12 +30,12 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onSpeakingChange }) => 
   const startConversation = async () => {
     try {
       chatRef.current = new RealtimeChat(handleMessage);
-      await chatRef.current.init();
+      await chatRef.current.init(language);
       setIsConnected(true);
       
       toast({
-        title: "Connected",
-        description: "Voice interface is ready",
+        title: language === 'es' ? "Conectado" : "Connected",
+        description: language === 'es' ? "Interfaz de voz está lista" : "Voice interface is ready",
       });
     } catch (error) {
       console.error('Error starting conversation:', error);
@@ -64,14 +66,14 @@ const VoiceInterface: React.FC<VoiceInterfaceProps> = ({ onSpeakingChange }) => 
           onClick={startConversation}
           className="bg-primary hover:bg-primary/90 text-white"
         >
-          Start Conversation
+          {language === 'es' ? "Iniciar Conversación" : "Start Conversation"}
         </Button>
       ) : (
         <Button 
           onClick={endConversation}
           variant="secondary"
         >
-          End Conversation
+          {language === 'es' ? "Finalizar Conversación" : "End Conversation"}
         </Button>
       )}
     </div>
