@@ -93,7 +93,32 @@ export class RealtimeChat {
       const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.pc.addTrack(ms.getTracks()[0]);
 
-      // Create offer before setting up data channel
+      // Set up data channel
+      this.dc = this.pc.createDataChannel("oai-events");
+      this.dc.addEventListener("message", (e) => {
+        const event = JSON.parse(e.data);
+        console.log("Received event:", event);
+        
+        if (event.type === 'response.audio_transcript.delta') {
+          this.currentTranscript += event.delta;
+        } else if (event.type === 'response.audio_transcript.done') {
+          if (this.currentTranscript.trim()) {
+            this.onMessage({
+              type: 'transcript',
+              content: this.currentTranscript.trim(),
+              role: 'user'
+            });
+            this.currentTranscript = '';
+          }
+        } else if (event.type === 'response.message.delta') {
+          this.onMessage({
+            type: 'message',
+            content: event.delta,
+            role: 'assistant'
+          });
+        }
+      });
+
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
 
@@ -116,69 +141,7 @@ export class RealtimeChat {
       await this.pc.setRemoteDescription(answer);
       console.log("WebRTC connection established");
 
-      // Set up data channel after connection is established
-      this.dc = this.pc.createDataChannel("oai-events");
-      
-      // Wait for data channel to be ready
-      await new Promise<void>((resolve, reject) => {
-        if (!this.dc) {
-          reject(new Error("Data channel creation failed"));
-          return;
-        }
-
-        const timeout = setTimeout(() => {
-          console.log("Data channel connection timeout - cleaning up");
-          this.disconnect(); // Clean up resources
-          reject(new Error("Data channel connection timeout"));
-        }, 30000); // Increased timeout to 30 seconds
-
-        this.dc.onopen = () => {
-          console.log("Data channel is now open");
-          clearTimeout(timeout);
-          resolve();
-        };
-        
-        this.dc.onerror = (error) => {
-          console.error("Data channel error:", error);
-          clearTimeout(timeout);
-          reject(error);
-        };
-
-        this.dc.onclose = () => {
-          console.log("Data channel closed");
-          clearTimeout(timeout);
-        };
-
-        this.dc.addEventListener("message", (e) => {
-          try {
-            const event = JSON.parse(e.data);
-            console.log("Received event:", event);
-            
-            if (event.type === 'response.audio_transcript.delta') {
-              this.currentTranscript += event.delta;
-            } else if (event.type === 'response.audio_transcript.done') {
-              if (this.currentTranscript.trim()) {
-                this.onMessage({
-                  type: 'transcript',
-                  content: this.currentTranscript.trim(),
-                  role: 'user'
-                });
-                this.currentTranscript = '';
-              }
-            } else if (event.type === 'response.message.delta') {
-              this.onMessage({
-                type: 'message',
-                content: event.delta,
-                role: 'assistant'
-              });
-            }
-          } catch (error) {
-            console.error("Error processing message:", error);
-          }
-        });
-      });
-
-      // Start recording after data channel is ready
+      // Start recording
       this.recorder = new AudioRecorder((audioData) => {
         if (this.dc?.readyState === 'open') {
           this.dc.send(JSON.stringify({
@@ -189,16 +152,15 @@ export class RealtimeChat {
       });
       await this.recorder.start();
 
-      // Send initial greeting once everything is ready
+      // Send initial greeting
       const greeting = language === 'es' 
         ? "¡Hola! 👋 Soy tu Asistente de Salud con IA. ¿Cómo puedo ayudarte hoy?"
         : "Hello! 👋 I'm your AI Health Assistant. How can I help you today?";
       
-      await this.sendMessage(greeting);
+      this.sendMessage(greeting);
 
     } catch (error) {
       console.error("Error initializing chat:", error);
-      this.disconnect(); // Ensure cleanup on error
       throw error;
     }
   }
@@ -246,20 +208,8 @@ export class RealtimeChat {
   }
 
   disconnect() {
-    try {
-      this.recorder?.stop();
-      if (this.dc) {
-        console.log("Closing data channel");
-        this.dc.close();
-        this.dc = null;
-      }
-      if (this.pc) {
-        console.log("Closing peer connection");
-        this.pc.close();
-        this.pc = null;
-      }
-    } catch (error) {
-      console.error("Error during disconnect:", error);
-    }
+    this.recorder?.stop();
+    this.dc?.close();
+    this.pc?.close();
   }
 }
