@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { format } from "date-fns";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { translations } from "@/utils/translations";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +36,8 @@ const Appointments = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(null);
-  const t = translations.en; // For now using English, can be made dynamic later
+  const { language } = useAccessibility();
+  const t = translations[language];
 
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments'],

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
@@ -10,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { translations } from "@/utils/translations";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   Dialog,
   DialogContent,
@@ -51,7 +51,8 @@ const PatientAppointment = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const t = translations.en; // For now using English, can be made dynamic later
+  const { language } = useAccessibility();
+  const t = translations[language];
 
   const isDetailsComplete = () => {
     if (!appointmentType || !bodyPart) return false;

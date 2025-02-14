@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Heart, ArrowLeft, Menu } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { translations } from "@/utils/translations";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { language } = useAccessibility();
+  const t = translations[language];
   
   // Add onboarding to the routes that should show only back button
   const showOnlyBackButton = location.pathname === '/provider/patients' || 
@@ -27,7 +31,7 @@ export const Header = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t.common.back}
             </Button>
           </div>
         </div>
@@ -49,7 +53,7 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-              Appointments
+              {t.common.appointments}
             </Link>
           </nav>
 
@@ -67,7 +71,7 @@ export const Header = () => {
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
               <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-                Appointments
+                {t.common.appointments}
               </Link>
             </div>
           </nav>
