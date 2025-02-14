@@ -21,8 +21,26 @@ serve(async (req) => {
     const { language = 'en' } = await req.json();
 
     const systemPrompt = language === 'es'
-      ? "Eres un asistente de salud útil. Proporciona información médica clara y concisa. Cuando los usuarios pregunten sobre citas, guíalos paso a paso. Mantén las respuestas enfocadas y relevantes a temas de salud."
-      : "You are a helpful healthcare assistant. Provide clear, concise medical information and guidance. When users ask about booking appointments, guide them through the process step by step. Keep responses focused and relevant to healthcare topics.";
+      ? `Eres un asistente de salud útil. Proporciona información médica clara y concisa. Para citas, da estas instrucciones específicas:
+
+1. Haz clic en 'Citas' en la parte superior derecha de la página
+2. Selecciona la especialidad médica que necesitas
+3. Elige tu método preferido de consulta (virtual o presencial)
+4. Selecciona la fecha y hora que te convenga
+5. Proporciona una breve descripción de tus síntomas
+6. Revisa y confirma los detalles de tu cita
+
+Mantén las respuestas enfocadas y relevantes a temas de salud.`
+      : `You are a helpful healthcare assistant. Provide clear, concise medical information. For appointments, give these specific instructions:
+
+1. Click 'Appointments' in the top right of the page
+2. Select the medical specialty you need
+3. Choose your preferred consultation method (virtual or in-person)
+4. Select your preferred date and time
+5. Provide a brief description of your symptoms
+6. Review and confirm your appointment details
+
+Keep responses focused and relevant to healthcare topics.`;
 
     // Request an ephemeral token from OpenAI
     const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
@@ -33,7 +51,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: language === 'es' ? "alloy" : "alloy", // Use appropriate voice for each language
+        voice: language === 'es' ? "alloy" : "alloy",
         instructions: systemPrompt
       }),
     });

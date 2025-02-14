@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 export class AudioRecorder {
@@ -66,6 +65,7 @@ export class RealtimeChat {
   private dc: RTCDataChannel | null = null;
   private audioEl: HTMLAudioElement;
   private recorder: AudioRecorder | null = null;
+  private currentTranscript: string = '';
 
   constructor(private onMessage: (message: any) => void) {
     this.audioEl = document.createElement("audio");
@@ -99,13 +99,17 @@ export class RealtimeChat {
         const event = JSON.parse(e.data);
         console.log("Received event:", event);
         
-        // Handle different types of events
         if (event.type === 'response.audio_transcript.delta') {
-          this.onMessage({
-            type: 'transcript',
-            content: event.delta,
-            role: 'user'
-          });
+          this.currentTranscript += event.delta;
+        } else if (event.type === 'response.audio_transcript.done') {
+          if (this.currentTranscript.trim()) {
+            this.onMessage({
+              type: 'transcript',
+              content: this.currentTranscript.trim(),
+              role: 'user'
+            });
+            this.currentTranscript = '';
+          }
         } else if (event.type === 'response.message.delta') {
           this.onMessage({
             type: 'message',
