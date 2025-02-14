@@ -8,27 +8,179 @@ import { useChat } from "@/hooks/useChat";
 import { AnimatePresence } from "framer-motion";
 import { MessageSquare, Mic, MicOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { useToast } from "@/hooks/use-toast";
+import { useConversation } from "@11labs/react";
+import { supabase } from "@/lib/supabase";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isVoiceMode, setIsVoiceMode] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [conversationStarted, setConversationStarted] = useState(false);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const {
-    conversation,
+    conversation: chatConversation,
     handleSendMessage,
   } = useChat();
-  
-  const onVoiceProcessed = (text: string) => {
-    if (text.trim()) {
-      handleSendMessage(text);
-    }
-  };
-
-  const { isRecording, toggleRecording } = useVoiceRecording(onVoiceProcessed);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const conversation = useConversation({
+    clientTools: {
+      completeProfile: async () => {
+        console.log("Profile conversation completed");
+        return "Profile completed successfully";
+      }
+    },
+    overrides: {
+      agent: {
+        prompt: {
+          prompt: `You are Lisa, a friendly and professional medical assistant helping patients with their healthcare needs. Your role is to:
+
+1. Have a natural conversation to assist with medical queries
+2. Pay attention to what the patient says and provide relevant information
+3. Be empathetic and understanding
+4. Help schedule appointments if needed
+
+Be friendly and conversational while maintaining professionalism.`,
+        },
+        firstMessage: "Hi! I'm Lisa, your medical assistant. How can I help you today?",
+        language: "en",
+      },
+      tts: {
+        modelId: "eleven_multilingual_v2",
+        voiceId: "EXAVITQu4vr4xnSDxMaL", // Lisa voice
+      }
+    }
+  });
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          console.log("No authenticated session found");
+          toast({
+            title: "Authentication required",
+            description: "Please log in to continue.",
+            variant: "destructive",
+          });
+          navigate("/patient/login");
+          return;
+        }
+        console.log("User authenticated:", session.user.id);
+        setUserId(session.user.id);
+      } catch (error) {
+        console.error("Auth check error:", error);
+        toast({
+          title: "Authentication error",
+          description: "Please try logging in again.",
+          variant: "destructive",
+        });
+        navigate("/patient/login");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
+  useEffect(() => {
+    const initAudio = async () => {
+      try {
+        const context = new AudioContext();
+        await context.resume();
+        setAudioContext(context);
+        console.log("AudioContext initialized successfully");
+      } catch (error) {
+        console.error("Error initializing AudioContext:", error);
+        toast({
+          title: "Error",
+          description: "Could not initialize audio system. Please check your browser settings.",
+          variant: "destructive",
+        });
+      }
+    };
+    initAudio();
+
+    return () => {
+      audioContext?.close();
+      if (conversationStarted) {
+        conversation.endSession().catch(console.error);
+      }
+    };
+  }, []);
+
+  const toggleVoiceRecording = async () => {
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to continue.",
+        variant: "destructive",
+      });
+      navigate("/patient/login");
+      return;
+    }
+
+    try {
+      if (!audioContext) {
+        console.error("AudioContext not initialized");
+        toast({
+          title: "Error",
+          description: "Audio system not initialized. Please refresh the page.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isRecording) {
+        console.log("Starting voice recording...");
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("Microphone access granted");
+        
+        if (!conversationStarted) {
+          console.log("Starting new conversation session");
+          await conversation.startSession({
+            agentId: "TnwIxSktmaUK3EAqZ6fb",
+            userId: userId,
+          });
+          console.log("Conversation session started");
+          setConversationStarted(true);
+        }
+        
+        setIsRecording(true);
+        toast({
+          title: "Recording Started",
+          description: "You can now speak with Lisa",
+        });
+      } else {
+        console.log("Stopping voice recording...");
+        setIsRecording(false);
+        
+        if (conversationStarted) {
+          console.log("Ending conversation session");
+          await conversation.endSession();
+          setConversationStarted(false);
+          console.log("Conversation session ended");
+        }
+        
+        toast({
+          title: "Recording Stopped",
+          description: "Voice interaction ended",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error with voice recording:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Could not access microphone. Please check your permissions.",
+        variant: "destructive",
+      });
+      setIsRecording(false);
+      setConversationStarted(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -36,7 +188,7 @@ const PatientDashboard = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [conversation]);
+  }, [chatConversation]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -60,7 +212,7 @@ const PatientDashboard = () => {
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
-              {conversation.map((msg, index) => (
+              {chatConversation.map((msg, index) => (
                 <ChatMessage
                   key={index}
                   message={msg}
@@ -73,12 +225,13 @@ const PatientDashboard = () => {
 
           <div className="p-4 border-t flex flex-col items-center gap-2">
             <Button
-              onClick={toggleRecording}
+              onClick={toggleVoiceRecording}
               className={`rounded-full w-20 h-20 p-0 ${
                 isRecording
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
               }`}
+              disabled={isLoading}
             >
               {isRecording ? (
                 <MicOff className="h-14 w-14 text-white" />
