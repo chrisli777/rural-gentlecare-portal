@@ -322,7 +322,7 @@ const PatientDashboard = () => {
                   <div className="flex items-start gap-4">
                     <Calendar className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
                     <div>
-                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book an Appointment</h3>
+                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book Appointments</h3>
                       <p className="text-gray-600 hidden sm:block">Schedule your next visit with our healthcare providers.</p>
                     </div>
                   </div>
