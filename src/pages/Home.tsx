@@ -1,10 +1,9 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe } from "lucide-react";
+import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe, TextSize } from "lucide-react";
 import { useState } from "react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { AccessibilityControls } from "@/components/accessibility/AccessibilityControls";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +16,7 @@ import {
 const Home = () => {
   const navigate = useNavigate();
   const [showFeatures, setShowFeatures] = useState(false);
-  const { language, setLanguage, translate } = useAccessibility();
+  const { language, setLanguage, translate, fontSize, setFontSize } = useAccessibility();
 
   const handleGetStarted = () => {
     navigate("/patient/dashboard");
@@ -25,6 +24,10 @@ const Home = () => {
 
   const handleLanguageChange = () => {
     setLanguage(language === 'en' ? 'es' : 'en');
+  };
+
+  const handleFontSizeChange = () => {
+    setFontSize(fontSize === 'normal' ? 'large' : 'normal');
   };
 
   const features = [
@@ -59,9 +62,6 @@ const Home = () => {
     >
       {/* Overlay for better text readability */}
       <div className="absolute inset-0 bg-black/40" />
-
-      {/* Accessibility Controls */}
-      <AccessibilityControls />
 
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
@@ -137,6 +137,17 @@ const Home = () => {
                 >
                   <Globe className="h-6 w-6" />
                   {language === 'en' ? 'Español' : 'English'}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleFontSizeChange}
+                  className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
+                            text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
+                >
+                  <TextSize className="h-6 w-6" />
+                  {fontSize === 'normal' ? 'Larger Text' : 'Normal Text'}
                 </Button>
               </div>
             </div>
