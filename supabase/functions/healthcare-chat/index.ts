@@ -39,23 +39,49 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
+            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️.
 
-1. In your FIRST response to any health concern:
-   SPLIT your response into TWO separate parts using [SPLIT] marker:
-   PART 1: Ask only ONE key question about their main symptom/concern
-   PART 2: "Or, I can help you book an appointment with a doctor right away. Would you like that? 🗓️"
+For EVERY response, provide:
+1. A clear message
+2. A list of options for the user to choose from
 
-2. For appointment booking:
-   • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ALWAYS show ALL available times:
-   "What time works best for you? Here are all available slots:"
-   ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+Format ALL responses as:
+{
+  "message": "Your message here",
+  "options": ["option1", "option2", "option3"]
+}
+
+EXAMPLES:
+
+For symptoms:
+{
+  "message": "What's your main health concern today? 🩺",
+  "options": ["Fever", "Headache", "Cough", "Stomach pain", "Other"]
+}
+
+For duration:
+{
+  "message": "How long have you been experiencing these symptoms?",
+  "options": ["Today", "Few days", "About a week", "More than a week"]
+}
+
+For severity:
+{
+  "message": "How would you rate your symptoms?",
+  "options": ["Mild", "Moderate", "Severe"]
+}
+
+For appointments:
+{
+  "message": "What time works best for you?",
+  "options": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+}
 
 Remember:
-• Be VERY flexible with user inputs - accept short/informal answers
-• Keep messages short and clear
-• Use emojis to keep it friendly 😊
-• ALWAYS show ALL time slots when discussing appointments`
+• ALWAYS provide options in your response
+• Keep messages clear and concise
+• Use emojis for friendly tone 😊
+• Show ALL time slots for appointments`
           },
           {
             role: "user",
@@ -76,88 +102,59 @@ Remember:
     }
 
     let aiResponse = data.choices[0].message.content.trim();
-    let finalResponses = [];
+    console.log('AI response:', aiResponse);
 
-    // Split the response if it contains the [SPLIT] marker
-    if (aiResponse.includes('[SPLIT]')) {
-      finalResponses = aiResponse.split('[SPLIT]').map(part => ({
-        role: "assistant",
-        content: part.trim()
-      }));
-    } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
-      // Handle appointment booking response
-      try {
-        const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
-        if (!bookingMatch) {
-          throw new Error('Invalid booking format');
-        }
-
-        const appointmentDetails = JSON.parse(bookingMatch[1]);
-        console.log('Booking appointment with details:', appointmentDetails);
-
-        // Insert the appointment into the database
-        const { data: appointment, error: appointmentError } = await supabase
-          .from('appointments')
-          .insert([
-            {
-              appointment_type: appointmentDetails.appointment_type,
-              appointment_date: appointmentDetails.appointment_date,
-              appointment_time: appointmentDetails.appointment_time,
-              notification_methods: appointmentDetails.notification_methods,
-              doctor_id: appointmentDetails.doctor_id,
-              status: 'pending'
-            }
-          ])
-          .select()
-          .single();
-
-        if (appointmentError) {
-          console.error('Error booking appointment:', appointmentError);
-          throw new Error('Failed to book appointment');
-        }
-
-        console.log('Successfully booked appointment:', appointment);
-        
-        finalResponses = [{
-          role: "assistant",
-          content: "Great! Your appointment has been booked successfully. 🎉",
-          options: ["View appointment details", "Book another appointment"]
-        }];
-      } catch (error) {
-        console.error('Error processing appointment booking:', error);
-        finalResponses = [{
-          role: "assistant",
-          content: "I apologize, but I encountered an error while trying to book your appointment. Please select from these available times:",
-          options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
-        }];
+    try {
+      // Parse the response as JSON
+      const parsedResponse = JSON.parse(aiResponse);
+      console.log('Parsed response:', parsedResponse);
+      
+      if (!parsedResponse.message || !parsedResponse.options) {
+        throw new Error('Invalid response structure');
       }
-    } else {
-      // Check if the response is about appointments or time slots
-      const isAppointmentRelated = aiResponse.toLowerCase().includes('appointment') || 
-                                 aiResponse.toLowerCase().includes('time') ||
-                                 aiResponse.toLowerCase().includes('schedule');
-
-      if (isAppointmentRelated) {
-        finalResponses = [{
-          role: "assistant",
-          content: aiResponse,
-          options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
-        }];
-      } else {
-        finalResponses = [{
-          role: "assistant",
-          content: aiResponse
-        }];
+      
+      // For appointment-related messages, ensure all time slots are shown
+      if (parsedResponse.message.toLowerCase().includes('time') || 
+          parsedResponse.message.toLowerCase().includes('appointment')) {
+        parsedResponse.options = ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"];
       }
+      
+      return new Response(JSON.stringify({
+        responses: [{
+          role: "assistant",
+          content: parsedResponse.message,
+          options: parsedResponse.options
+        }]
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+      
+    } catch (parseError) {
+      console.error('Error parsing AI response:', parseError);
+      
+      // Fallback response with error message and options
+      return new Response(JSON.stringify({
+        responses: [{
+          role: "assistant",
+          content: "I apologize, but I'm having trouble understanding. Could you please try again? 🤔",
+          options: ["Start over", "Speak to a doctor", "Get help"]
+        }]
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-
-    return new Response(JSON.stringify({ responses: finalResponses }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+    
+    // Return a user-friendly error response with options
+    return new Response(JSON.stringify({
+      responses: [{
+        role: "assistant",
+        content: "I apologize, but I encountered an error. How can I help you? 🤔",
+        options: ["Try again", "Start over", "Get help"]
+      }]
+    }), {
+      status: 200, // Changed to 200 to ensure the client always gets a valid response
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
