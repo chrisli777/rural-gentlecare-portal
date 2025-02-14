@@ -47,35 +47,15 @@ serve(async (req) => {
    PART 2: "Or, I can help you book an appointment with a doctor right away. Would you like that? 🗓️"
 
 2. For appointment booking:
-   • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ask:
-   "Online or in-person appointment? 🏥"
-
-   • Accept ANY variation of these answers:
-     - For online: "online", "virtual", "video", "remote", "tele", etc.
-     - For in-person: "in person", "office", "clinic", "physical", "in-person", etc.
-
-   • Then immediately suggest a time:
-   "Perfect! How about tomorrow at 10:00 AM? Or I can check other times if this doesn't work for you. 📅"
-
-Then use this format to book it (IMPORTANT: date must be in YYYY-MM-DD format and must be today or a future date):
-!BOOK_APPOINTMENT:
-{
-  "appointment_type": "in-person",
-  "appointment_date": "${new Date(Date.now() + 86400000).toISOString().split('T')[0]}",
-  "appointment_time": "10:00 AM",
-  "notification_methods": ["app"],
-  "doctor_id": 1
-}
-
-For serious symptoms (severe pain, breathing issues, high fever, sudden changes in vision/speech), immediately say:
-"This sounds serious. Let me help you book an appointment right away. Online or in-person? 🚨"
+   • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ALWAYS show ALL available times:
+   "What time works best for you? Here are all available slots:"
+   ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
 
 Remember:
 • Be VERY flexible with user inputs - accept short/informal answers
-• Immediately proceed with booking when user shows any interest
 • Keep messages short and clear
 • Use emojis to keep it friendly 😊
-• ALWAYS suggest tomorrow's date for appointments`
+• ALWAYS show ALL time slots when discussing appointments`
           },
           {
             role: "user",
@@ -95,16 +75,18 @@ Remember:
       throw new Error('Invalid response format from OpenAI API');
     }
 
-    const aiResponse = data.choices[0].message.content.trim();
+    let aiResponse = data.choices[0].message.content.trim();
     let finalResponses = [];
 
     // Split the response if it contains the [SPLIT] marker
     if (aiResponse.includes('[SPLIT]')) {
-      finalResponses = aiResponse.split('[SPLIT]').map(part => part.trim());
+      finalResponses = aiResponse.split('[SPLIT]').map(part => ({
+        role: "assistant",
+        content: part.trim()
+      }));
     } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       // Handle appointment booking response
       try {
-        // Extract the JSON part
         const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
         if (!bookingMatch) {
           throw new Error('Invalid booking format');
@@ -112,15 +94,6 @@ Remember:
 
         const appointmentDetails = JSON.parse(bookingMatch[1]);
         console.log('Booking appointment with details:', appointmentDetails);
-
-        // Validate appointment date
-        const appointmentDate = new Date(appointmentDetails.appointment_date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (appointmentDate < today) {
-          throw new Error('Appointment date must be today or in the future');
-        }
 
         // Insert the appointment into the database
         const { data: appointment, error: appointmentError } = await supabase
@@ -145,14 +118,37 @@ Remember:
 
         console.log('Successfully booked appointment:', appointment);
         
-        // Keep only the human-readable part of the response
-        finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
+        finalResponses = [{
+          role: "assistant",
+          content: "Great! Your appointment has been booked successfully. 🎉",
+          options: ["View appointment details", "Book another appointment"]
+        }];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
-        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
+        finalResponses = [{
+          role: "assistant",
+          content: "I apologize, but I encountered an error while trying to book your appointment. Please select from these available times:",
+          options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+        }];
       }
     } else {
-      finalResponses = [aiResponse];
+      // Check if the response is about appointments or time slots
+      const isAppointmentRelated = aiResponse.toLowerCase().includes('appointment') || 
+                                 aiResponse.toLowerCase().includes('time') ||
+                                 aiResponse.toLowerCase().includes('schedule');
+
+      if (isAppointmentRelated) {
+        finalResponses = [{
+          role: "assistant",
+          content: aiResponse,
+          options: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+        }];
+      } else {
+        finalResponses = [{
+          role: "assistant",
+          content: aiResponse
+        }];
+      }
     }
 
     return new Response(JSON.stringify({ responses: finalResponses }), {
