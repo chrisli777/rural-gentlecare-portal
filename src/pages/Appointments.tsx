@@ -230,8 +230,8 @@ const Appointments = () => {
               >
                 Delete Appointment
               </AlertDialogAction>
-            </DialogFooter>
-          </DialogContent>
+            </AlertDialogFooter>
+          </AlertDialogContent>
         </AlertDialog>
       </main>
     </div>
