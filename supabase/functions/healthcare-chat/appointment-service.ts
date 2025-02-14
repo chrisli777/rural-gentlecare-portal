@@ -1,5 +1,5 @@
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
 
 interface AppointmentDetails {
   appointment_type: string;
@@ -40,4 +40,3 @@ export class AppointmentService {
     return data;
   }
 }
-
