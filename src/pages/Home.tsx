@@ -34,11 +34,10 @@ const Home = () => {
           <div className="space-y-6 mb-12">
             <HandHeart className="w-16 h-16 text-primary mx-auto animate-float" />
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-              We're here to help.<br />
-              You deserve care that listens to you.
+              Welcome, looking for a simpler way to book appointments
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Take the first step towards personalized care. We'll guide you through everything, one step at a time.
+              Your health matters, and we're here to listen.
             </p>
           </div>
 
