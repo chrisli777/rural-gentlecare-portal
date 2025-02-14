@@ -306,7 +306,7 @@ const PatientDashboard = () => {
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Calendar className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Book Now</h3>
+                  <h3 className="text-xl font-semibold mb-2">Book an Appointment</h3>
                   <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
                 </CardContent>
               </Card>
