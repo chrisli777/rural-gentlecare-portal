@@ -18,7 +18,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+</invoke>} from "@/components/ui/alert-dialog";
 
 interface Appointment {
   id: string;
@@ -43,7 +43,7 @@ const Appointments = () => {
       const { data, error } = await supabase
         .from('appointments')
         .select('*')
-        .neq('status', 'cancelled') // Filter out cancelled appointments
+        .neq('status', 'cancelled')
         .order('appointment_date', { ascending: true });
 
       if (error) {
@@ -63,7 +63,6 @@ const Appointments = () => {
     if (!appointmentToDelete) return;
 
     try {
-      // Update the appointment status to 'cancelled' instead of deleting it
       const { error } = await supabase
         .from('appointments')
         .update({ status: 'cancelled' })
@@ -74,15 +73,16 @@ const Appointments = () => {
       toast({
         title: "Success",
         description: "Appointment cancelled successfully",
+        duration: 2000, // Set duration to 2 seconds
       });
 
-      // Refresh appointments data
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
     } catch (error: any) {
       toast({
         title: "Error",
         description: "Failed to cancel appointment",
         variant: "destructive",
+        duration: 2000, // Set duration to 2 seconds
       });
     } finally {
       setAppointmentToDelete(null);
@@ -104,7 +104,33 @@ const Appointments = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center h-16">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+              >
+                <path d="m15 18-6-6 6-6"/>
+              </svg>
+              Back
+            </Button>
+          </div>
+        </div>
+      </div>
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">My Appointments</h1>
