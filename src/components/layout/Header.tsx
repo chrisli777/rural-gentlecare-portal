@@ -9,12 +9,14 @@ export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Check if we're on provider patients or analytics page
-  const isProviderPatientsOrAnalytics = location.pathname === '/provider/patients' || location.pathname === '/provider/analytics';
-  // Check if we're on appointment or messages page
-  const isAppointmentOrMessages = location.pathname === '/patient/appointment' || location.pathname === '/patient/messages';
+  // Add onboarding to the routes that should show only back button
+  const showOnlyBackButton = location.pathname === '/provider/patients' || 
+    location.pathname === '/provider/analytics' ||
+    location.pathname === '/patient/appointment' || 
+    location.pathname === '/patient/messages' ||
+    location.pathname === '/patient/onboarding';
   
-  if (isProviderPatientsOrAnalytics || isAppointmentOrMessages) {
+  if (showOnlyBackButton) {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="container mx-auto px-4">

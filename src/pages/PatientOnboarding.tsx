@@ -1,7 +1,6 @@
 
 import { AIConversationStep } from "@/components/signup/AIConversationStep";
 import { useNavigate } from "react-router-dom";
-import { Heart } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 
 const PatientOnboarding = () => {
@@ -12,11 +11,10 @@ const PatientOnboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-white">
       <Header />
-      <main className="container mx-auto px-4 pt-20 pb-6">
-        <h1 className="text-3xl font-bold mb-8">Voice Assistant Onboarding</h1>
-        
+      <div className="container mx-auto px-4 pt-24 pb-12">
+        {/* AI Assistant Section */}
         <div className="max-w-md mx-auto space-y-8 bg-white p-8 rounded-xl shadow-lg animate-fade-in">
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -26,7 +24,7 @@ const PatientOnboarding = () => {
 
           <AIConversationStep onProfileComplete={handleProfileComplete} />
         </div>
-      </main>
+      </div>
     </div>
   );
 };
