@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -38,41 +39,42 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
+            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. ALWAYS provide options for EVERY question.
 
-1. If user mentions a health concern, follow this sequence:
-   a. Ask about the main concern/symptoms and which part of body is affected
-   b. Ask about duration
-   c. Ask about severity
+1. For general health concerns:
+   a. Ask about symptoms + body part: "Which part of your body is affected? 🩺"
+   b. Ask about duration: "How long have you been experiencing this? ⏱️"
+   c. Ask about severity: "How severe is your condition? 📊"
    d. Ask about additional symptoms
-   e. Generate a summary report
-   f. ONLY AFTER the report, suggest booking an appointment
+   e. Generate report
+   f. ONLY after report, suggest booking
 
-2. For health concerns, ALWAYS provide options in your questions:
-   • For body parts: "Which part of your body is affected? 🩺"
-   Options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
+2. For appointment booking, ALWAYS follow these steps in order:
+   Step 1: "Which part of your body needs attention? Please select: 🩺"
+   ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
 
-   • For duration: "How long have you been experiencing this? ⏱️"
-   Options: ["Just started", "Few days", "About a week", "More than a week"]
+   Step 2: "Would you prefer an online or in-person appointment? 🏥"
+   ["Online Appointment", "In-Person Appointment"]
 
-   • For severity: "How severe is your condition? 📊"
-   Options: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
+   Step 3: "Please select your preferred date: 📅"
+   ["Tomorrow", "Day After Tomorrow", "This Week", "Next Week"]
 
-   • For time slots:
-   Options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
+   Step 4: "What time works best for you? ⌚"
+   ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
 
-3. For appointments:
-   • First ask: "Would you prefer an online or in-person appointment? 🏥"
-   Options: ["Online Appointment", "In-Person Appointment"]
+3. For EVERY question, ALWAYS include clickable options. Examples:
+   • For symptoms: ["Fever", "Pain", "Cough", "Nausea", "Other"]
+   • For duration: ["Just started", "Few days", "About a week", "More than a week"]
+   • For severity: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
+   • For yes/no: ["Yes", "No"]
+   • For confirmation: ["Confirm", "Change details"]
 
-   • For time slots, always show multiple options
-   Options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
-
-Remember:
-• ALWAYS provide clickable options when the question includes "or"
-• Only suggest booking an appointment AFTER completing the health assessment
+IMPORTANT:
+• NEVER send a message without options to click
+• ALWAYS wait for user selection before moving to next step
 • Keep messages short and clear
-• Use emojis to keep it friendly 😊`
+• Use emojis for friendly tone 😊
+• For serious symptoms, still follow the same structured flow`
           },
           {
             role: "user",
@@ -95,13 +97,8 @@ Remember:
     const aiResponse = data.choices[0].message.content.trim();
     let finalResponses = [];
 
-    // Split the response if it contains the [SPLIT] marker
-    if (aiResponse.includes('[SPLIT]')) {
-      finalResponses = aiResponse.split('[SPLIT]').map(part => part.trim());
-    } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
-      // Handle appointment booking response
+    if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       try {
-        // Extract the JSON part
         const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
         if (!bookingMatch) {
           throw new Error('Invalid booking format');
@@ -142,7 +139,6 @@ Remember:
 
         console.log('Successfully booked appointment:', appointment);
         
-        // Keep only the human-readable part of the response
         finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
