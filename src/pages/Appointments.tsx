@@ -43,6 +43,7 @@ const Appointments = () => {
       const { data, error } = await supabase
         .from('appointments')
         .select('*')
+        .neq('status', 'cancelled') // Filter out cancelled appointments
         .order('appointment_date', { ascending: true });
 
       if (error) {
@@ -87,31 +88,6 @@ const Appointments = () => {
     }
   };
 
-  const handleClearAllAppointments = async () => {
-    try {
-      const { error } = await supabase
-        .from('appointments')
-        .delete()
-        .not('id', 'is', null); // This will delete all appointments
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "All appointments cleared successfully",
-      });
-
-      // Refresh appointments data
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to clear appointments",
-        variant: "destructive",
-      });
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
@@ -131,22 +107,12 @@ const Appointments = () => {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">My Appointments</h1>
-          <div className="flex gap-4">
-            {appointments?.length > 0 && (
-              <Button 
-                variant="destructive"
-                onClick={handleClearAllAppointments}
-              >
-                Clear All
-              </Button>
-            )}
-            <Button 
-              onClick={() => navigate('/patient/book-appointment')}
-              className="bg-primary hover:bg-primary/90"
-            >
-              Book Appointment
-            </Button>
-          </div>
+          <Button 
+            onClick={() => navigate('/patient/book-appointment')}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Book Appointment
+          </Button>
         </div>
 
         {isLoading ? (
