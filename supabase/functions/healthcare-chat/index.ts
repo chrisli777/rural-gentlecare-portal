@@ -44,14 +44,6 @@ serve(async (req) => {
 
 Current appointment info: ${JSON.stringify(appointmentInfo)}
 
-Step-by-Step Booking Process:
-1. If no appointmentType or appointmentType is null: Ask what type of appointment they prefer (online, in-person, or home visit)
-2. Once appointmentType is set and if it's in-person: Ask which clinic they prefer
-3. If no appointmentDate: Ask for preferred date
-4. If have date but no time: Show available times
-5. If no bodyPart or symptoms: Ask about affected body part
-6. If have all required info: Show summary and ask for confirmation
-
 Required fields for booking:
 - appointmentType
 - appointmentDate
@@ -59,15 +51,32 @@ Required fields for booking:
 - bodyPart/symptoms
 - clinicId (only if in-person)
 
-IMPORTANT RULES:
-- Never assume appointmentType. Only mention it if user has explicitly chosen one
-- Only ask ONE question at a time
-- Only ask for required fields listed above
-- Don't ask about severity or duration
-- Show confirmation only when ALL required fields are present
-- Keep responses focused and friendly
+Workflow:
+1. New Appointment:
+   - Check if all required fields are present
+   - If yes, show summary and ask for confirmation with options ["Confirm Appointment", "Change Details"]
+   - On confirmation, use !BOOK_APPOINTMENT to create appointment
 
-For appointment booking, use !BOOK_APPOINTMENT:
+2. Cancel Appointment:
+   - If user mentions canceling/cancelling appointment, use !CANCEL_APPOINTMENT
+   - Ask for confirmation before canceling
+
+IMPORTANT:
+- After collecting all required info, IMMEDIATELY show summary and ask for confirmation
+- Never ask additional questions if all required fields are present
+- For cancellation, respond with understanding and confirm the action
+
+Example Summary Format:
+"Great! Here's your appointment summary:
+- Type: [appointmentType]
+- Date: [appointmentDate]
+- Time: [appointmentTime]
+- Location: [clinic if in-person]
+- Body Part: [bodyPart]
+
+Would you like to confirm this appointment?"
+
+For booking, use !BOOK_APPOINTMENT:
 {
   "appointment_type": "[type]",
   "appointment_date": "YYYY-MM-DD",
@@ -76,7 +85,10 @@ For appointment booking, use !BOOK_APPOINTMENT:
   "clinic_id": "[clinic_id]",
   "body_part": "[body_part]",
   "description": "[description]"
-}`
+}
+
+For cancellation, use !CANCEL_APPOINTMENT"
+`
           },
           {
             role: "user",
@@ -99,6 +111,7 @@ For appointment booking, use !BOOK_APPOINTMENT:
     const aiResponse = data.choices[0].message.content.trim();
     let finalResponses = [];
     let appointmentCreated = false;
+    let appointmentCancelled = false;
 
     if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       try {
@@ -142,17 +155,39 @@ For appointment booking, use !BOOK_APPOINTMENT:
 
         console.log('Successfully booked appointment:', appointment);
         appointmentCreated = true;
-        
-        finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
+        finalResponses = [
+          "Great news! 🎉 Your appointment has been successfully booked. Would you like to book another appointment or is there anything else I can help you with?"
+        ];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
         finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
+      }
+    } else if (aiResponse.includes('!CANCEL_APPOINTMENT')) {
+      try {
+        const { error: cancelError } = await supabase
+          .from('appointments')
+          .update({ status: 'cancelled' })
+          .eq('id', appointmentInfo.id);
+
+        if (cancelError) throw cancelError;
+
+        appointmentCancelled = true;
+        finalResponses = [
+          "I've successfully cancelled your appointment. Is there anything else I can help you with?"
+        ];
+      } catch (error) {
+        console.error('Error cancelling appointment:', error);
+        finalResponses = ["I apologize, but I encountered an error while trying to cancel your appointment. Please try again."];
       }
     } else {
       finalResponses = [aiResponse];
     }
 
-    return new Response(JSON.stringify({ responses: finalResponses, appointmentCreated }), {
+    return new Response(JSON.stringify({ 
+      responses: finalResponses, 
+      appointmentCreated,
+      appointmentCancelled 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
