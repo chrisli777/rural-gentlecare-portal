@@ -42,8 +42,8 @@ const Home = () => {
           {/* Main Image */}
           <div className="relative rounded-2xl overflow-hidden shadow-xl mb-12">
             <img
-              src="https://images.unsplash.com/photo-1472396961693-142e6e269027"
-              alt="Peaceful rural landscape"
+              src="https://datausa.io/api/profile/geo/adams-county-wa/splash"
+              alt="Adams County, Washington landscape"
               className="w-full h-[300px] md:h-[400px] object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
