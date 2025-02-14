@@ -14,8 +14,10 @@ export type Database = {
           appointment_date: string
           appointment_time: string
           appointment_type: string
+          body_part: string | null
           clinic_id: number | null
           created_at: string | null
+          description: string | null
           doctor_id: number | null
           id: string
           notification_methods: string[]
@@ -26,8 +28,10 @@ export type Database = {
           appointment_date: string
           appointment_time: string
           appointment_type: string
+          body_part?: string | null
           clinic_id?: number | null
           created_at?: string | null
+          description?: string | null
           doctor_id?: number | null
           id?: string
           notification_methods: string[]
@@ -38,8 +42,10 @@ export type Database = {
           appointment_date?: string
           appointment_time?: string
           appointment_type?: string
+          body_part?: string | null
           clinic_id?: number | null
           created_at?: string | null
+          description?: string | null
           doctor_id?: number | null
           id?: string
           notification_methods?: string[]
