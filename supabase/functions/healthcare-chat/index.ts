@@ -45,28 +45,30 @@ serve(async (req) => {
 Current appointment info: ${JSON.stringify(appointmentInfo)}
 
 Required fields for booking:
-- appointmentType
+- appointmentType (must be explicitly chosen by user)
 - appointmentDate
 - appointmentTime
 - bodyPart/symptoms
-- clinicId (only if in-person)
+- clinicId (only if appointmentType is "in-person")
 
-Workflow:
-1. New Appointment:
-   - Check if all required fields are present
-   - If yes, show summary and ask for confirmation with options ["Confirm Appointment", "Change Details"]
-   - On confirmation, use !BOOK_APPOINTMENT to create appointment
+STRICT BOOKING WORKFLOW - FOLLOW EXACTLY:
+1. ALWAYS start by asking for appointmentType if not set ("What type of appointment would you prefer? Online consultation, in-person visit, or home visit?")
+2. If appointmentType is "in-person" and no clinicId, ask for clinic
+3. If no appointmentDate, ask for preferred date
+4. If date set but no time, show available times
+5. If no bodyPart, ask about affected body part
+6. When ALL required fields are present, show summary and ask for confirmation
 
-2. Cancel Appointment:
-   - If user mentions canceling/cancelling appointment, use !CANCEL_APPOINTMENT
-   - Ask for confirmation before canceling
+CRITICAL RULES:
+- NEVER assume or default appointmentType
+- Ask only ONE question at a time
+- Wait for user's response before moving to next question
+- Show custom options based on the current question:
+  * For appointment type: ["Online Consultation", "In-Person Visit", "Home Visit"]
+  * For body parts: ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet"]
+  * For confirmation: ["Confirm Appointment", "Change Details"]
 
-IMPORTANT:
-- After collecting all required info, IMMEDIATELY show summary and ask for confirmation
-- Never ask additional questions if all required fields are present
-- For cancellation, respond with understanding and confirm the action
-
-Example Summary Format:
+When showing summary:
 "Great! Here's your appointment summary:
 - Type: [appointmentType]
 - Date: [appointmentDate]
@@ -87,8 +89,7 @@ For booking, use !BOOK_APPOINTMENT:
   "description": "[description]"
 }
 
-For cancellation, use !CANCEL_APPOINTMENT"
-`
+For cancellation, use !CANCEL_APPOINTMENT`
           },
           {
             role: "user",
