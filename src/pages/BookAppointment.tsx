@@ -46,7 +46,7 @@ const appointmentTypes = [
 ];
 
 const PatientAppointment = () => {
-  const [currentStep, setCurrentStep] = useState<'type' | 'clinic' | 'bodyPart' | 'date' | 'time' | 'description'>('type');
+  const [currentStep, setCurrentStep] = useState<'details' | 'schedule'>('details');
   const [appointmentType, setAppointmentType] = useState("");
   const [selectedClinic, setSelectedClinic] = useState("");
   const [bodyPart, setBodyPart] = useState("");
@@ -57,48 +57,38 @@ const PatientAppointment = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleAppointmentTypeChange = (value: string) => {
-    setAppointmentType(value);
-    if (value === 'in-person') {
-      setCurrentStep('clinic');
-    } else {
-      setCurrentStep('bodyPart');
-    }
-  };
-
-  const handleClinicChange = (value: string) => {
-    setSelectedClinic(value);
-    setCurrentStep('bodyPart');
-  };
-
-  const handleBodyPartChange = (value: string) => {
-    setBodyPart(value);
-    setCurrentStep('date');
-  };
-
-  const handleDateSelect = (selectedDate: Date | undefined) => {
-    setDate(selectedDate);
-    if (selectedDate) {
-      setCurrentStep('time');
-    }
-  };
-
-  const handleTimeSelect = (value: string) => {
-    setSelectedTime(value);
-    setCurrentStep('description');
-  };
-
-  const handleDescriptionChange = (value: string) => {
-    setDescription(value);
-    if (isReadyForConfirmation()) {
-      setShowConfirmation(true);
-    }
-  };
-
-  const isReadyForConfirmation = () => {
-    if (!appointmentType || !bodyPart || !date || !selectedTime) return false;
+  const isDetailsComplete = () => {
+    if (!appointmentType || !bodyPart) return false;
     if (appointmentType === 'in-person' && !selectedClinic) return false;
     return true;
+  };
+
+  const isScheduleComplete = () => {
+    return date && selectedTime;
+  };
+
+  const handleDetailsNext = () => {
+    if (isDetailsComplete()) {
+      setCurrentStep('schedule');
+    } else {
+      toast({
+        title: "Required Fields",
+        description: "Please fill in all required fields before proceeding.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleNext = () => {
+    if (isScheduleComplete()) {
+      setShowConfirmation(true);
+    } else {
+      toast({
+        title: "Required Fields",
+        description: "Please select both date and time before proceeding.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBookAppointment = async () => {
@@ -143,118 +133,133 @@ const PatientAppointment = () => {
         <div className="max-w-md mx-auto">
           <Card className="p-6">
             <div className="space-y-6">
-              {currentStep === 'type' && (
-                <div>
-                  <Label>What type of appointment would you prefer?</Label>
-                  <Select
-                    value={appointmentType}
-                    onValueChange={handleAppointmentTypeChange}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Select appointment type" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {appointmentTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              {currentStep === 'details' && (
+                <div className="space-y-6">
+                  <div>
+                    <Label>What type of appointment would you prefer?</Label>
+                    <Select
+                      value={appointmentType}
+                      onValueChange={setAppointmentType}
+                    >
+                      <SelectTrigger className="w-full bg-white">
+                        <SelectValue placeholder="Select appointment type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        {appointmentTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {currentStep === 'clinic' && appointmentType === 'in-person' && (
-                <div>
-                  <Label>Select Clinic</Label>
-                  <Select
-                    value={selectedClinic}
-                    onValueChange={handleClinicChange}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Choose a clinic" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {clinics.map((clinic) => (
-                        <SelectItem key={clinic.id} value={clinic.id.toString()}>
-                          {clinic.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                  {appointmentType === 'in-person' && (
+                    <div>
+                      <Label>Select Clinic</Label>
+                      <Select
+                        value={selectedClinic}
+                        onValueChange={setSelectedClinic}
+                      >
+                        <SelectTrigger className="w-full bg-white">
+                          <SelectValue placeholder="Choose a clinic" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          {clinics.map((clinic) => (
+                            <SelectItem key={clinic.id} value={clinic.id.toString()}>
+                              {clinic.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-              {currentStep === 'bodyPart' && (
-                <div>
-                  <Label>Which part of your body is affected?</Label>
-                  <Select
-                    value={bodyPart}
-                    onValueChange={handleBodyPartChange}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Select body part" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {bodyParts.map((part) => (
-                        <SelectItem key={part} value={part}>
-                          {part}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+                  <div>
+                    <Label>Which part of your body is affected?</Label>
+                    <Select
+                      value={bodyPart}
+                      onValueChange={setBodyPart}
+                    >
+                      <SelectTrigger className="w-full bg-white">
+                        <SelectValue placeholder="Select body part" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        {bodyParts.map((part) => (
+                          <SelectItem key={part} value={part}>
+                            {part}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {currentStep === 'date' && (
-                <div>
-                  <Label>Select Date</Label>
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={handleDateSelect}
-                    className="rounded-md border"
-                    disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
-                  />
-                </div>
-              )}
+                  <div>
+                    <Label>Additional Description (Optional)</Label>
+                    <Textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Please describe your symptoms or reason for visit"
+                      className="mt-1"
+                    />
+                  </div>
 
-              {currentStep === 'time' && (
-                <div>
-                  <Label>Select Time</Label>
-                  <Select
-                    value={selectedTime}
-                    onValueChange={handleTimeSelect}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Choose a time" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {timeSlots.map((time) => (
-                        <SelectItem key={time} value={time}>
-                          {time}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {currentStep === 'description' && (
-                <div>
-                  <Label>Additional Description (Optional)</Label>
-                  <Textarea
-                    value={description}
-                    onChange={(e) => handleDescriptionChange(e.target.value)}
-                    placeholder="Please describe your symptoms or reason for visit"
-                    className="mt-1"
-                  />
                   <Button
                     className="w-full mt-4"
-                    onClick={() => setShowConfirmation(true)}
+                    onClick={handleDetailsNext}
                   >
-                    Review Appointment
+                    Continue to Schedule
                   </Button>
+                </div>
+              )}
+
+              {currentStep === 'schedule' && (
+                <div className="space-y-6">
+                  <div>
+                    <Label>Select Date</Label>
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      className="rounded-md border"
+                      disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Select Time</Label>
+                    <Select
+                      value={selectedTime}
+                      onValueChange={setSelectedTime}
+                    >
+                      <SelectTrigger className="w-full bg-white">
+                        <SelectValue placeholder="Choose a time" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        {timeSlots.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setCurrentStep('details')}
+                    >
+                      Back to Details
+                    </Button>
+                    <Button
+                      className="w-full"
+                      onClick={handleScheduleNext}
+                    >
+                      Review Appointment
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
