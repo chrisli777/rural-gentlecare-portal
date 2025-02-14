@@ -7,7 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Trash } from "lucide-react";
 
 interface Appointment {
   id: string;
@@ -17,11 +18,13 @@ interface Appointment {
   status: string;
   clinic_id?: number;
   description?: string;
+  body_part?: string;
 }
 
 const Appointments = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments'],
@@ -43,6 +46,31 @@ const Appointments = () => {
       return data as Appointment[];
     },
   });
+
+  const handleCancelAppointment = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Appointment cancelled successfully",
+      });
+
+      // Refresh appointments data
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel appointment",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -89,6 +117,11 @@ const Appointments = () => {
                       <p className="text-gray-600">
                         Type: {appointment.appointment_type}
                       </p>
+                      {appointment.body_part && (
+                        <p className="text-gray-600">
+                          Body Part: {appointment.body_part}
+                        </p>
+                      )}
                       {appointment.description && (
                         <p className="text-gray-600">
                           Description: {appointment.description}
@@ -96,9 +129,19 @@ const Appointments = () => {
                       )}
                     </div>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
-                    {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                  </span>
+                  <div className="flex items-start gap-2">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(appointment.status)}`}>
+                      {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                    </span>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => handleCancelAppointment(appointment.id)}
+                      className="h-8 w-8"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))}
