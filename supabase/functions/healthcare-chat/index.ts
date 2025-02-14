@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -36,9 +35,9 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and helpful healthcare assistant. When users ask about booking appointments or select "Need to see a doctor?" (or "¿Necesitas ver a un médico?" in Spanish), provide direct guidance without asking for more details. Your response should be concise.
+            content: `You are a friendly and helpful healthcare assistant. Your responses should be concise and include relevant follow-up options at the end of your message.
 
-The response format should match the user's language (English or Spanish). 
+For appointment booking requests (in English or Spanish), provide the following guidance:
 
 For English:
 "Based on your request, here's how to book an appointment:
@@ -60,7 +59,11 @@ For Spanish:
 6. Elige tu fecha y hora preferida
 7. Revisa los detalles de tu cita y confirma"
 
-For other health topics, provide focused responses with relevant follow-up options in a JSON array at the end of your message, formatted like this: "OPTIONS:["option1", "option2"]". The options should be contextual to your response and in the same language as the user's message.`
+For all responses, ALWAYS provide 2-4 contextual follow-up options based on the conversation topic. Format these options in a JSON array at the end of your message like this: "OPTIONS:["option1", "option2"]". The options should be in the same language as the user's message and be directly related to the current topic of discussion.
+
+For example, if discussing headaches:
+English: OPTIONS:["How severe is your headache?", "Do you have any other symptoms?", "Would you like information about migraine prevention?"]
+Spanish: OPTIONS:["¿Qué tan fuerte es tu dolor de cabeza?", "¿Tienes otros síntomas?", "¿Quieres información sobre prevención de migrañas?"]`
           },
           {
             role: "user",
@@ -75,24 +78,37 @@ For other health topics, provide focused responses with relevant follow-up optio
     const data = await response.json();
     console.log('OpenAI API response:', data);
 
-    if (!data.choices || !data.choices[0]?.message?.content) {
+    if (!data.choices?.[0]?.message?.content) {
       console.error('Unexpected API response format:', data);
+      if (data.error) {
+        throw new Error(`OpenAI API error: ${data.error.message || JSON.stringify(data.error)}`);
+      }
       throw new Error('Invalid response format from OpenAI API');
     }
 
     const content = data.choices[0].message.content.trim();
-    let options: string[] = message.toLowerCase().includes('español') || /[áéíóúñ¿¡]/.test(message)
-      ? ["¿Necesitas ver a un médico?"]
-      : ["Need to see a doctor?"];
-
-    // Extract options if present
+    
+    // Extract options if present, otherwise use an empty array
     const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);
-    const cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
+    let options: string[] = [];
 
     if (optionsMatch && optionsMatch[1]) {
-      const parsedOptions = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
-      options = [...options, ...parsedOptions];
+      try {
+        options = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
+      } catch (error) {
+        console.error('Error parsing options:', error);
+        // If parsing fails, keep options array empty
+      }
     }
+
+    // Only add "Need to see a doctor" if no options were found and it's the first message
+    if (options.length === 0) {
+      options = message.toLowerCase().includes('español') || /[áéíóúñ¿¡]/.test(message)
+        ? ["¿Necesitas ver a un médico?"]
+        : ["Need to see a doctor?"];
+    }
+
+    const cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
 
     return new Response(JSON.stringify({ 
       responses: [{
@@ -102,9 +118,13 @@ For other health topics, provide focused responses with relevant follow-up optio
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error instanceof Error ? error.message : 'An unexpected error occurred',
+      details: error
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
