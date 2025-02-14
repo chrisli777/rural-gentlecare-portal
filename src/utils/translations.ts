@@ -85,6 +85,7 @@ export const translations = {
     },
     appointments: {
       title: "Book Appointments",
+      description: "Description",
       type: {
         label: "Appointment Type",
         select: "Select appointment type",
@@ -205,6 +206,7 @@ export const translations = {
     },
     appointments: {
       title: "Programar Citas",
+      description: "Description",
       type: {
         label: "Tipo de Cita",
         select: "Seleccione el tipo de cita",
