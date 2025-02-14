@@ -44,7 +44,7 @@ const Home = () => {
             <img
               src="https://datausa.io/api/profile/geo/adams-county-wa/splash"
               alt="Adams County, Washington landscape"
-              className="w-full h-[300px] md:h-[400px] object-cover"
+              className="w-full h-[400px] md:h-[600px] object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           </div>
