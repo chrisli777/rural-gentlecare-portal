@@ -1,14 +1,15 @@
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Bot, Send, Loader2, Mic, MicOff, Headphones, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -411,24 +412,34 @@ const PatientDashboard = () => {
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
                 <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                  {conversation.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${
-                        msg.role === "user" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[80%] p-3 rounded-lg ${
-                          msg.role === "user"
-                            ? "bg-[#1E5AAB] text-white"
-                            : "bg-muted"
+                  <AnimatePresence>
+                    {conversation.map((msg, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ 
+                          duration: 0.5,
+                          delay: msg.role === 'assistant' ? (index === 0 ? 0.2 : 0.5) : 0 
+                        }}
+                        className={`flex ${
+                          msg.role === "user" ? "justify-end" : "justify-start"
                         }`}
                       >
-                        {msg.content}
-                      </div>
-                    </div>
-                  ))}
+                        <motion.div
+                          initial={{ scale: 0.95 }}
+                          animate={{ scale: 1 }}
+                          className={`max-w-[80%] p-3 rounded-lg ${
+                            msg.role === "user"
+                              ? "bg-[#1E5AAB] text-white"
+                              : "bg-muted"
+                          }`}
+                        >
+                          {msg.content}
+                        </motion.div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 </div>
                 <div className="flex gap-2 mt-auto">
                   <Button
