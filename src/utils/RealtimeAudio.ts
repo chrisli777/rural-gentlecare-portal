@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 
 export class AudioRecorder {
@@ -95,28 +96,52 @@ export class RealtimeChat {
 
       // Set up data channel
       this.dc = this.pc.createDataChannel("oai-events");
-      this.dc.addEventListener("message", (e) => {
-        const event = JSON.parse(e.data);
-        console.log("Received event:", event);
-        
-        if (event.type === 'response.audio_transcript.delta') {
-          this.currentTranscript += event.delta;
-        } else if (event.type === 'response.audio_transcript.done') {
-          if (this.currentTranscript.trim()) {
-            this.onMessage({
-              type: 'transcript',
-              content: this.currentTranscript.trim(),
-              role: 'user'
-            });
-            this.currentTranscript = '';
-          }
-        } else if (event.type === 'response.message.delta') {
-          this.onMessage({
-            type: 'message',
-            content: event.delta,
-            role: 'assistant'
-          });
+      
+      // Wait for data channel to be ready
+      await new Promise<void>((resolve, reject) => {
+        if (!this.dc) {
+          reject(new Error("Data channel creation failed"));
+          return;
         }
+
+        this.dc.onopen = () => {
+          console.log("Data channel is now open");
+          resolve();
+        };
+        
+        this.dc.onerror = (error) => {
+          console.error("Data channel error:", error);
+          reject(error);
+        };
+
+        this.dc.addEventListener("message", (e) => {
+          const event = JSON.parse(e.data);
+          console.log("Received event:", event);
+          
+          if (event.type === 'response.audio_transcript.delta') {
+            this.currentTranscript += event.delta;
+          } else if (event.type === 'response.audio_transcript.done') {
+            if (this.currentTranscript.trim()) {
+              this.onMessage({
+                type: 'transcript',
+                content: this.currentTranscript.trim(),
+                role: 'user'
+              });
+              this.currentTranscript = '';
+            }
+          } else if (event.type === 'response.message.delta') {
+            this.onMessage({
+              type: 'message',
+              content: event.delta,
+              role: 'assistant'
+            });
+          }
+        });
+
+        // Set a timeout for the connection
+        setTimeout(() => {
+          reject(new Error("Data channel connection timeout"));
+        }, 10000); // 10 second timeout
       });
 
       const offer = await this.pc.createOffer();
@@ -152,12 +177,12 @@ export class RealtimeChat {
       });
       await this.recorder.start();
 
-      // Send initial greeting
+      // Send initial greeting once everything is ready
       const greeting = language === 'es' 
         ? "¡Hola! 👋 Soy tu Asistente de Salud con IA. ¿Cómo puedo ayudarte hoy?"
         : "Hello! 👋 I'm your AI Health Assistant. How can I help you today?";
       
-      this.sendMessage(greeting);
+      await this.sendMessage(greeting);
 
     } catch (error) {
       console.error("Error initializing chat:", error);
