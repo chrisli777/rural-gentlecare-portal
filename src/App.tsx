@@ -10,6 +10,10 @@ import Appointments from "@/pages/Appointments";
 import PatientOnboarding from "@/pages/PatientOnboarding";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+
+// Create a client
+const queryClient = new QueryClient();
 
 function AppRoutes() {
   const location = useLocation();
@@ -37,12 +41,14 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AccessibilityProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <Toaster />
-      </BrowserRouter>
-    </AccessibilityProvider>
+    <QueryClientProvider client={queryClient}>
+      <AccessibilityProvider>
+        <BrowserRouter>
+          <AppRoutes />
+          <Toaster />
+        </BrowserRouter>
+      </AccessibilityProvider>
+    </QueryClientProvider>
   );
 }
 
