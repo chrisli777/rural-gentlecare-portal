@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
@@ -58,16 +57,9 @@ const PatientAppointment = () => {
 
   const handleBookAppointment = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user?.id) {
-        throw new Error('No authenticated user found');
-      }
-
       const { error } = await supabase
         .from('appointments')
         .insert({
-          patient_id: session.user.id,
           appointment_date: date.toISOString().split('T')[0],
           appointment_time: selectedTime,
           appointment_type: appointmentType,

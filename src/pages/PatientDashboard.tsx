@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,17 +41,10 @@ const PatientDashboard = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user?.id) {
-          console.error('No authenticated user found');
-          return;
-        }
-
-        console.log('Fetching appointments for user:', session.user.id);
+        console.log('Fetching appointments');
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
-          .eq('patient_id', session.user.id)
           .neq('status', 'cancelled')
           .order('appointment_date', { ascending: true })
           .order('appointment_time', { ascending: true });
@@ -246,16 +240,6 @@ const PatientDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        console.log('Current user ID:', session.user.id);
-      }
-    };
-    getCurrentUser();
-  }, []);
-
   const handleSendMessage = async (textMessage?: string) => {
     const messageToSend = textMessage || message;
     if (!messageToSend.trim()) return;
@@ -266,16 +250,8 @@ const PatientDashboard = () => {
     setMessage("");
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) {
-        throw new Error('No authenticated user found');
-      }
-
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { 
-          message: messageToSend,
-          userId: session.user.id
-        }
+        body: { message: messageToSend }
       });
 
       if (error) throw error;
