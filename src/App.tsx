@@ -5,7 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import Home from "@/pages/Home";
 import PatientDashboard from "@/pages/PatientDashboard";
-import PatientAppointment from "@/pages/PatientAppointment";
+import BookAppointment from "@/pages/BookAppointment";
+import Appointments from "@/pages/Appointments";
 import PatientOnboarding from "@/pages/PatientOnboarding";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
@@ -26,7 +27,8 @@ function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/patient/onboarding" element={<PatientOnboarding />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
-          <Route path="/patient/appointment" element={<PatientAppointment />} />
+          <Route path="/patient/book-appointment" element={<BookAppointment />} />
+          <Route path="/patient/appointments" element={<Appointments />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
