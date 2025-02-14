@@ -6,7 +6,6 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
-import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { AnimatePresence } from "framer-motion";
 
 const PatientDashboard = () => {
@@ -17,11 +16,6 @@ const PatientDashboard = () => {
     isLoading,
     handleSendMessage,
   } = useChat();
-
-  const { isRecording, toggleRecording } = useVoiceRecording((text) => {
-    setMessage(text);
-    handleSendMessage(text);
-  });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -57,9 +51,9 @@ const PatientDashboard = () => {
             message={message}
             setMessage={setMessage}
             isLoading={isLoading}
-            isRecording={isRecording}
+            isRecording={false}
             onSendMessage={() => handleSendMessage()}
-            onToggleRecording={toggleRecording}
+            onToggleRecording={() => {}}
           />
         </Card>
       </main>
