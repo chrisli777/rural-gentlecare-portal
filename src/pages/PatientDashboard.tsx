@@ -330,59 +330,61 @@ const PatientDashboard = () => {
               </Card>
             </Link>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-2">
-                <ClipboardList className="w-8 h-8 text-[#1E5AAB] flex-shrink-0" />
-                <CardTitle className="text-[#1E5AAB]">All Appointments</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                  {recentAppointments.length > 0 ? (
-                    recentAppointments.map((appointment) => (
-                      <div 
-                        key={appointment.id}
-                        className="flex flex-col p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <p className="font-medium text-[#1E5AAB]">{appointment.appointment_type}</p>
-                            <p className="text-sm text-muted-foreground hidden sm:block">
-                              {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
-                            </p>
-                            <p className="text-sm text-muted-foreground sm:hidden">
-                              {format(new Date(appointment.appointment_date), 'PP')}
-                            </p>
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <ClipboardList className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">All Appointments</h3>
+                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                      {recentAppointments.length > 0 ? (
+                        recentAppointments.map((appointment) => (
+                          <div 
+                            key={appointment.id}
+                            className="flex flex-col p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
+                          >
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <p className="font-medium text-[#1E5AAB]">{appointment.appointment_type}</p>
+                                <p className="text-sm text-muted-foreground hidden sm:block">
+                                  {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
+                                </p>
+                                <p className="text-sm text-muted-foreground sm:hidden">
+                                  {format(new Date(appointment.appointment_date), 'PP')}
+                                </p>
+                              </div>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="sm"
+                                  >
+                                    Cancel
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-[#1E5AAB]">Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently cancel your appointment.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
+                                      Yes, cancel appointment
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
                           </div>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                              >
-                                Cancel
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle className="text-[#1E5AAB]">Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently cancel your appointment.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
-                                  Yes, cancel appointment
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted-foreground text-center py-4">No appointments found</p>
-                  )}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-4">No appointments found</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
