@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
@@ -298,19 +299,19 @@ const PatientDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 pt-20 pb-6 h-[calc(100vh-80px)]"> {/* Adjusted for Header height */}
+      <main className="container mx-auto px-4 pt-20 pb-6 h-[calc(100vh-80px)]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-          <div className="md:col-span-1 space-y-6 overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Appointments</h2>
+          <div className="md:col-span-1 space-y-6 overflow-y-auto">            
             <Link to="/patient/appointment" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Calendar className="w-12 h-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Book an Appointment</h3>
+                  <h3 className="text-xl font-semibold mb-2">Book Now</h3>
                   <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
                 </CardContent>
               </Card>
             </Link>
+
             <Card>
               <CardHeader>
                 <CardTitle>All Appointments</CardTitle>
@@ -364,6 +365,7 @@ const PatientDashboard = () => {
               </CardContent>
             </Card>
           </div>
+
           <div className="md:col-span-2 flex flex-col h-full">
             <Card className="flex-1 flex flex-col">
               <CardHeader>
