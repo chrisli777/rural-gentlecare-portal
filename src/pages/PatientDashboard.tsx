@@ -52,40 +52,19 @@ const PatientDashboard = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { message: messageToSend }
+        body: { message: userMessage.content }
       });
 
       if (error) throw error;
 
       if (data.responses) {
-        const newMessages = data.responses.map((response: string) => {
-          // Parse options from the response if they exist
-          let content = response;
-          let options: string[] | undefined;
-          
-          // If response contains "options:", extract them
-          if (response.includes("options:")) {
-            const optionsMatch = response.match(/options:\s*\[(.*?)\]/);
-            if (optionsMatch) {
-              try {
-                const optionsString = `[${optionsMatch[1]}]`;
-                options = JSON.parse(optionsString.replace(/'/g, '"'));
-                // Remove the options part from the content
-                content = response.replace(/options:\s*\[.*?\]/, '').trim();
-              } catch (e) {
-                console.error('Error parsing options:', e);
-              }
-            }
-          }
-
-          return {
+        data.responses.forEach((response: { message: string; options: string[] }) => {
+          setConversation(prev => [...prev, {
             role: "assistant",
-            content: content,
-            options: options
-          };
+            content: response.message,
+            options: response.options
+          }]);
         });
-
-        setConversation(prev => [...prev, ...newMessages]);
       }
     } catch (error: any) {
       toast({
@@ -206,7 +185,7 @@ const PatientDashboard = () => {
                 >
                   <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[80%] p-4 rounded-lg ${
+                      className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap ${
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
@@ -221,7 +200,7 @@ const PatientDashboard = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="flex flex-wrap gap-2"
+                      className="flex flex-wrap gap-2 ml-4"
                     >
                       {msg.options.map((option, optionIndex) => (
                         <Button

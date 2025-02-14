@@ -96,6 +96,14 @@ export const translations = {
         label: "Select Clinic",
         select: "Choose a clinic"
       },
+      bodyPart: {
+        label: "Area of Concern",
+        select: "Select area of concern"
+      },
+      description: {
+        label: "Description",
+        placeholder: "Please describe your symptoms or concern"
+      },
       date: {
         label: "Select Date"
       },
@@ -108,6 +116,8 @@ export const translations = {
       details: {
         type: "Type",
         clinic: "Clinic",
+        bodyPart: "Area of Concern",
+        description: "Description",
         date: "Date",
         time: "Time"
       },
@@ -216,6 +226,14 @@ export const translations = {
         label: "Seleccionar Clínica",
         select: "Elija una clínica"
       },
+      bodyPart: {
+        label: "Área de Preocupación",
+        select: "Seleccione el área de preocupación"
+      },
+      description: {
+        label: "Descripción",
+        placeholder: "Por favor describa sus síntomas o preocupación"
+      },
       date: {
         label: "Seleccionar Fecha"
       },
@@ -228,6 +246,8 @@ export const translations = {
       details: {
         type: "Tipo",
         clinic: "Clínica",
+        bodyPart: "Área de Preocupación",
+        description: "Descripción",
         date: "Fecha",
         time: "Hora"
       },

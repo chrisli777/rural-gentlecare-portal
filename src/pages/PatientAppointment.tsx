@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -33,18 +34,50 @@ const clinics = [
   { id: 2, name: "Adams Rural Care East Branch", address: "456 East Ave, Adams County" },
 ];
 
+const bodyParts = [
+  "Head/Face",
+  "Chest/Heart",
+  "Stomach/Digestive",
+  "Back/Spine",
+  "Arms/Hands",
+  "Legs/Feet",
+  "Skin",
+  "Other"
+];
+
 const PatientAppointment = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState("");
   const [appointmentType, setAppointmentType] = useState("");
   const [selectedClinic, setSelectedClinic] = useState("");
+  const [bodyPart, setBodyPart] = useState("");
+  const [description, setDescription] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translate } = useAccessibility();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        toast({
+          title: "Please log in",
+          description: "You need to be logged in to book appointments",
+          variant: "destructive",
+        });
+        navigate("/patient/login");
+        return;
+      }
+      setUserId(session.user.id);
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
 
   const handleShowConfirmation = () => {
-    if (!date || !selectedTime || !appointmentType) {
+    if (!date || !selectedTime || !appointmentType || !bodyPart) {
       toast({
         title: translate('appointments.missingInfo'),
         description: translate('appointments.missingInfoDesc'),
@@ -56,16 +89,28 @@ const PatientAppointment = () => {
   };
 
   const handleBookAppointment = async () => {
+    if (!userId) {
+      toast({
+        title: "Authentication Error",
+        description: "Please log in to book appointments",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('appointments')
         .insert({
-          appointment_date: date.toISOString().split('T')[0],
+          appointment_date: date?.toISOString().split('T')[0],
           appointment_time: selectedTime,
           appointment_type: appointmentType,
           clinic_id: selectedClinic ? parseInt(selectedClinic) : null,
+          body_part: bodyPart,
+          description: description,
           notification_methods: ["app"],
-          status: 'pending'
+          status: 'pending',
+          patient_id: userId  // Set the patient_id to the current user's ID
         });
 
       if (error) throw error;
@@ -81,7 +126,7 @@ const PatientAppointment = () => {
       console.error('Error booking appointment:', error);
       toast({
         title: translate('appointments.error'),
-        description: translate('appointments.errorDesc'),
+        description: error.message || translate('appointments.errorDesc'),
         variant: "destructive",
       });
     }
@@ -95,6 +140,35 @@ const PatientAppointment = () => {
         <div className="max-w-md mx-auto">
           <Card className="p-6">
             <div className="space-y-6">
+              <div>
+                <Label>{translate('appointments.bodyPart.label')}</Label>
+                <Select
+                  value={bodyPart}
+                  onValueChange={setBodyPart}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder={translate('appointments.bodyPart.select')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {bodyParts.map((part) => (
+                      <SelectItem key={part} value={part}>
+                        {part}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>{translate('appointments.description.label')}</Label>
+                <Textarea
+                  placeholder={translate('appointments.description.placeholder')}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+
               <div>
                 <Label>{translate('appointments.type.label')}</Label>
                 <Select
@@ -179,6 +253,16 @@ const PatientAppointment = () => {
               <DialogTitle>{translate('appointments.summary')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              <p>
+                <span className="font-medium">{translate('appointments.details.bodyPart')}: </span>
+                {bodyPart}
+              </p>
+              {description && (
+                <p>
+                  <span className="font-medium">{translate('appointments.details.description')}: </span>
+                  {description}
+                </p>
+              )}
               {appointmentType && (
                 <p>
                   <span className="font-medium">{translate('appointments.details.type')}: </span>
