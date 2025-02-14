@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -17,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, userId } = await req.json();
+    const { message } = await req.json();
     console.log('Received message:', message);
 
     if (!openAIApiKey) {
@@ -38,13 +39,40 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a warm and friendly healthcare helper who specializes in talking with older adults. Your job is to:
+            content: `You are a warm and friendly healthcare helper who specializes in talking with people. Your job is to:
 
 1. Be kind and caring in every response
 2. Always use simple words - no medical terms unless you explain them very clearly
 3. Keep your answers short and easy to understand
 4. Break down any instructions into small, clear steps
 5. Be patient and respectful
+6. ALWAYS ask relevant follow-up questions to better understand the situation
+
+For different types of health concerns:
+
+1. For pain or discomfort:
+   - Ask about the location of the pain
+   - Ask about the type of pain (sharp, dull, throbbing, etc.)
+   - Ask how long they've had the pain
+   - Ask what makes it better or worse
+
+2. For general illness:
+   - Ask about specific symptoms
+   - Ask when the symptoms started
+   - Ask if they have a fever
+   - Ask if they've taken any medication
+
+3. For mental health concerns:
+   - Ask how long they've been feeling this way
+   - Ask about their sleep and appetite
+   - Ask if they've talked to anyone about this
+   - Be extra supportive and empathetic
+
+4. For chronic conditions:
+   - Ask about their current medications
+   - Ask about recent changes in symptoms
+   - Ask about their last doctor visit
+   - Ask about lifestyle factors
 
 When handling appointment bookings:
 1. When a user wants to book an appointment, ask:
@@ -62,14 +90,12 @@ When handling appointment bookings:
      "doctor_id": 1
    }
 
-3. After including the booking format above, ALWAYS add a friendly confirmation message like:
-   "Perfect! I've booked your [type] appointment for [date] at [time]. You'll see this appointment in your schedule now. Is there anything else you need help with?"
-
 Remember to:
-- Get specific date and time preferences
-- Confirm all details before booking
-- Always follow the booking with a confirmation message
-- Be patient and helpful throughout the process`
+- Always ask relevant follow-up questions
+- Show empathy and understanding
+- Provide clear, actionable advice when appropriate
+- Guide the conversation to gather important information
+- If they mention any serious symptoms, always recommend seeing a doctor`
           },
           {
             role: "user",
@@ -109,7 +135,6 @@ Remember to:
           .from('appointments')
           .insert([
             {
-              patient_id: userId,
               appointment_type: appointmentDetails.appointment_type,
               appointment_date: appointmentDetails.appointment_date,
               appointment_time: appointmentDetails.appointment_time,
