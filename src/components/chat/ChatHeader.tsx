@@ -29,19 +29,13 @@ export const ChatHeader = ({ onVoiceInputReceived }: ChatHeaderProps) => {
         chatRef.current = new RealtimeChat(handleMessage);
         await chatRef.current.init(language);
         setIsConnected(true);
-        
-        // Send initial greeting
-        const greeting = language === 'es' 
-          ? "¡Hola! 👋 Soy tu Asistente de Salud con IA. ¿Cómo puedo ayudarte hoy?"
-          : "Hello! 👋 I'm your AI Health Assistant. How can I help you today?";
-        onVoiceInputReceived(greeting);
-        
         toast({
           title: language === 'es' ? "Conectado" : "Connected",
           description: language === 'es' ? "Modo de voz está activo" : "Voice mode is active",
         });
       } catch (error) {
         console.error('Error starting conversation:', error);
+        setIsConnected(false);
         toast({
           title: language === 'es' ? "Error" : "Error",
           description: error instanceof Error ? error.message : 'Failed to start conversation',
@@ -60,7 +54,6 @@ export const ChatHeader = ({ onVoiceInputReceived }: ChatHeaderProps) => {
     };
   }, []);
 
-  // Reconnect when language changes if already connected
   useEffect(() => {
     if (isConnected) {
       chatRef.current?.disconnect();
@@ -83,7 +76,7 @@ export const ChatHeader = ({ onVoiceInputReceived }: ChatHeaderProps) => {
         <Switch
           checked={isConnected}
           onCheckedChange={handleVoiceModeToggle}
-          className="data-[state=checked]:bg-[#4A90E2]"
+          className="transition-transform duration-100 data-[state=checked]:bg-[#1EAEDB] data-[state=unchecked]:bg-gray-200"
         />
       </div>
     </div>

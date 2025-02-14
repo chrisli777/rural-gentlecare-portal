@@ -12,12 +12,13 @@ const PatientDashboard = () => {
   const {
     message,
     setMessage,
-    conversation,
+    conversation: initialConversation,
     isLoading,
     handleSendMessage,
   } = useChat();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [conversation, setConversation] = useState(initialConversation);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,13 +30,23 @@ const PatientDashboard = () => {
 
   const handleVoiceInput = (text: string) => {
     const newMessage = {
-      role: "assistant",
+      role: text.includes("Hello! 👋") ? "assistant" : "user",
       content: text
     };
     setConversation(prev => [...prev, newMessage]);
   };
 
-  const [conversationState, setConversation] = useState(conversation);
+  const handleTextInput = async () => {
+    if (!message.trim()) return;
+    
+    const userMessage = {
+      role: "user",
+      content: message
+    };
+    
+    setConversation(prev => [...prev, userMessage]);
+    await handleSendMessage();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -46,7 +57,7 @@ const PatientDashboard = () => {
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
-              {conversationState.map((msg, index) => (
+              {conversation.map((msg, index) => (
                 <ChatMessage
                   key={index}
                   message={msg}
@@ -62,7 +73,7 @@ const PatientDashboard = () => {
             setMessage={setMessage}
             isLoading={isLoading}
             isRecording={false}
-            onSendMessage={() => handleSendMessage()}
+            onSendMessage={handleTextInput}
             onToggleRecording={() => {}}
           />
         </Card>
