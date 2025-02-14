@@ -308,10 +308,10 @@ const PatientDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 pt-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <main className="container mx-auto px-4 pt-20 pb-6 h-[calc(100vh-80px)]"> {/* Adjusted for Header height */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
           {/* Left Column - Appointments Section */}
-          <div className="md:col-span-1 space-y-6">
+          <div className="md:col-span-1 space-y-6 overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Appointments</h2>
             
             {/* Appointment Booking */}
@@ -381,16 +381,16 @@ const PatientDashboard = () => {
           </div>
 
           {/* Right Column - Chatbot Section */}
-          <div className="md:col-span-2">
-            <Card>
+          <div className="md:col-span-2 flex flex-col h-full">
+            <Card className="flex-1 flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5" />
                   Healthcare Assistant
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="h-[600px] overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              <CardContent className="flex-1 flex flex-col">
+                <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {conversation.map((msg, index) => (
                     <div
                       key={index}
@@ -410,7 +410,7 @@ const PatientDashboard = () => {
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-auto">
                   <Button
                     variant={isRecording ? "destructive" : "outline"}
                     size="icon"
