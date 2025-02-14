@@ -66,16 +66,12 @@ const Appointments = () => {
       // Optimistically update the UI
       queryClient.setQueryData(['appointments'], (oldData: Appointment[] | undefined) => {
         if (!oldData) return [];
-        return oldData.map(appointment => 
-          appointment.id === appointmentToDelete 
-            ? { ...appointment, status: 'cancelled' } 
-            : appointment
-        );
+        return oldData.filter(appointment => appointment.id !== appointmentToDelete);
       });
 
       const { error } = await supabase
         .from('appointments')
-        .update({ status: 'cancelled' })
+        .delete()
         .eq('id', appointmentToDelete);
 
       if (error) throw error;
@@ -145,12 +141,14 @@ const Appointments = () => {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">My Appointments</h1>
-          <Button 
-            onClick={() => navigate('/patient/book-appointment')}
-            className="bg-primary hover:bg-primary/90"
-          >
-            Book Appointment
-          </Button>
+          {appointments && appointments.length > 0 && (
+            <Button 
+              onClick={() => navigate('/patient/book-appointment')}
+              className="bg-primary hover:bg-primary/90"
+            >
+              Book Appointment
+            </Button>
+          )}
         </div>
 
         {isLoading ? (
