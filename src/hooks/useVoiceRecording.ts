@@ -11,6 +11,64 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Initialize WebSocket immediately when component mounts
+    const projectRef = "pascdrwwolpnfljfzioj";
+    wsRef.current = new WebSocket(`wss://${projectRef}.functions.supabase.co/realtime-chat`);
+    
+    // Send initial greeting message when connection is established
+    wsRef.current.onopen = () => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'conversation.item.create',
+          item: {
+            type: 'message',
+            role: 'assistant',
+            content: [
+              {
+                type: 'input_text',
+                text: "Hello! I'm your AI Health Assistant. How can I help you today?"
+              }
+            ]
+          }
+        }));
+        wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+      }
+    };
+
+    // Handle incoming messages from the server
+    wsRef.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'response.audio.delta') {
+        // Convert base64 audio to Float32Array and play
+        const audioData = atob(data.delta);
+        const audioArray = new Float32Array(audioData.length);
+        for (let i = 0; i < audioData.length; i++) {
+          audioArray[i] = audioData.charCodeAt(i) / 255;
+        }
+        
+        // Create a new AudioContext for playing the greeting
+        const ctx = new AudioContext({ sampleRate: 24000 });
+        const buffer = ctx.createBuffer(1, audioArray.length, 24000);
+        buffer.copyToChannel(audioArray, 0);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(ctx.destination);
+        source.start();
+      } else if (data.type === 'response.text.delta') {
+        onVoiceProcessed(data.delta);
+      }
+    };
+
+    // Cleanup WebSocket on component unmount
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, []); // Empty dependency array means this runs once on mount
+
+  useEffect(() => {
     if (isRecording) {
       const ctx = new AudioContext({ sampleRate: 24000 });
       setAudioContext(ctx);
@@ -31,30 +89,6 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
           autoGainControl: true
         }
       });
-
-      // Initialize WebSocket connection using the project reference
-      const projectRef = "pascdrwwolpnfljfzioj"; // Project ID from supabase/config.toml
-      wsRef.current = new WebSocket(`wss://${projectRef}.functions.supabase.co/realtime-chat`);
-      
-      // Send initial greeting message when connection is established
-      wsRef.current.onopen = () => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({
-            type: 'conversation.item.create',
-            item: {
-              type: 'message',
-              role: 'assistant',
-              content: [
-                {
-                  type: 'input_text',
-                  text: "Hello! I'm your AI Health Assistant. How can I help you today?"
-                }
-              ]
-            }
-          }));
-          wsRef.current.send(JSON.stringify({ type: 'response.create' }));
-        }
-      };
       
       const recorder = new MediaRecorder(stream);
       const audioChunks: Float32Array[] = [];
@@ -71,30 +105,6 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
             type: 'input_audio_buffer.append',
             audio: encodeAudioData(channelData)
           }));
-        }
-      };
-
-      // Handle incoming messages from the server
-      wsRef.current.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'response.audio.delta') {
-          // Convert base64 audio to Float32Array and play
-          const audioData = atob(data.delta);
-          const audioArray = new Float32Array(audioData.length);
-          for (let i = 0; i < audioData.length; i++) {
-            audioArray[i] = audioData.charCodeAt(i) / 255;
-          }
-          
-          if (audioContext) {
-            const buffer = audioContext.createBuffer(1, audioArray.length, 24000);
-            buffer.copyToChannel(audioArray, 0);
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioContext.destination);
-            source.start();
-          }
-        } else if (data.type === 'response.text.delta') {
-          onVoiceProcessed(data.delta);
         }
       };
 
@@ -121,12 +131,6 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
       mediaRecorder.stop();
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
-      
-      // Close WebSocket connection
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
       
       toast({
         title: "Voice Chat Ended",
