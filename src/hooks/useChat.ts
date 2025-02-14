@@ -10,8 +10,8 @@ export const useChat = () => {
       role: "assistant",
       content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today?",
       options: [
+        "Need to see a doctor?",
         "Get medical advice",
-        "Learn about services",
         "Health information"
       ]
     },
@@ -39,7 +39,7 @@ export const useChat = () => {
         const newMessages = data.responses.map((response: string) => ({
           role: "assistant",
           content: response,
-          options: ["Get medical advice", "Health information"]
+          options: ["Need to see a doctor?", "Get medical advice", "Health information"]
         }));
         setConversation(prev => [...prev, ...newMessages]);
       }
