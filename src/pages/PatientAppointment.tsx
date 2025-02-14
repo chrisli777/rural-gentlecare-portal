@@ -16,6 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM",
@@ -32,11 +39,12 @@ const PatientAppointment = () => {
   const [selectedTime, setSelectedTime] = useState("");
   const [appointmentType, setAppointmentType] = useState("");
   const [selectedClinic, setSelectedClinic] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translate } = useAccessibility();
 
-  const handleBookAppointment = async () => {
+  const handleShowConfirmation = () => {
     if (!date || !selectedTime || !appointmentType) {
       toast({
         title: translate('appointments.missingInfo'),
@@ -45,7 +53,10 @@ const PatientAppointment = () => {
       });
       return;
     }
+    setShowConfirmation(true);
+  };
 
+  const handleBookAppointment = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -82,15 +93,16 @@ const PatientAppointment = () => {
         variant: "destructive",
       });
     }
+    setShowConfirmation(false);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <h1 className="text-3xl font-bold mb-8">{translate('appointments.title')}</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center">{translate('appointments.title')}</h1>
         
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="max-w-md mx-auto">
           <Card className="p-6">
             <div className="space-y-6">
               <div>
@@ -163,16 +175,20 @@ const PatientAppointment = () => {
 
               <Button
                 className="w-full"
-                onClick={handleBookAppointment}
+                onClick={handleShowConfirmation}
               >
                 {translate('appointments.book')}
               </Button>
             </div>
           </Card>
+        </div>
 
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">{translate('appointments.summary')}</h2>
-            <div className="space-y-4">
+        <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{translate('appointments.summary')}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
               {appointmentType && (
                 <p>
                   <span className="font-medium">{translate('appointments.details.type')}: </span>
@@ -200,8 +216,16 @@ const PatientAppointment = () => {
                 </p>
               )}
             </div>
-          </Card>
-        </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowConfirmation(false)}>
+                {translate('common.cancel')}
+              </Button>
+              <Button onClick={handleBookAppointment}>
+                {translate('appointments.book')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
