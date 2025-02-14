@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -103,7 +104,7 @@ export const useChat = () => {
     }
     
     // Handle date selection
-    else if (["Today", "Tomorrow", "Next Week"].includes(selectedOption)) {
+    if (!updated && ["Today", "Tomorrow", "Next Week"].includes(selectedOption)) {
       let date = new Date();
       if (selectedOption === "Tomorrow") {
         date.setDate(date.getDate() + 1);
@@ -112,8 +113,10 @@ export const useChat = () => {
       }
       newInfo.appointmentDate = date.toISOString().split('T')[0];
       updated = true;
-    } else {
-      // Try to parse date from message
+    }
+    
+    // Try to parse date from message if not already updated
+    if (!updated) {
       const parsedDate = parseDateFromMessage(selectedOption);
       if (parsedDate) {
         newInfo.appointmentDate = parsedDate;
@@ -122,26 +125,26 @@ export const useChat = () => {
     }
     
     // Handle time selection
-    else if (selectedOption.includes("AM") || selectedOption.includes("PM")) {
+    if (!updated && (selectedOption.includes("AM") || selectedOption.includes("PM"))) {
       newInfo.appointmentTime = selectedOption;
       updated = true;
     }
     
     // Handle clinic selection
-    else if (selectedOption.includes("Clinic")) {
+    if (!updated && selectedOption.includes("Clinic")) {
       newInfo.clinicId = selectedOption.includes("Main") ? 1 : 2;
       updated = true;
     }
     
     // Handle body part/symptoms selection
-    else if (["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"].includes(selectedOption)) {
+    if (!updated && ["Head", "Neck", "Chest", "Back", "Arms", "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"].includes(selectedOption)) {
       newInfo.bodyPart = selectedOption;
       newInfo.symptoms = selectedOption;
       updated = true;
     }
     
     // Handle duration selection
-    else if (["Just started", "Few days", "About a week", "More than a week"].includes(selectedOption)) {
+    if (!updated && ["Just started", "Few days", "About a week", "More than a week"].includes(selectedOption)) {
       newInfo.duration = selectedOption;
       if (!newInfo.description) {
         newInfo.description = '';
@@ -151,7 +154,7 @@ export const useChat = () => {
     }
     
     // Handle severity selection
-    else if (["Mild", "Moderate", "Severe"].includes(selectedOption)) {
+    if (!updated && ["Mild", "Moderate", "Severe"].includes(selectedOption)) {
       if (!newInfo.description) {
         newInfo.description = '';
       }
