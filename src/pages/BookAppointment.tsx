@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
   Select,
   SelectContent,
@@ -50,13 +49,12 @@ const PatientAppointment = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { translate } = useAccessibility();
 
   const handleShowConfirmation = () => {
     if (!date || !selectedTime || !appointmentType || !bodyPart) {
       toast({
-        title: translate('appointments.missingInfo'),
-        description: translate('appointments.missingInfoDesc'),
+        title: "Missing Information",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
@@ -82,8 +80,8 @@ const PatientAppointment = () => {
       if (error) throw error;
 
       toast({
-        title: translate('appointments.success'),
-        description: translate('appointments.successDesc'),
+        title: "Success",
+        description: "Your appointment has been successfully scheduled",
       });
 
       navigate('/patient/dashboard');
@@ -91,8 +89,8 @@ const PatientAppointment = () => {
     } catch (error: any) {
       console.error('Error booking appointment:', error);
       toast({
-        title: translate('appointments.error'),
-        description: translate('appointments.errorDesc'),
+        title: "Error",
+        description: "Failed to book appointment. Please try again.",
         variant: "destructive",
       });
     }
@@ -107,31 +105,31 @@ const PatientAppointment = () => {
           <Card className="p-6">
             <div className="space-y-6">
               <div>
-                <Label>{translate('appointments.type.label')}</Label>
+                <Label>Appointment Type</Label>
                 <Select
                   value={appointmentType}
                   onValueChange={setAppointmentType}
                 >
                   <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder={translate('appointments.type.select')} />
+                    <SelectValue placeholder="Select appointment type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    <SelectItem value="online">{translate('appointments.type.online')}</SelectItem>
-                    <SelectItem value="in-person">{translate('appointments.type.inPerson')}</SelectItem>
-                    <SelectItem value="call-out">{translate('appointments.type.homeVisit')}</SelectItem>
+                    <SelectItem value="online">Online Consultation</SelectItem>
+                    <SelectItem value="in-person">In-Person Visit</SelectItem>
+                    <SelectItem value="call-out">Home Visit</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {appointmentType === "in-person" && (
                 <div>
-                  <Label>{translate('appointments.clinic.label')}</Label>
+                  <Label>Select Clinic</Label>
                   <Select
                     value={selectedClinic}
                     onValueChange={setSelectedClinic}
                   >
                     <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder={translate('appointments.clinic.select')} />
+                      <SelectValue placeholder="Choose a clinic" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {clinics.map((clinic) => (
@@ -145,13 +143,13 @@ const PatientAppointment = () => {
               )}
 
               <div>
-                <Label>{translate('appointments.bodyPart.label') || 'Affected Body Part'}</Label>
+                <Label>Affected Body Part</Label>
                 <Select
                   value={bodyPart}
                   onValueChange={setBodyPart}
                 >
                   <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder={translate('appointments.bodyPart.select') || 'Select body part'} />
+                    <SelectValue placeholder="Select body part" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {bodyParts.map((part) => (
@@ -164,17 +162,17 @@ const PatientAppointment = () => {
               </div>
 
               <div>
-                <Label>{translate('appointments.description.label') || 'Description'}</Label>
+                <Label>Description</Label>
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder={translate('appointments.description.placeholder') || 'Please describe your symptoms or reason for visit'}
+                  placeholder="Please describe your symptoms or reason for visit"
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label>{translate('appointments.date.label')}</Label>
+                <Label>Select Date</Label>
                 <Calendar
                   mode="single"
                   selected={date}
@@ -185,13 +183,13 @@ const PatientAppointment = () => {
               </div>
 
               <div>
-                <Label>{translate('appointments.time.label')}</Label>
+                <Label>Select Time</Label>
                 <Select
                   value={selectedTime}
                   onValueChange={setSelectedTime}
                 >
                   <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder={translate('appointments.time.select')} />
+                    <SelectValue placeholder="Choose a time" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {timeSlots.map((time) => (
@@ -207,7 +205,7 @@ const PatientAppointment = () => {
                 className="w-full"
                 onClick={handleShowConfirmation}
               >
-                {translate('appointments.book')}
+                Book Appointment
               </Button>
             </div>
           </Card>
@@ -216,54 +214,54 @@ const PatientAppointment = () => {
         <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{translate('appointments.summary')}</DialogTitle>
+              <DialogTitle>Appointment Summary</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               {appointmentType && (
                 <p>
-                  <span className="font-medium">{translate('appointments.details.type')}: </span>
-                  {appointmentType === "online" ? translate('appointments.type.online') : 
-                   appointmentType === "in-person" ? translate('appointments.type.inPerson') : 
-                   translate('appointments.type.homeVisit')}
+                  <span className="font-medium">Type: </span>
+                  {appointmentType === "online" ? "Online Consultation" : 
+                   appointmentType === "in-person" ? "In-Person Visit" : 
+                   "Home Visit"}
                 </p>
               )}
               {selectedClinic && appointmentType === "in-person" && (
                 <p>
-                  <span className="font-medium">{translate('appointments.details.clinic')}: </span>
+                  <span className="font-medium">Clinic: </span>
                   {clinics.find(c => c.id.toString() === selectedClinic)?.name}
                 </p>
               )}
               {bodyPart && (
                 <p>
-                  <span className="font-medium">{translate('appointments.details.bodyPart') || 'Body Part'}: </span>
+                  <span className="font-medium">Body Part: </span>
                   {bodyPart}
                 </p>
               )}
               {description && (
                 <p>
-                  <span className="font-medium">{translate('appointments.details.description') || 'Description'}: </span>
+                  <span className="font-medium">Description: </span>
                   {description}
                 </p>
               )}
               {date && (
                 <p>
-                  <span className="font-medium">{translate('appointments.details.date')}: </span>
+                  <span className="font-medium">Date: </span>
                   {date.toLocaleDateString()}
                 </p>
               )}
               {selectedTime && (
                 <p>
-                  <span className="font-medium">{translate('appointments.details.time')}: </span>
+                  <span className="font-medium">Time: </span>
                   {selectedTime}
                 </p>
               )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowConfirmation(false)}>
-                {translate('common.cancel')}
+                Cancel
               </Button>
               <Button onClick={handleBookAppointment}>
-                {translate('appointments.book')}
+                Book Appointment
               </Button>
             </DialogFooter>
           </DialogContent>
