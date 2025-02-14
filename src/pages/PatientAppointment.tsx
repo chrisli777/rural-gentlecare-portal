@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import {
@@ -16,12 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const doctors = [
-  { id: 1, name: "Dr. Sarah Johnson", specialty: "Geriatric Medicine" },
-  { id: 2, name: "Dr. Michael Chen", specialty: "Internal Medicine" },
-  { id: 3, name: "Dr. Emily Brown", specialty: "Family Medicine" },
-];
 
 const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM",
@@ -35,19 +28,17 @@ const clinics = [
 
 const PatientAppointment = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [appointmentType, setAppointmentType] = useState("");
   const [selectedClinic, setSelectedClinic] = useState("");
-  const [notificationMethods, setNotificationMethods] = useState<string[]>(["app"]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleBookAppointment = async () => {
-    if (!date || !selectedDoctor || !selectedTime || !appointmentType || notificationMethods.length === 0) {
+    if (!date || !selectedTime || !appointmentType) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields and select at least one notification method",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
@@ -68,10 +59,9 @@ const PatientAppointment = () => {
           patient_id: session.user.id,
           appointment_date: date.toISOString().split('T')[0],
           appointment_time: selectedTime,
-          doctor_id: parseInt(selectedDoctor),
           appointment_type: appointmentType,
           clinic_id: selectedClinic ? parseInt(selectedClinic) : null,
-          notification_methods: notificationMethods,
+          notification_methods: ["app"],
           status: 'pending'
         });
 
@@ -143,25 +133,6 @@ const PatientAppointment = () => {
               )}
 
               <div>
-                <Label>Select Doctor</Label>
-                <Select
-                  value={selectedDoctor}
-                  onValueChange={setSelectedDoctor}
-                >
-                  <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Choose a doctor" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    {doctors.map((doctor) => (
-                      <SelectItem key={doctor.id} value={doctor.id.toString()}>
-                        {doctor.name} - {doctor.specialty}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
                 <Label>Select Date</Label>
                 <Calendar
                   mode="single"
@@ -191,11 +162,6 @@ const PatientAppointment = () => {
                 </Select>
               </div>
 
-              <NotificationPreferences
-                selectedMethods={notificationMethods}
-                onMethodsChange={setNotificationMethods}
-              />
-
               <Button
                 className="w-full"
                 onClick={handleBookAppointment}
@@ -221,12 +187,6 @@ const PatientAppointment = () => {
                   {clinics.find(c => c.id.toString() === selectedClinic)?.name}
                 </p>
               )}
-              {selectedDoctor && (
-                <p>
-                  <span className="font-medium">Doctor: </span>
-                  {doctors.find(d => d.id.toString() === selectedDoctor)?.name}
-                </p>
-              )}
               {date && (
                 <p>
                   <span className="font-medium">Date: </span>
@@ -237,12 +197,6 @@ const PatientAppointment = () => {
                 <p>
                   <span className="font-medium">Time: </span>
                   {selectedTime}
-                </p>
-              )}
-              {notificationMethods.length > 0 && (
-                <p>
-                  <span className="font-medium">Notifications: </span>
-                  {notificationMethods.join(", ")}
                 </p>
               )}
             </div>
