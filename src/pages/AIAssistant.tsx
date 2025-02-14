@@ -1,14 +1,17 @@
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
-import { ChatHeader } from "@/components/chat/ChatHeader";
+import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { AnimatePresence } from "framer-motion";
+import { Mic } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const PatientDashboard = () => {
+const AIAssistant = () => {
+  const navigate = useNavigate();
   const {
     message,
     setMessage,
@@ -32,7 +35,20 @@ const PatientDashboard = () => {
       <Header />
       <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex">
         <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
-          <ChatHeader />
+          <div className="p-4 border-b flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bot className="h-5 w-5" style={{ color: "#1E5AAB" }} />
+              <h2 className="text-lg font-semibold">AI Health Assistant</h2>
+            </div>
+            <Button
+              onClick={() => navigate("/patient/dashboard")}
+              className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white flex items-center gap-2"
+              size="sm"
+            >
+              <Mic className="h-4 w-4" />
+              Switch to Voice Chat
+            </Button>
+          </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
             <AnimatePresence>
@@ -59,4 +75,4 @@ const PatientDashboard = () => {
   );
 };
 
-export default PatientDashboard;
+export default AIAssistant;

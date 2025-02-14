@@ -3,7 +3,6 @@ import { useRef, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
@@ -34,21 +33,21 @@ const PatientDashboard = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex flex-col">
-        <div className="mb-4 flex justify-end">
-          <Button
-            onClick={() => navigate("/patient/ai-assistant")}
-            className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white flex items-center gap-2"
-          >
-            <MessageSquare className="h-4 w-4" />
-            Switch to Text Chat
-          </Button>
-        </div>
-        
-        <Card className="flex-1 flex flex-col h-[calc(100vh-12rem)] bg-white">
-          <div className="p-4 border-b flex items-center gap-2">
-            <div className="h-5 w-5 bg-[#1E5AAB] rounded-full animate-pulse" />
-            <h2 className="text-lg font-semibold">AI Realtime Conversation</h2>
+      <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex">
+        <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
+          <div className="p-4 border-b flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 bg-[#1E5AAB] rounded-full animate-pulse" />
+              <h2 className="text-lg font-semibold">AI Realtime Conversation</h2>
+            </div>
+            <Button
+              onClick={() => navigate("/patient/ai-assistant")}
+              className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white flex items-center gap-2"
+              size="sm"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Switch to Text Chat
+            </Button>
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
