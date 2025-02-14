@@ -1,12 +1,21 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HandHeart, Volume2, Stethoscope, Leaf } from "lucide-react";
+import { HandHeart, Volume2, Stethoscope, Leaf, CalendarCheck, MessageSquare, UserCircle2, Video } from "lucide-react";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const Home = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showFeatures, setShowFeatures] = useState(false);
 
   const welcomeText = "Welcome to the Virtual Clinic of Adams County, Washington. Your virtual health companion—guiding you to the right care, when you need it.";
 
@@ -29,6 +38,33 @@ const Home = () => {
       window.speechSynthesis.speak(speech);
     }
   };
+
+  const handleGetStarted = () => {
+    setShowFeatures(true);
+  };
+
+  const features = [
+    {
+      icon: <CalendarCheck className="w-6 h-6 text-primary" />,
+      title: "Book Appointments",
+      description: "Schedule in-person, online, or home visit appointments with our healthcare providers."
+    },
+    {
+      icon: <MessageSquare className="w-6 h-6 text-primary" />,
+      title: "Secure Messaging",
+      description: "Communicate securely with your healthcare team through our messaging system."
+    },
+    {
+      icon: <Video className="w-6 h-6 text-primary" />,
+      title: "Virtual Consultations",
+      description: "Connect with healthcare providers through video calls from the comfort of your home."
+    },
+    {
+      icon: <UserCircle2 className="w-6 h-6 text-primary" />,
+      title: "Personal Health Profile",
+      description: "Manage your health information and track your medical history in one place."
+    }
+  ];
 
   return (
     <div 
@@ -85,7 +121,7 @@ const Home = () => {
               className="text-xl px-8 py-6 mt-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
                          bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
                          border-2 border-[#1E5AAB]"
-              onClick={() => navigate("/patient/dashboard")}
+              onClick={handleGetStarted}
             >
               Get Started
             </Button>
@@ -106,6 +142,47 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Features Dialog */}
+      <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-2">
+              Welcome to Your Virtual Healthcare Journey
+            </DialogTitle>
+            <DialogDescription className="text-center text-lg">
+              Here's what you can do with our virtual clinic platform
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="flex flex-col items-center text-center p-4 space-y-3 rounded-lg border bg-card hover:bg-accent/10 transition-colors duration-300"
+              >
+                <div className="p-3 rounded-full bg-accent/20">
+                  {feature.icon}
+                </div>
+                <h3 className="font-semibold text-lg">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter className="sm:justify-center">
+            <Button 
+              onClick={() => {
+                setShowFeatures(false);
+                navigate("/patient/dashboard");
+              }}
+              className="w-full sm:w-auto"
+            >
+              Continue to Dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
