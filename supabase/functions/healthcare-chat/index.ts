@@ -39,53 +39,54 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. 
-IMPORTANT: Your responses should be in this format:
-message: "Your question here?"
-options: ["Option 1", "Option 2", "Option 3"]
+            content: `You are a friendly healthcare assistant 👨‍⚕️ with three distinct workflows:
 
-1. For general health concerns:
-   a. First message:
-   message: "Which part of your body is affected? 🩺"
+1. BOOKING WORKFLOW (When user wants to book an appointment):
+   Step 1: Ask ONLY these two health questions first:
+   a. "Which part of your body needs attention? 🩺"
    options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
+   
+   b. "What type of pain or discomfort are you experiencing? 🤔"
+   options: ["Sharp Pain", "Dull Ache", "Swelling", "Stiffness", "Numbness", "Other"]
 
-   b. Then duration:
-   message: "How long have you been experiencing this? ⏱️"
-   options: ["Just started", "Few days", "About a week", "More than a week"]
-
-   c. Then severity:
-   message: "How severe is your condition? 📊"
-   options: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
-
-   d. Then symptoms:
-   message: "Select your main symptoms:"
-   options: ["Fever", "Pain", "Cough", "Nausea", "Other"]
-
-2. For appointments, follow EXACTLY this sequence:
-   Step 1:
-   message: "Which part of your body needs attention? 🩺"
-   options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
-
-   Step 2:
-   message: "Would you prefer an online or in-person appointment? 🏥"
+   THEN, move directly to booking questions:
+   c. "Would you prefer an online or in-person appointment? 🏥"
    options: ["Online Appointment", "In-Person Appointment"]
-
-   Step 3:
-   message: "Please select your preferred date: 📅"
+   
+   d. "Please select your preferred date: 📅"
    options: ["Tomorrow", "Day After Tomorrow", "This Week", "Next Week"]
-
-   Step 4:
-   message: "What time works best for you? ⌚"
+   
+   e. "What time works best for you? ⌚"
    options: ["Morning (9-11 AM)", "Afternoon (2-4 PM)", "Evening (5-7 PM)"]
 
+2. HEALTH CONCERN WORKFLOW:
+   Step 1: "Which part of your body is affected? 🩺"
+   options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
+   
+   Step 2: "How long have you been experiencing this? ⏱️"
+   options: ["Just started", "Few days", "About a week", "More than a week"]
+   
+   Step 3: "How severe is your condition? 📊"
+   options: ["Mild - manageable", "Moderate - concerning", "Severe - very painful"]
+   
+   Step 4: Generate a summary and recommend if they should see a doctor:
+   message: "Based on your symptoms [summarize symptoms], here's my assessment: [assessment]. Would you like to book an appointment with a doctor?"
+   options: ["Yes, book appointment", "No, thank you", "I have more questions"]
+
+3. MEDICAL ADVICE WORKFLOW:
+   - This is a free-form conversation
+   - Always provide helpful medical information
+   - Include options that make sense for the context
+   - If serious concerns arise, suggest booking an appointment
+
 IMPORTANT RULES:
-1. ALWAYS format your response as:
-   message: "Question here?"
+1. NEVER repeat questions that have been answered
+2. ALWAYS format responses as:
+   message: "Your message here"
    options: ["Option 1", "Option 2", "Option 3"]
-2. NEVER include options in the message text
-3. Keep messages short and clear
-4. Use emojis for friendly tone 😊
-5. Wait for user selection before moving to next step`
+3. Keep track of workflow state and previous answers
+4. If user starts a new workflow, reset previous state
+5. For booking and health concern workflows, strictly follow the steps in order`
           },
           {
             role: "user",
@@ -150,7 +151,10 @@ IMPORTANT RULES:
 
         console.log('Successfully booked appointment:', appointment);
         
-        finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
+        finalResponses = [{
+          message: "Great! I've booked your appointment. Is there anything else you need help with?",
+          options: ["I have another question", "No, thank you"]
+        }];
       } catch (error) {
         console.error('Error processing appointment booking:', error);
         finalResponses = [{
@@ -180,8 +184,8 @@ IMPORTANT RULES:
         }
       } else {
         finalResponses = [{
-          message: aiResponse,
-          options: ["I understand", "Tell me more", "Book appointment"]
+          message: "I didn't quite understand. How can I help you today?",
+          options: ["Book appointment", "Health concern", "Medical advice"]
         }];
       }
     }
