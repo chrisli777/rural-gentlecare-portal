@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1';
@@ -46,39 +45,31 @@ serve(async (req) => {
 3. Keep your answers short and easy to understand
 4. Break down any instructions into small, clear steps
 5. Be patient and respectful
-6. IMPORTANT: If you identify any concerning symptoms or serious health issues, strongly recommend that they book an appointment immediately and provide a clear reason why. Use phrases like:
-   - "I recommend booking an appointment right away because [specific reason]"
-   - "This is something that should be checked by a doctor soon because [specific reason]"
-   - "For your safety, please schedule an appointment to have this checked."
 
-When someone tells you about a health worry:
-- First, show them you understand how they're feeling
-- Use everyday words to explain what might be causing it
-- Suggest simple things they can try at home to feel better
-- For serious concerns, emphasize the importance of seeing a doctor
-- Be gentle and supportive
-- Make any steps very clear and simple
+When handling appointment bookings:
+1. When a user wants to book an appointment, ask:
+   - Would they prefer an online or in-person appointment?
+   - What date would work best for them? (Get a specific date)
+   - What time would they prefer? (Offer these times: 9:00 AM, 10:00 AM, 11:00 AM, 2:00 PM, 3:00 PM, 4:00 PM)
 
-Remember to:
-- Write like you're talking to a friend
-- Keep sentences short
-- Be very gentle and understanding
-- Focus on practical, easy-to-follow advice
-- Always put safety first
-
-IMPORTANT - Appointment Booking:
-If the user asks you to book an appointment or if you identify a serious health concern:
-1. Ask them if they prefer a specific date and time
-2. Confirm their preference for in-person or online consultation
-3. Book the appointment using the following format in your response:
+2. Once you have all the details, format your response EXACTLY like this to book the appointment:
    !BOOK_APPOINTMENT:
    {
-     "appointment_type": "in-person" or "online",
-     "appointment_date": "YYYY-MM-DD",
-     "appointment_time": "HH:MM AM/PM",
-     "notification_methods": ["app"]
+     "appointment_type": "in-person",
+     "appointment_date": "2024-03-20",
+     "appointment_time": "9:00 AM",
+     "notification_methods": ["app"],
+     "doctor_id": 1
    }
-4. After booking, confirm the appointment details with them in a friendly way`
+
+3. After including the booking format above, ALWAYS add a friendly confirmation message like:
+   "Perfect! I've booked your [type] appointment for [date] at [time]. You'll see this appointment in your schedule now. Is there anything else you need help with?"
+
+Remember to:
+- Get specific date and time preferences
+- Confirm all details before booking
+- Always follow the booking with a confirmation message
+- Be patient and helpful throughout the process`
           },
           {
             role: "user",
@@ -99,14 +90,18 @@ If the user asks you to book an appointment or if you identify a serious health 
     }
 
     const aiResponse = data.choices[0].message.content.trim();
+    let finalResponse = aiResponse;
     
     // Check if the response contains an appointment booking request
     if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       try {
-        const appointmentDetails = JSON.parse(
-          aiResponse.split('!BOOK_APPOINTMENT:')[1].trim()
-        );
+        // Extract the JSON part
+        const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
+        if (!bookingMatch) {
+          throw new Error('Invalid booking format');
+        }
 
+        const appointmentDetails = JSON.parse(bookingMatch[1]);
         console.log('Booking appointment with details:', appointmentDetails);
 
         // Insert the appointment into the database
@@ -119,6 +114,7 @@ If the user asks you to book an appointment or if you identify a serious health 
               appointment_date: appointmentDetails.appointment_date,
               appointment_time: appointmentDetails.appointment_time,
               notification_methods: appointmentDetails.notification_methods,
+              doctor_id: appointmentDetails.doctor_id,
               status: 'pending'
             }
           ])
@@ -131,15 +127,17 @@ If the user asks you to book an appointment or if you identify a serious health 
         }
 
         console.log('Successfully booked appointment:', appointment);
+        
+        // Keep only the human-readable part of the response after successful booking
+        finalResponse = aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim();
+
       } catch (error) {
         console.error('Error processing appointment booking:', error);
+        finalResponse = "I apologize, but I encountered an error while trying to book your appointment. Could you please try again with the appointment details?";
       }
     }
 
-    // Remove the booking markup from the response before sending to the user
-    const cleanResponse = aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*$/, '');
-
-    return new Response(JSON.stringify({ response: cleanResponse }), {
+    return new Response(JSON.stringify({ response: finalResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
