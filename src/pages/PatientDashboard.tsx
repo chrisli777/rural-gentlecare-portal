@@ -24,14 +24,13 @@ const PatientDashboard = () => {
   const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
   const { toast } = useToast();
 
-  // Fetch recent appointments
+  // Fetch appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
-          .gte('appointment_date', new Date().toISOString().split('T')[0])
           .order('appointment_date', { ascending: true })
           .order('appointment_time', { ascending: true });
 
@@ -52,10 +51,12 @@ const PatientDashboard = () => {
           setRecentAppointments(sortedAppointments);
           
           // Add appointment notifications to conversation without replacing existing messages
-          const appointmentMessages = sortedAppointments.map(apt => ({
-            role: "assistant",
-            content: `You have an appointment scheduled for ${format(new Date(apt.appointment_date), 'PPP')} at ${apt.appointment_time}. Type: ${apt.appointment_type}`
-          }));
+          const appointmentMessages = sortedAppointments
+            .filter(apt => apt.status !== 'cancelled')
+            .map(apt => ({
+              role: "assistant",
+              content: `You have an appointment scheduled for ${format(new Date(apt.appointment_date), 'PPP')} at ${apt.appointment_time}. Type: ${apt.appointment_type}`
+            }));
           
           setConversation(prev => {
             const initialGreeting = prev.find(msg => msg.role === "assistant" && msg.content.includes("Hello! I'm your healthcare assistant"));
@@ -104,6 +105,30 @@ const PatientDashboard = () => {
       appointmentsSubscription.unsubscribe();
     };
   }, [toast]);
+
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'cancelled' })
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Appointment cancelled successfully",
+      });
+
+    } catch (error: any) {
+      console.error('Error cancelling appointment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel appointment",
+        variant: "destructive",
+      });
+    }
+  };
 
   const startRecording = async () => {
     try {
@@ -262,32 +287,48 @@ const PatientDashboard = () => {
               </Card>
             </Link>
 
-            {/* Upcoming Appointments */}
+            {/* All Appointments */}
             <Card className="h-full">
               <CardHeader>
-                <CardTitle>Upcoming Appointments</CardTitle>
+                <CardTitle>All Appointments</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                   {recentAppointments.length > 0 ? (
-                    recentAppointments.map((appointment, index) => (
+                    recentAppointments.map((appointment) => (
                       <div 
                         key={appointment.id}
-                        className="flex justify-between items-center p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
+                        className="flex flex-col p-4 bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
                       >
-                        <div>
-                          <p className="font-medium">{appointment.appointment_type}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
-                          </p>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium">{appointment.appointment_type}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
+                            </p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-sm ${
+                            appointment.status === 'cancelled' 
+                              ? 'bg-destructive/10 text-destructive' 
+                              : 'bg-primary/10 text-primary'
+                          }`}>
+                            {appointment.status}
+                          </span>
                         </div>
-                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                          {appointment.status}
-                        </span>
+                        {appointment.status !== 'cancelled' && (
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleCancelAppointment(appointment.id)}
+                            className="self-end"
+                          >
+                            Cancel Appointment
+                          </Button>
+                        )}
                       </div>
                     ))
                   ) : (
-                    <p className="text-muted-foreground text-center py-4">No upcoming appointments</p>
+                    <p className="text-muted-foreground text-center py-4">No appointments found</p>
                   )}
                 </div>
               </CardContent>
