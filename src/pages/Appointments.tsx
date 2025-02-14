@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -218,8 +219,18 @@ const Appointments = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleCancelDialog}>Cancel Appointment</AlertDialogCancel>
-              <AlertDialogAction onClick={() => setAppointmentToDelete(null)}>Keep Appointment</AlertDialogAction>
+              <AlertDialogCancel 
+                onClick={handleCancelDialog}
+                className="bg-destructive hover:bg-destructive/90 text-white"
+              >
+                Cancel Appointment
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => setAppointmentToDelete(null)}
+                className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
+              >
+                Keep Appointment
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
