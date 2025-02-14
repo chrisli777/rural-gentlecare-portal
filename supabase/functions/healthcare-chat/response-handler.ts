@@ -6,6 +6,15 @@ interface AIResponse {
 
 export class ResponseHandler {
   static parseAIResponse(aiResponse: string): AIResponse[] {
+    // First, handle booking requests directly
+    if (aiResponse.toLowerCase().includes('i need to book an appointment')) {
+      return [{
+        message: "Which part of your body needs attention? 🩺",
+        options: ["Head/Face", "Chest/Heart", "Stomach/Digestive", "Back/Spine", "Arms/Hands", "Legs/Feet", "Skin", "Other"]
+      }];
+    }
+
+    // Handle completed booking
     if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
       const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
       if (!bookingMatch) {
@@ -38,6 +47,7 @@ export class ResponseHandler {
       }
     }
 
+    // Default response if no match
     return [{
       message: "How can I help you today?",
       options: ["I need to book an appointment", "I have a health concern", "I need medical advice"]
