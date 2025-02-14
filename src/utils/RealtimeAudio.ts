@@ -1,3 +1,4 @@
+import { supabase } from '@/lib/supabase';
 
 export class AudioRecorder {
   private stream: MediaStream | null = null;

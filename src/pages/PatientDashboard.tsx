@@ -7,7 +7,6 @@ import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useChat } from "@/hooks/useChat";
 import { AnimatePresence } from "framer-motion";
-import VoiceInterface from "@/components/chat/VoiceInterface";
 
 const PatientDashboard = () => {
   const {
@@ -18,7 +17,6 @@ const PatientDashboard = () => {
     handleSendMessage,
   } = useChat();
 
-  const [isAISpeaking, setIsAISpeaking] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -59,7 +57,6 @@ const PatientDashboard = () => {
           />
         </Card>
       </main>
-      <VoiceInterface onSpeakingChange={setIsAISpeaking} />
     </div>
   );
 };
