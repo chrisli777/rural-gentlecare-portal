@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -57,6 +56,25 @@ const PatientAppointment = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { translate } = useAccessibility();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        toast({
+          title: "Please log in",
+          description: "You need to be logged in to book appointments",
+          variant: "destructive",
+        });
+        navigate("/patient/login");
+        return;
+      }
+      setUserId(session.user.id);
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
 
   const handleShowConfirmation = () => {
     if (!date || !selectedTime || !appointmentType || !bodyPart) {
@@ -71,18 +89,28 @@ const PatientAppointment = () => {
   };
 
   const handleBookAppointment = async () => {
+    if (!userId) {
+      toast({
+        title: "Authentication Error",
+        description: "Please log in to book appointments",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('appointments')
         .insert({
-          appointment_date: date.toISOString().split('T')[0],
+          appointment_date: date?.toISOString().split('T')[0],
           appointment_time: selectedTime,
           appointment_type: appointmentType,
           clinic_id: selectedClinic ? parseInt(selectedClinic) : null,
           body_part: bodyPart,
           description: description,
           notification_methods: ["app"],
-          status: 'pending'
+          status: 'pending',
+          patient_id: userId  // Set the patient_id to the current user's ID
         });
 
       if (error) throw error;
@@ -98,7 +126,7 @@ const PatientAppointment = () => {
       console.error('Error booking appointment:', error);
       toast({
         title: translate('appointments.error'),
-        description: translate('appointments.errorDesc'),
+        description: error.message || translate('appointments.errorDesc'),
         variant: "destructive",
       });
     }
