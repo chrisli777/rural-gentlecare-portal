@@ -1,61 +1,85 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 
 export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isRecording) {
+      const ctx = new AudioContext({ sampleRate: 24000 });
+      setAudioContext(ctx);
+    } else if (audioContext) {
+      audioContext.close();
+      setAudioContext(null);
+    }
+  }, [isRecording]);
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const audioChunks: BlobPart[] = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 24000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
 
-      recorder.ondataavailable = (event) => {
-        audioChunks.push(event.data);
+      // Initialize WebSocket connection
+      wsRef.current = new WebSocket(`wss://${supabase.project}.functions.supabase.co/realtime-chat`);
+      
+      const recorder = new MediaRecorder(stream);
+      const audioChunks: Float32Array[] = [];
+
+      recorder.ondataavailable = async (event) => {
+        const audioData = await event.data.arrayBuffer();
+        const audioContext = new AudioContext({ sampleRate: 24000 });
+        const audioBuffer = await audioContext.decodeAudioData(audioData);
+        const channelData = audioBuffer.getChannelData(0);
+        
+        // Send audio data through WebSocket
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            audio: Array.from(channelData)
+          }));
+        }
       };
 
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-
-        reader.onload = async () => {
-          if (reader.result && typeof reader.result === 'string') {
-            const base64Audio = reader.result.split(',')[1];
-            
-            try {
-              const { data, error } = await supabase.functions.invoke('voice-to-text', {
-                body: { audio: base64Audio }
-              });
-
-              if (error) throw error;
-
-              if (data.text) {
-                onVoiceProcessed(data.text);
-              }
-            } catch (error: any) {
-              console.error('Voice to text error:', error);
-              toast({
-                title: "Error",
-                description: "Failed to convert voice to text. Please try again.",
-                variant: "destructive",
-              });
-            }
+      // Handle incoming messages from the server
+      wsRef.current.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'response.audio.delta') {
+          // Play the audio response
+          const audioData = atob(data.delta);
+          const audioArray = new Float32Array(audioData.length);
+          for (let i = 0; i < audioData.length; i++) {
+            audioArray[i] = audioData.charCodeAt(i) / 255;
           }
-        };
-
-        reader.readAsDataURL(audioBlob);
+          
+          if (audioContext) {
+            const buffer = audioContext.createBuffer(1, audioArray.length, 24000);
+            buffer.copyToChannel(audioArray, 0);
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start();
+          }
+        }
       };
 
       setMediaRecorder(recorder);
-      recorder.start();
+      recorder.start(100); // Collect data every 100ms
       setIsRecording(true);
 
       toast({
-        title: "Recording Started",
+        title: "Voice Chat Started",
         description: "Speak clearly into your microphone.",
       });
     } catch (error) {
@@ -74,9 +98,15 @@ export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
       
+      // Close WebSocket connection
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      
       toast({
-        title: "Recording Stopped",
-        description: "Processing your message...",
+        title: "Voice Chat Ended",
+        description: "Voice chat has ended.",
       });
     }
   };
