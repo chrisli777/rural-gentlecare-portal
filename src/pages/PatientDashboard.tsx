@@ -14,7 +14,7 @@ const PatientDashboard = () => {
   const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
-      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can describe your health concern, and I'll guide you through the process. 🏥",
+      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today?",
       options: [
         "I need to book an appointment",
         "I have a health concern",
@@ -58,56 +58,13 @@ const PatientDashboard = () => {
       if (error) throw error;
 
       if (data.responses) {
-        const newMessages = data.responses.map((response: string) => {
-          const message: { role: string; content: string; options?: string[] } = {
+        data.responses.forEach((response: { message: string; options: string[] }) => {
+          setConversation(prev => [...prev, {
             role: "assistant",
-            content: response,
-          };
-
-          // Add common response options based on message content
-          if (response.toLowerCase().includes("online or in-person")) {
-            message.options = ["Online Appointment", "In-Person Appointment"];
-          }
-          else if (response.toLowerCase().includes("how about") && response.toLowerCase().includes("am?")) {
-            message.options = [
-              "Yes, that time works",
-              "No, show me other times",
-              "Different day please"
-            ];
-          }
-          else if (response.toLowerCase().includes("what symptoms")) {
-            message.options = [
-              "Fever",
-              "Headache",
-              "Cough",
-              "Sore throat",
-              "Other symptoms"
-            ];
-          }
-          else if (response.toLowerCase().includes("how long")) {
-            message.options = [
-              "Just started",
-              "Few days",
-              "About a week",
-              "More than a week"
-            ];
-          }
-          else if (response.toLowerCase().includes("severity")) {
-            message.options = [
-              "Mild",
-              "Moderate",
-              "Severe"
-            ];
-          }
-
-          return message;
+            content: response.message,
+            options: response.options
+          }]);
         });
-        setConversation(prev => [...prev, ...newMessages]);
-      } else if (data.response) {
-        setConversation(prev => [...prev, {
-          role: "assistant",
-          content: data.response
-        }]);
       }
     } catch (error: any) {
       toast({
@@ -157,7 +114,7 @@ const PatientDashboard = () => {
 
               if (data.text) {
                 setMessage(data.text);
-                await handleSendMessage();
+                await handleSendMessage(data.text);
               }
             } catch (error: any) {
               console.error('Voice to text error:', error);
