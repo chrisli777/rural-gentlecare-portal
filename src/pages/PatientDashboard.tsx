@@ -309,13 +309,14 @@ const PatientDashboard = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-20">
-        {/* Appointments and Booking Section */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Appointments</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Left Column - Appointments Section */}
+          <div className="md:col-span-1 space-y-6">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">Appointments</h2>
+            
             {/* Appointment Booking */}
-            <Link to="/patient/appointment" className="group">
-              <Card className="hover:shadow-lg transition-shadow h-full">
+            <Link to="/patient/appointment" className="block group">
+              <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <Calendar className="w-12 h-12 text-primary mb-4" />
                   <h3 className="text-xl font-semibold mb-2">Book an Appointment</h3>
@@ -325,7 +326,7 @@ const PatientDashboard = () => {
             </Link>
 
             {/* All Appointments */}
-            <Card className="h-full">
+            <Card>
               <CardHeader>
                 <CardTitle>All Appointments</CardTitle>
               </CardHeader>
@@ -378,70 +379,70 @@ const PatientDashboard = () => {
               </CardContent>
             </Card>
           </div>
-        </section>
 
-        {/* Chatbot Section */}
-        <section className="mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="h-5 w-5" />
-                Healthcare Assistant
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px] overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                {conversation.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
+          {/* Right Column - Chatbot Section */}
+          <div className="md:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  Healthcare Assistant
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[600px] overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                  {conversation.map((msg, index) => (
                     <div
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                      key={index}
+                      className={`flex ${
+                        msg.role === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
-                      {msg.content}
+                      <div
+                        className={`max-w-[80%] p-3 rounded-lg ${
+                          msg.role === "user"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant={isRecording ? "destructive" : "outline"}
-                  size="icon"
-                  onClick={toggleRecording}
-                  disabled={isLoading}
-                  className={isRecording ? 'animate-pulse' : ''}
-                >
-                  {isRecording ? (
-                    <MicOff className="h-4 w-4" />
-                  ) : (
-                    <Mic className="h-4 w-4" />
-                  )}
-                </Button>
-                <Input
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={isRecording ? "Recording..." : "Type your message..."}
-                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  disabled={isLoading || isRecording}
-                />
-                <Button onClick={() => handleSendMessage()} disabled={isLoading || isRecording}>
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant={isRecording ? "destructive" : "outline"}
+                    size="icon"
+                    onClick={toggleRecording}
+                    disabled={isLoading}
+                    className={isRecording ? 'animate-pulse' : ''}
+                  >
+                    {isRecording ? (
+                      <MicOff className="h-4 w-4" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Input
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={isRecording ? "Recording..." : "Type your message..."}
+                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                    disabled={isLoading || isRecording}
+                  />
+                  <Button onClick={() => handleSendMessage()} disabled={isLoading || isRecording}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
     </div>
   );
