@@ -39,10 +39,19 @@ const PatientDashboard = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        // Get the current user's session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) {
+          console.error('No authenticated user found');
+          return;
+        }
+
+        console.log('Fetching appointments for user:', session.user.id);
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
-          .neq('status', 'cancelled') // Only fetch non-cancelled appointments
+          .eq('patient_id', session.user.id)
+          .neq('status', 'cancelled')
           .order('appointment_date', { ascending: true })
           .order('appointment_time', { ascending: true });
 
