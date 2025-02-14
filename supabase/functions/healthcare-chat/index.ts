@@ -39,42 +39,43 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️.
+            content: `You are a friendly and efficient healthcare assistant 👨‍⚕️. Be VERY flexible in understanding user responses - accept short, informal answers.
 
-For EVERY response, provide:
-1. A clear message
-2. A list of options for the user to choose from
+1. In your FIRST response to any health concern:
+   SPLIT your response into TWO separate parts using [SPLIT] marker:
+   PART 1: Ask only ONE key question about their main symptom/concern
+   PART 2: "Or, I can help you book an appointment with a doctor right away. Would you like that? 🗓️"
 
-Format ALL responses as:
+2. For appointment booking:
+   • When user shows ANY interest in booking (words like "yes", "book", "appointment", "doctor", etc.), ask:
+   "Online or in-person appointment? 🏥"
+
+   • Accept ANY variation of these answers:
+     - For online: "online", "virtual", "video", "remote", "tele", etc.
+     - For in-person: "in person", "office", "clinic", "physical", "in-person", etc.
+
+   • Then immediately suggest a time:
+   "Perfect! How about tomorrow at 10:00 AM? Or I can check other times if this doesn't work for you. 📅"
+
+Then use this format to book it (IMPORTANT: date must be in YYYY-MM-DD format and must be today or a future date):
+!BOOK_APPOINTMENT:
 {
-  "message": "Your message here",
-  "options": ["option1", "option2", "option3"]
+  "appointment_type": "in-person",
+  "appointment_date": "${new Date(Date.now() + 86400000).toISOString().split('T')[0]}",
+  "appointment_time": "10:00 AM",
+  "notification_methods": ["app"],
+  "doctor_id": 1
 }
 
-EXAMPLES:
-
-For symptoms:
-{
-  "message": "What's your main health concern today? 🩺",
-  "options": ["Fever", "Headache", "Cough", "Stomach pain", "Other"]
-}
-
-For duration:
-{
-  "message": "How long have you been experiencing these symptoms?",
-  "options": ["Today", "Few days", "About a week", "More than a week"]
-}
-
-For severity:
-{
-  "message": "How would you rate your symptoms?",
-  "options": ["Mild", "Moderate", "Severe"]
-}
+For serious symptoms (severe pain, breathing issues, high fever, sudden changes in vision/speech), immediately say:
+"This sounds serious. Let me help you book an appointment right away. Online or in-person? 🚨"
 
 Remember:
-• ALWAYS provide options in your response
-• Keep messages clear and concise
-• Use emojis for friendly tone 😊`
+• Be VERY flexible with user inputs - accept short/informal answers
+• Immediately proceed with booking when user shows any interest
+• Keep messages short and clear
+• Use emojis to keep it friendly 😊
+• ALWAYS suggest tomorrow's date for appointments`
           },
           {
             role: "user",
@@ -94,54 +95,73 @@ Remember:
       throw new Error('Invalid response format from OpenAI API');
     }
 
-    let aiResponse = data.choices[0].message.content.trim();
-    console.log('AI response:', aiResponse);
+    const aiResponse = data.choices[0].message.content.trim();
+    let finalResponses = [];
 
-    try {
-      // Parse the response as JSON
-      const parsedResponse = JSON.parse(aiResponse);
-      console.log('Parsed response:', parsedResponse);
-      
-      if (!parsedResponse.message || !parsedResponse.options) {
-        throw new Error('Invalid response structure');
+    // Split the response if it contains the [SPLIT] marker
+    if (aiResponse.includes('[SPLIT]')) {
+      finalResponses = aiResponse.split('[SPLIT]').map(part => part.trim());
+    } else if (aiResponse.includes('!BOOK_APPOINTMENT:')) {
+      // Handle appointment booking response
+      try {
+        // Extract the JSON part
+        const bookingMatch = aiResponse.match(/!BOOK_APPOINTMENT:\s*({[\s\S]*?})/);
+        if (!bookingMatch) {
+          throw new Error('Invalid booking format');
+        }
+
+        const appointmentDetails = JSON.parse(bookingMatch[1]);
+        console.log('Booking appointment with details:', appointmentDetails);
+
+        // Validate appointment date
+        const appointmentDate = new Date(appointmentDetails.appointment_date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (appointmentDate < today) {
+          throw new Error('Appointment date must be today or in the future');
+        }
+
+        // Insert the appointment into the database
+        const { data: appointment, error: appointmentError } = await supabase
+          .from('appointments')
+          .insert([
+            {
+              appointment_type: appointmentDetails.appointment_type,
+              appointment_date: appointmentDetails.appointment_date,
+              appointment_time: appointmentDetails.appointment_time,
+              notification_methods: appointmentDetails.notification_methods,
+              doctor_id: appointmentDetails.doctor_id,
+              status: 'pending'
+            }
+          ])
+          .select()
+          .single();
+
+        if (appointmentError) {
+          console.error('Error booking appointment:', appointmentError);
+          throw new Error('Failed to book appointment');
+        }
+
+        console.log('Successfully booked appointment:', appointment);
+        
+        // Keep only the human-readable part of the response
+        finalResponses = [aiResponse.replace(/!BOOK_APPOINTMENT:[\s\S]*?}/, '').trim()];
+      } catch (error) {
+        console.error('Error processing appointment booking:', error);
+        finalResponses = ["I apologize, but I encountered an error while trying to book your appointment. Please try selecting a different day or time."];
       }
-      
-      return new Response(JSON.stringify({
-        responses: [{
-          role: "assistant",
-          content: parsedResponse.message,
-          options: parsedResponse.options
-        }]
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-      
-    } catch (parseError) {
-      console.error('Error parsing AI response:', parseError);
-      
-      // Fallback response with error message and options
-      return new Response(JSON.stringify({
-        responses: [{
-          role: "assistant",
-          content: "I apologize, but I'm having trouble understanding. Could you please try again? 🤔",
-          options: ["Start over", "Speak to a doctor", "Get help"]
-        }]
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    } else {
+      finalResponses = [aiResponse];
     }
+
+    return new Response(JSON.stringify({ responses: finalResponses }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error:', error);
-    
-    // Return a user-friendly error response with options
-    return new Response(JSON.stringify({
-      responses: [{
-        role: "assistant",
-        content: "I apologize, but I encountered an error. How can I help you? 🤔",
-        options: ["Try again", "Start over", "Get help"]
-      }]
-    }), {
-      status: 200, // Changed to 200 to ensure the client always gets a valid response
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
