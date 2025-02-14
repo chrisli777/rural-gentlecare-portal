@@ -305,9 +305,13 @@ const PatientDashboard = () => {
             <Link to="/patient/onboarding" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <Headphones className="w-12 h-12 text-[#1E5AAB] mb-4" />
-                  <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Voice Assistant</h3>
-                  <p className="text-gray-600 hidden sm:block">Experience hands-free interaction with our voice-enabled features.</p>
+                  <div className="flex items-start gap-4">
+                    <Headphones className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Voice Assistant</h3>
+                      <p className="text-gray-600 hidden sm:block">Experience hands-free interaction with our voice-enabled features.</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </Link>
@@ -315,16 +319,20 @@ const PatientDashboard = () => {
             <Link to="/patient/appointment" className="block group">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <Calendar className="w-12 h-12 text-[#1E5AAB] mb-4" />
-                  <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book an Appointment</h3>
-                  <p className="text-gray-600 hidden sm:block">Schedule your next visit with our healthcare providers.</p>
+                  <div className="flex items-start gap-4">
+                    <Calendar className="w-12 h-12 text-[#1E5AAB] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book an Appointment</h3>
+                      <p className="text-gray-600 hidden sm:block">Schedule your next visit with our healthcare providers.</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </Link>
 
             <Card>
               <CardHeader className="flex flex-row items-center gap-2">
-                <ClipboardList className="w-8 h-8 text-[#1E5AAB]" />
+                <ClipboardList className="w-8 h-8 text-[#1E5AAB] flex-shrink-0" />
                 <CardTitle className="text-[#1E5AAB]">All Appointments</CardTitle>
               </CardHeader>
               <CardContent>
