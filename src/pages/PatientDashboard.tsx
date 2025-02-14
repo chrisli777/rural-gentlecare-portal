@@ -1,6 +1,6 @@
+
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Calendar, Bot, Send, Loader2, Mic, MicOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -9,6 +9,17 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const PatientDashboard = () => {
   const [message, setMessage] = useState("");
@@ -31,6 +42,7 @@ const PatientDashboard = () => {
         const { data: appointments, error } = await supabase
           .from('appointments')
           .select('*')
+          .neq('status', 'cancelled') // Only fetch non-cancelled appointments
           .order('appointment_date', { ascending: true })
           .order('appointment_time', { ascending: true });
 
@@ -52,7 +64,6 @@ const PatientDashboard = () => {
           
           // Add appointment notifications to conversation without replacing existing messages
           const appointmentMessages = sortedAppointments
-            .filter(apt => apt.status !== 'cancelled')
             .map(apt => ({
               role: "assistant",
               content: `You have an appointment scheduled for ${format(new Date(apt.appointment_date), 'PPP')} at ${apt.appointment_time}. Type: ${apt.appointment_type}`
@@ -307,24 +318,31 @@ const PatientDashboard = () => {
                               {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
                             </p>
                           </div>
-                          <span className={`px-3 py-1 rounded-full text-sm ${
-                            appointment.status === 'cancelled' 
-                              ? 'bg-destructive/10 text-destructive' 
-                              : 'bg-primary/10 text-primary'
-                          }`}>
-                            {appointment.status}
-                          </span>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                              >
+                                Cancel
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently cancel your appointment.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
+                                  Yes, cancel appointment
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
-                        {appointment.status !== 'cancelled' && (
-                          <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => handleCancelAppointment(appointment.id)}
-                            className="self-end"
-                          >
-                            Cancel Appointment
-                          </Button>
-                        )}
                       </div>
                     ))
                   ) : (
