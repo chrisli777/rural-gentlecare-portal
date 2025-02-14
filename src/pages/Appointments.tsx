@@ -92,7 +92,7 @@ const Appointments = () => {
       const { error } = await supabase
         .from('appointments')
         .delete()
-        .neq('id', ''); // This will delete all appointments
+        .not('id', 'is', null); // This will delete all appointments
 
       if (error) throw error;
 
