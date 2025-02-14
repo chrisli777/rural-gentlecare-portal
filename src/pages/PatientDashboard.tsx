@@ -1,7 +1,7 @@
 
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Bot, Send, Loader2, Mic, MicOff, Headphones } from "lucide-react";
+import { Calendar, Bot, Send, Loader2, Mic, MicOff, Headphones, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -307,7 +307,7 @@ const PatientDashboard = () => {
                 <CardContent className="p-6">
                   <Headphones className="w-12 h-12 text-[#1E5AAB] mb-4" />
                   <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Voice Assistant</h3>
-                  <p className="text-gray-600">Experience hands-free interaction with our voice-enabled features.</p>
+                  <p className="text-gray-600 hidden sm:block">Experience hands-free interaction with our voice-enabled features.</p>
                 </CardContent>
               </Card>
             </Link>
@@ -317,13 +317,14 @@ const PatientDashboard = () => {
                 <CardContent className="p-6">
                   <Calendar className="w-12 h-12 text-[#1E5AAB] mb-4" />
                   <h3 className="text-xl font-semibold mb-2 text-[#1E5AAB]">Book an Appointment</h3>
-                  <p className="text-gray-600">Schedule your next visit with our healthcare providers.</p>
+                  <p className="text-gray-600 hidden sm:block">Schedule your next visit with our healthcare providers.</p>
                 </CardContent>
               </Card>
             </Link>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center gap-2">
+                <ClipboardList className="w-8 h-8 text-[#1E5AAB]" />
                 <CardTitle className="text-[#1E5AAB]">All Appointments</CardTitle>
               </CardHeader>
               <CardContent>
@@ -337,8 +338,11 @@ const PatientDashboard = () => {
                         <div className="flex justify-between items-start mb-2">
                           <div>
                             <p className="font-medium text-[#1E5AAB]">{appointment.appointment_type}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground hidden sm:block">
                               {format(new Date(appointment.appointment_date), 'PPP')} at {appointment.appointment_time}
+                            </p>
+                            <p className="text-sm text-muted-foreground sm:hidden">
+                              {format(new Date(appointment.appointment_date), 'PP')}
                             </p>
                           </div>
                           <AlertDialog>
