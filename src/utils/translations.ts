@@ -62,7 +62,7 @@ export const translations = {
       back: "Back"
     },
     aiAssistant: {
-      title: "Meet Lisa",
+      title: "AI Health Assistant",
       chat: "Chat",
       analysis: "Analysis",
       reports: "Reports",
@@ -182,7 +182,7 @@ export const translations = {
       back: "Volver"
     },
     aiAssistant: {
-      title: "Conoce a Lisa",
+      title: "Asistente de Salud IA",
       chat: "Chat",
       analysis: "Análisis",
       reports: "Informes",

@@ -41,17 +41,17 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center space-x-2">
-              <Heart className="w-6 h-6 text-primary" />
+              <Heart className="w-6 h-6 text-[#9b87f5]" />
               <span className="text-xl font-semibold">Adams Rural Care</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
+            <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
               About Us
             </Link>
-            <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="#contact" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
               Contact Us
             </a>
           </nav>
@@ -69,10 +69,10 @@ export const Header = () => {
         {isMenuOpen && (
           <nav className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-4">
-              <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
+              <Link to="/about" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 About Us
               </Link>
-              <a href="#contact" className="text-gray-600 hover:text-primary transition-colors">
+              <a href="#contact" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 Contact Us
               </a>
             </div>
