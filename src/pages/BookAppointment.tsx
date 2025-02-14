@@ -64,6 +64,17 @@ const PatientAppointment = () => {
 
   const handleBookAppointment = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to book an appointment",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('appointments')
         .insert({
@@ -74,7 +85,8 @@ const PatientAppointment = () => {
           body_part: bodyPart,
           description: description,
           notification_methods: ["app"],
-          status: 'pending'
+          status: 'pending',
+          patient_id: user.id // Add the patient_id from the authenticated user
         });
 
       if (error) throw error;
