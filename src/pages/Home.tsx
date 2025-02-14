@@ -85,7 +85,7 @@ const Home = () => {
       <div className="container mx-auto px-4 py-12 md:py-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Hero Section */}
-          <div className="space-y-6 mb-12 animate-fade-in">
+          <div className="space-y-12 mb-12 animate-fade-in">
             <div className="relative">
               <HandHeart className="w-16 h-16 text-white mx-auto animate-float hover:scale-110 transition-transform duration-300" />
               <div className="absolute -inset-4 bg-[#1E5AAB]/5 rounded-full blur-xl -z-10" />
@@ -98,7 +98,7 @@ const Home = () => {
             </p>
             
             {/* Action Buttons */}
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-8">
               <Button
                 size="lg"
                 className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
