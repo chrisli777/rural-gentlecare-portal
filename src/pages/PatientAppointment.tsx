@@ -100,8 +100,6 @@ const PatientAppointment = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <h1 className="text-3xl font-bold mb-8 text-center">{translate('appointments.title')}</h1>
-        
         <div className="max-w-md mx-auto">
           <Card className="p-6">
             <div className="space-y-6">
