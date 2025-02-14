@@ -36,10 +36,10 @@ export const useChat = () => {
       if (error) throw error;
 
       if (data.responses) {
-        const newMessages = data.responses.map((response: string) => ({
+        const newMessages = data.responses.map((response: any) => ({
           role: "assistant",
-          content: response,
-          options: ["Need to see a doctor?", "Get medical advice", "Health information"]
+          content: response.content,
+          options: response.options || ["Need to see a doctor?"]
         }));
         setConversation(prev => [...prev, ...newMessages]);
       }

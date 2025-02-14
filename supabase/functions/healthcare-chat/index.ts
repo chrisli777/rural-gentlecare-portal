@@ -36,24 +36,18 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a friendly and helpful healthcare assistant. When users ask about booking appointments or select "Need to see a doctor?", help them understand their needs and guide them to the booking page. Your response should:
+            content: `You are a friendly and helpful healthcare assistant. When users ask about booking appointments or select "Need to see a doctor?", provide direct guidance without asking for more details. Your response should be concise:
 
-1. First, ask about their symptoms or concerns briefly
-2. Then, suggest the most appropriate appointment type based on their needs (online, in-person, or home visit)
-3. Finally, guide them to book using this format:
-
-"Based on what you've described, I recommend [appointment type] appointment. You can book this right away by:
+"Based on your request, here's how to book an appointment:
 1. Click 'Appointments' in the top right corner of the page
 2. Select your preferred appointment type (online/in-person/home visit)
 3. If choosing in-person visit, select your preferred clinic
 4. Select which part of your body is affected
 5. Add any additional description of your symptoms
 6. Choose your preferred date and time
-7. Review your appointment details and confirm
+7. Review your appointment details and confirm"
 
-Would you like me to help you with any other health-related questions?"
-
-For other health-related questions, provide helpful, friendly guidance while maintaining a professional tone.`
+For other health topics, provide focused responses with relevant follow-up options in a JSON array at the end of your message, formatted like this: "OPTIONS:["option1", "option2"]". The options should be contextual to your response. For example, if discussing diet, options might include "Learn about nutrition", "Get exercise tips". Limit to 2-3 relevant options.`
           },
           {
             role: "user",
@@ -73,8 +67,23 @@ For other health-related questions, provide helpful, friendly guidance while mai
       throw new Error('Invalid response format from OpenAI API');
     }
 
+    const content = data.choices[0].message.content.trim();
+    let options: string[] = ["Need to see a doctor?"];
+
+    // Extract options if present
+    const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);
+    const cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
+
+    if (optionsMatch && optionsMatch[1]) {
+      const parsedOptions = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
+      options = [...options, ...parsedOptions];
+    }
+
     return new Response(JSON.stringify({ 
-      responses: [data.choices[0].message.content.trim()]
+      responses: [{
+        content: cleanContent,
+        options: options
+      }]
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
