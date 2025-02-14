@@ -36,10 +36,10 @@ const clinics = [
   { id: 2, name: "Adams Rural Care East Branch", address: "456 East Ave, Adams County" },
 ];
 
-const bodyParts = [
-  "Head", "Neck", "Chest", "Back", "Arms",
-  "Hands", "Abdomen", "Legs", "Feet", "Multiple Areas"
-];
+const bodyPartKeys = [
+  "head", "neck", "chest", "back", "arms",
+  "hands", "abdomen", "legs", "feet", "multipleAreas"
+] as const;
 
 const PatientAppointment = () => {
   const [currentStep, setCurrentStep] = useState<'details' | 'schedule'>('details');
@@ -181,9 +181,9 @@ const PatientAppointment = () => {
                         <SelectValue placeholder={t.appointments.bodyPart.select} />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        {bodyParts.map((part) => (
+                        {bodyPartKeys.map((part) => (
                           <SelectItem key={part} value={part}>
-                            {part}
+                            {t.appointments.bodyParts[part]}
                           </SelectItem>
                         ))}
                       </SelectContent>

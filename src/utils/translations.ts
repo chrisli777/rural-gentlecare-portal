@@ -126,7 +126,19 @@ export const translations = {
       success: "Success",
       successDesc: "Your appointment has been successfully scheduled",
       error: "Error",
-      errorDesc: "Failed to book appointment. Please try again."
+      errorDesc: "Failed to book appointment. Please try again.",
+      bodyParts: {
+        head: "Head",
+        neck: "Neck",
+        chest: "Chest",
+        back: "Back",
+        arms: "Arms",
+        hands: "Hands",
+        abdomen: "Abdomen",
+        legs: "Legs",
+        feet: "Feet",
+        multipleAreas: "Multiple Areas"
+      },
     }
   },
   es: {
@@ -256,7 +268,19 @@ export const translations = {
       success: "Éxito",
       successDesc: "Su cita ha sido programada exitosamente",
       error: "Error",
-      errorDesc: "Error al programar la cita. Por favor intente nuevamente."
+      errorDesc: "Error al programar la cita. Por favor intente nuevamente.",
+      bodyParts: {
+        head: "Cabeza",
+        neck: "Cuello",
+        chest: "Pecho",
+        back: "Espalda",
+        arms: "Brazos",
+        hands: "Manos",
+        abdomen: "Abdomen",
+        legs: "Piernas",
+        feet: "Pies",
+        multipleAreas: "Múltiples Áreas"
+      },
     }
   }
 };
