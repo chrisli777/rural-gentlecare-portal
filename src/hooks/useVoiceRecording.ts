@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 export const useVoiceRecording = (onVoiceProcessed: (text: string) => void) => {
   const [isRecording, setIsRecording] = useState(false);
