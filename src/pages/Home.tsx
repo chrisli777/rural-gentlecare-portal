@@ -8,7 +8,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const welcomeText = "Welcome to the Virtual Clinic of Adams County, Washington. We're here to help you book doctor appointments and fill out forms—easily and stress-free. Take your time, and let us guide you through every step. Whenever you're ready, we're here for you.";
+  const welcomeText = "Welcome to the Virtual Clinic of Adams County, Washington. Your virtual health companion—guiding you to the right care, when you need it.";
 
   const handleReadAloud = () => {
     if ('speechSynthesis' in window) {
@@ -76,7 +76,7 @@ const Home = () => {
               Welcome to the Virtual Clinic of Adams County
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-              We're here to help you book appointments and fill out forms—easily and stress-free.
+              Your virtual health companion—guiding you to the right care, when you need it.
             </p>
             
             {/* Get Started Button moved here */}
