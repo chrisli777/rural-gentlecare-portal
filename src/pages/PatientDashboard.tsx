@@ -14,7 +14,7 @@ const PatientDashboard = () => {
   const [conversation, setConversation] = useState<{ role: string; content: string; options?: string[] }[]>([
     {
       role: "assistant",
-      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today? You can describe your health concern, and I'll guide you through the process. 🏥",
+      content: "Hello! 👋 I'm your AI Health Assistant. How can I help you today?",
       options: [
         "I need to book an appointment",
         "I have a health concern",
@@ -52,62 +52,40 @@ const PatientDashboard = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('healthcare-chat', {
-        body: { message: userMessage.content }
+        body: { message: messageToSend }
       });
 
       if (error) throw error;
 
       if (data.responses) {
         const newMessages = data.responses.map((response: string) => {
-          const message: { role: string; content: string; options?: string[] } = {
+          // Parse options from the response if they exist
+          let content = response;
+          let options: string[] | undefined;
+          
+          // If response contains "options:", extract them
+          if (response.includes("options:")) {
+            const optionsMatch = response.match(/options:\s*\[(.*?)\]/);
+            if (optionsMatch) {
+              try {
+                const optionsString = `[${optionsMatch[1]}]`;
+                options = JSON.parse(optionsString.replace(/'/g, '"'));
+                // Remove the options part from the content
+                content = response.replace(/options:\s*\[.*?\]/, '').trim();
+              } catch (e) {
+                console.error('Error parsing options:', e);
+              }
+            }
+          }
+
+          return {
             role: "assistant",
-            content: response,
+            content: content,
+            options: options
           };
-
-          // Add common response options based on message content
-          if (response.toLowerCase().includes("online or in-person")) {
-            message.options = ["Online Appointment", "In-Person Appointment"];
-          }
-          else if (response.toLowerCase().includes("how about") && response.toLowerCase().includes("am?")) {
-            message.options = [
-              "Yes, that time works",
-              "No, show me other times",
-              "Different day please"
-            ];
-          }
-          else if (response.toLowerCase().includes("what symptoms")) {
-            message.options = [
-              "Fever",
-              "Headache",
-              "Cough",
-              "Sore throat",
-              "Other symptoms"
-            ];
-          }
-          else if (response.toLowerCase().includes("how long")) {
-            message.options = [
-              "Just started",
-              "Few days",
-              "About a week",
-              "More than a week"
-            ];
-          }
-          else if (response.toLowerCase().includes("severity")) {
-            message.options = [
-              "Mild",
-              "Moderate",
-              "Severe"
-            ];
-          }
-
-          return message;
         });
+
         setConversation(prev => [...prev, ...newMessages]);
-      } else if (data.response) {
-        setConversation(prev => [...prev, {
-          role: "assistant",
-          content: data.response
-        }]);
       }
     } catch (error: any) {
       toast({
@@ -157,7 +135,7 @@ const PatientDashboard = () => {
 
               if (data.text) {
                 setMessage(data.text);
-                await handleSendMessage();
+                await handleSendMessage(data.text);
               }
             } catch (error: any) {
               console.error('Voice to text error:', error);
@@ -228,7 +206,7 @@ const PatientDashboard = () => {
                 >
                   <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap ${
+                      className={`max-w-[80%] p-4 rounded-lg ${
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
@@ -243,7 +221,7 @@ const PatientDashboard = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="flex flex-wrap gap-2 ml-4"
+                      className="flex flex-wrap gap-2"
                     >
                       {msg.options.map((option, optionIndex) => (
                         <Button
