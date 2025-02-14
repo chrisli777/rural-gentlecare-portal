@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { translations } from "@/utils/translations";
@@ -62,6 +63,12 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
         window.location.href = '/patient/profile';
       } else if (command.includes('dashboard')) {
         window.location.href = '/patient/dashboard';
+      } else if (command.includes('start') || command.includes('begin') || command.includes('login')) {
+        window.location.href = '/patient/login';
+      } else if (command.includes('appointment') || command.includes('schedule')) {
+        window.location.href = '/patient/appointment';
+      } else if (command.includes('messages')) {
+        window.location.href = '/patient/messages';
       }
     };
 
