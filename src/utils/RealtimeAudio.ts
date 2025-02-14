@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 
 export class AudioRecorder {
@@ -71,10 +72,11 @@ export class RealtimeChat {
     this.audioEl.autoplay = true;
   }
 
-  async init() {
+  async init(language: 'en' | 'es') {
     try {
-      // Get ephemeral token from our Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke("realtime-chat");
+      const { data, error } = await supabase.functions.invoke("realtime-chat", {
+        body: { language }
+      });
       if (error) throw error;
 
       if (!data.client_secret?.value) {
@@ -83,10 +85,8 @@ export class RealtimeChat {
 
       const EPHEMERAL_KEY = data.client_secret.value;
 
-      // Create peer connection
+      // Set up WebRTC connection
       this.pc = new RTCPeerConnection();
-
-      // Set up remote audio
       this.pc.ontrack = e => this.audioEl.srcObject = e.streams[0];
 
       // Add local audio track
@@ -98,14 +98,26 @@ export class RealtimeChat {
       this.dc.addEventListener("message", (e) => {
         const event = JSON.parse(e.data);
         console.log("Received event:", event);
-        this.onMessage(event);
+        
+        // Handle different types of events
+        if (event.type === 'response.audio_transcript.delta') {
+          this.onMessage({
+            type: 'transcript',
+            content: event.delta,
+            role: 'user'
+          });
+        } else if (event.type === 'response.message.delta') {
+          this.onMessage({
+            type: 'message',
+            content: event.delta,
+            role: 'assistant'
+          });
+        }
       });
 
-      // Create and set local description
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
 
-      // Connect to OpenAI's Realtime API
       const baseUrl = "https://api.openai.com/v1/realtime";
       const model = "gpt-4o-realtime-preview-2024-12-17";
       const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
@@ -135,6 +147,13 @@ export class RealtimeChat {
         }
       });
       await this.recorder.start();
+
+      // Send initial greeting
+      const greeting = language === 'es' 
+        ? "¡Hola! 👋 Soy tu Asistente de Salud con IA. ¿Cómo puedo ayudarte hoy?"
+        : "Hello! 👋 I'm your AI Health Assistant. How can I help you today?";
+      
+      this.sendMessage(greeting);
 
     } catch (error) {
       console.error("Error initializing chat:", error);
@@ -170,7 +189,7 @@ export class RealtimeChat {
       type: 'conversation.item.create',
       item: {
         type: 'message',
-        role: 'user',
+        role: 'assistant',
         content: [
           {
             type: 'input_text',

@@ -18,6 +18,12 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not set');
     }
 
+    const { language = 'en' } = await req.json();
+
+    const systemPrompt = language === 'es'
+      ? "Eres un asistente de salud útil. Proporciona información médica clara y concisa. Cuando los usuarios pregunten sobre citas, guíalos paso a paso. Mantén las respuestas enfocadas y relevantes a temas de salud."
+      : "You are a helpful healthcare assistant. Provide clear, concise medical information and guidance. When users ask about booking appointments, guide them through the process step by step. Keep responses focused and relevant to healthcare topics.";
+
     // Request an ephemeral token from OpenAI
     const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",
@@ -27,8 +33,8 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "alloy",
-        instructions: "You are a helpful healthcare assistant. Provide clear, concise medical information and guidance. When users ask about booking appointments, guide them through the process step by step. Keep responses focused and relevant to healthcare topics."
+        voice: language === 'es' ? "alloy" : "alloy", // Use appropriate voice for each language
+        instructions: systemPrompt
       }),
     });
 
