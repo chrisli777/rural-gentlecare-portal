@@ -65,7 +65,7 @@ For Spanish users:
 6. Elige tu fecha y hora preferida
 7. Revisa los detalles de tu cita y confirma"
 
-IMPORTANT: For the options bar, ALWAYS provide 2-4 contextual follow-up options that are directly related to the current topic, using this format in your response: OPTIONS:["option1", "option2"]. The options should be in the same language as the user's message.`
+IMPORTANT: At the end of your message, ALWAYS add 2-4 contextual follow-up options that are directly related to the current topic, using this EXACT format (on a new line): \nOPTIONS:["option1", "option2"]. The options should be in the same language as the user's message.`
           },
           {
             role: "user",
@@ -93,16 +93,18 @@ IMPORTANT: For the options bar, ALWAYS provide 2-4 contextual follow-up options 
     // Extract options if present
     const optionsMatch = content.match(/OPTIONS:\[(.*?)\]/);
     let options: string[] = [];
+    let cleanContent = content;
 
     if (optionsMatch && optionsMatch[1]) {
       try {
         options = optionsMatch[1].split(',').map(opt => opt.trim().replace(/"/g, ''));
+        // Remove the OPTIONS:[...] text and any preceding newlines
+        cleanContent = content.replace(/\n*OPTIONS:\[.*?\]/, '').trim();
       } catch (error) {
         console.error('Error parsing options:', error);
+        cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
       }
     }
-
-    const cleanContent = content.replace(/OPTIONS:\[.*?\]/, '').trim();
 
     return new Response(JSON.stringify({ 
       responses: [{
