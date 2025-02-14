@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe } from "lucide-react";
@@ -185,4 +184,3 @@ const Home = () => {
 };
 
 export default Home;
-

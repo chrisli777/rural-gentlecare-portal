@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -144,7 +143,7 @@ const Appointments = () => {
           {appointments && appointments.length > 0 && (
             <Button 
               onClick={() => navigate('/patient/book-appointment')}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
             >
               Book Appointment
             </Button>
@@ -203,7 +202,7 @@ const Appointments = () => {
             <p className="text-gray-600 mb-4">You don't have any appointments yet</p>
             <Button 
               onClick={() => navigate('/patient/book-appointment')}
-              variant="outline"
+              className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
             >
               Book Your First Appointment
             </Button>

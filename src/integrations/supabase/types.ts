@@ -62,30 +62,6 @@ export type Database = {
           },
         ]
       }
-      processed_documents: {
-        Row: {
-          created_at: string | null
-          file_path: string
-          id: string
-          processed_data: Json | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          file_path: string
-          id?: string
-          processed_data?: Json | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          file_path?: string
-          id?: string
-          processed_data?: Json | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           address: string | null
@@ -155,21 +131,6 @@ export type Database = {
           smoker?: boolean | null
           updated_at?: string | null
           voice_preferences?: Json | null
-        }
-        Relationships: []
-      }
-      users_id: {
-        Row: {
-          created_at: string
-          id: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
         }
         Relationships: []
       }
