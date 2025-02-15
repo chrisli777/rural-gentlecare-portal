@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useConversation } from "@11labs/react";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
@@ -17,7 +17,6 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
   const { language } = useAccessibility();
   const [isRecording, setIsRecording] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [currentTranscript, setCurrentTranscript] = useState<string>("");
 
   const conversation = useConversation({
@@ -108,40 +107,16 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
     }
   });
 
-  useEffect(() => {
-    const initAudio = async () => {
-      try {
-        const context = new AudioContext();
-        await context.resume();
-        setAudioContext(context);
-        console.log("AudioContext initialized successfully");
-      } catch (error) {
-        console.error("Error initializing AudioContext:", error);
-      }
-    };
-    initAudio();
-
-    return () => {
-      audioContext?.close();
-    };
-  }, []);
-
   const toggleVoiceRecording = async () => {
     try {
-      if (!audioContext) {
-        console.error("AudioContext not initialized");
-        toast({
-          title: "Error",
-          description: "Audio system not initialized. Please refresh the page.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       if (!isRecording) {
         console.log("Starting voice recording...");
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         console.log("Microphone access granted");
+        
+        // Initialize AudioContext only when starting recording
+        const audioContext = new AudioContext();
+        await audioContext.resume();
         
         if (!conversationStarted) {
           console.log("Starting new conversation session");
