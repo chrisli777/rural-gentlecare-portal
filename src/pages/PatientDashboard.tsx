@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
@@ -41,6 +40,19 @@ const PatientDashboard = () => {
       completeProfile: async () => {
         console.log("Profile conversation completed");
         return "Profile completed successfully";
+      },
+      endCall: async () => {
+        console.log("Voice command to end call received");
+        if (isRecording) {
+          await conversation.endSession();
+          setIsRecording(false);
+          setConversationStarted(false);
+          toast({
+            title: "Call Ended",
+            description: "Voice call ended by voice command",
+          });
+        }
+        return "Call ended successfully";
       }
     },
     overrides: {
@@ -53,6 +65,7 @@ const PatientDashboard = () => {
 2. Pay attention to what the patient says and provide relevant information
 3. Be empathetic and understanding
 4. Help schedule appointments if needed
+5. End the call when the patient says "end call" or similar phrases by using the endCall tool
 
 When patients ask about booking appointments or seeing a doctor, provide these specific instructions:
 "Absolutely, you can see a doctor by booking an appointment. Here's how you can do it:
@@ -74,6 +87,7 @@ Be friendly and conversational while maintaining professionalism. Always offer t
 2. Prestar atención a lo que dice el paciente y proporcionar información relevante
 3. Ser empática y comprensiva
 4. Ayudar a programar citas cuando sea necesario
+5. Terminar la llamada cuando el paciente diga "terminar llamada" o frases similares usando la herramienta endCall
 
 Cuando los pacientes pregunten sobre cómo reservar citas o ver a un médico, proporciona estas instrucciones específicas:
 "Por supuesto, puedes ver a un médico reservando una cita. Aquí te explico cómo hacerlo:
@@ -171,9 +185,6 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
 
     return () => {
       audioContext?.close();
-      if (conversationStarted) {
-        conversation.endSession().catch(console.error);
-      }
     };
   }, []);
 
