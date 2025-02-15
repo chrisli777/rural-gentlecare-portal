@@ -314,22 +314,24 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
             </AnimatePresence>
           </div>
 
-          <div className="p-4 border-t flex justify-center">
-            <Button
+          <div className="p-4 border-t flex flex-col items-center justify-center">
+            <motion.button
               onClick={toggleVoiceRecording}
-              className={`rounded-full w-20 h-20 relative p-0 ${
-                isRecording
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
+              className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+                isRecording 
+                  ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
+                  : 'bg-primary hover:bg-primary/90'
               }`}
               disabled={isLoading}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {isRecording ? (
-                <MicOff className="w-full h-full p-4 text-white" />
+                <MicOff className="h-14 w-14 text-white" />
               ) : (
-                <Mic className="w-full h-full p-4 text-white" />
+                <Mic className="h-14 w-14 text-white" />
               )}
-            </Button>
+            </motion.button>
           </div>
         </Card>
       </main>
