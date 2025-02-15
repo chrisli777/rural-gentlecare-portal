@@ -28,6 +28,7 @@ const PatientDashboard = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [currentTranscript, setCurrentTranscript] = useState<string>("");
   const {
     conversation: chatConversation,
     handleSendMessage,
@@ -100,9 +101,20 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
       }
     },
     onMessage: (message) => {
-      if (message.type === 'transcript' || message.type === 'response') {
+      if (message.type === 'transcript') {
+        // Update current transcript for real-time display
+        setCurrentTranscript(message.content);
+      } else if (message.type === 'response') {
+        // Clear transcript and add both user's message and assistant's response
+        if (currentTranscript) {
+          setMessages(prev => [...prev, {
+            role: 'user',
+            content: currentTranscript
+          }]);
+          setCurrentTranscript("");
+        }
         setMessages(prev => [...prev, {
-          role: message.type === 'transcript' ? 'user' : 'assistant',
+          role: 'assistant',
           content: message.content
         }]);
       }
@@ -286,6 +298,18 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
                   </div>
                 </motion.div>
               ))}
+              {currentTranscript && (
+                <motion.div
+                  key="transcript"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-end"
+                >
+                  <div className="max-w-[80%] p-4 rounded-lg bg-primary text-primary-foreground opacity-70">
+                    {currentTranscript}
+                  </div>
+                </motion.div>
+              )}
               <div ref={messagesEndRef} />
             </AnimatePresence>
           </div>
