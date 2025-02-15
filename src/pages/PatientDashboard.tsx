@@ -58,7 +58,7 @@ const PatientDashboard = () => {
               onClick={toggleVoiceRecording}
               className={`w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden ${
                 isRecording 
-                  ? 'ring-4 ring-destructive ring-offset-4 animate-pulse' 
+                  ? 'ring-4 ring-[#1E5AAB] ring-offset-4 animate-pulse' 
                   : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 ring-offset-4 hover:ring-4 hover:ring-[#1E5AAB]'
               }`}
               whileHover={{ scale: 1.05 }}
@@ -86,7 +86,7 @@ const PatientDashboard = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center mt-4"
               >
-                <p className="text-lg text-primary">{currentTranscript}</p>
+                <p className="text-lg text-[#1E5AAB]">{currentTranscript}</p>
               </motion.div>
             )}
           </div>

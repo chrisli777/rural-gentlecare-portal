@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useConversation } from "@11labs/react";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { supabase } from "@/lib/supabase";
 
 interface ConversationContextType {
   isRecording: boolean;
@@ -19,7 +18,6 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
   const [isRecording, setIsRecording] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [currentTranscript, setCurrentTranscript] = useState<string>("");
 
   const conversation = useConversation({
@@ -111,21 +109,6 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
   });
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUserId(session.user.id);
-        }
-      } catch (error) {
-        console.error("Auth check error:", error);
-      }
-    };
-    
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
     const initAudio = async () => {
       try {
         const context = new AudioContext();
@@ -144,15 +127,6 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
   }, []);
 
   const toggleVoiceRecording = async () => {
-    if (!userId) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to continue.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       if (!audioContext) {
         console.error("AudioContext not initialized");
@@ -173,7 +147,7 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
           console.log("Starting new conversation session");
           await conversation.startSession({
             agentId: "TnwIxSktmaUK3EAqZ6fb",
-            userId: userId,
+            userId: "guest-user", // Use a default guest user ID
           });
           console.log("Conversation session started");
           setConversationStarted(true);
