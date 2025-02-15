@@ -23,7 +23,7 @@ export const ChatMessage = ({ message, onOptionSelect }: ChatMessageProps) => {
         <div
           className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap ${
             message.role === "user"
-              ? "bg-primary text-primary-foreground"
+              ? "bg-[#1E5AAB] text-white"
               : "bg-muted"
           }`}
         >
