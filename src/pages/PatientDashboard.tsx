@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
@@ -49,7 +50,20 @@ const PatientDashboard = () => {
 3. Be empathetic and understanding
 4. Help schedule appointments if needed
 
-Be friendly and conversational while maintaining professionalism.`,
+When patients ask about booking appointments or seeing a doctor, provide these specific instructions:
+"Absolutely, you can see a doctor by booking an appointment. Here's how you can do it:
+
+1. Click 'Appointments' in the top right corner
+2. Select your preferred appointment type (online/in-person/home visit)
+3. If choosing in-person visit, select your preferred clinic
+4. Select which part of your body is affected
+5. Add any additional description of your symptoms
+6. Choose your preferred date and time
+7. Review your appointment details and confirm
+
+Remember, I can guide you through this process, but I can't make the booking for you."
+
+Be friendly and conversational while maintaining professionalism. Always offer to help explain any part of the booking process that might be unclear.`,
         },
         firstMessage: "Hi! I'm Lisa, your medical assistant. How can I help you today?",
         language: "en",
