@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
@@ -275,17 +276,17 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
             </Button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-8">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-12">
             <motion.div
               className="text-center space-y-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2 className="text-3xl font-semibold text-gray-900">
                 {language === 'en' ? 'Talk to Us' : 'Habla con Nosotros'}
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-lg text-muted-foreground max-w-md mx-auto">
                 {language === 'en' 
                   ? 'Click the button below to start speaking with your AI Health assistant'
                   : 'Haz clic en el botón para comenzar a hablar con tu asistente de salud IA'}
@@ -294,7 +295,7 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
             
             <motion.button
               onClick={toggleVoiceRecording}
-              className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+              className={`w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 ${
                 isRecording 
                   ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
                   : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90'
@@ -304,9 +305,9 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
               whileTap={{ scale: 0.95 }}
             >
               {isRecording ? (
-                <MicOff className="h-14 w-14 text-white" />
+                <MicOff className="h-20 w-20 text-white" />
               ) : (
-                <Mic className="h-14 w-14 text-white" />
+                <Mic className="h-20 w-20 text-white" />
               )}
             </motion.button>
 
