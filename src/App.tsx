@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { ConversationProvider } from "@/contexts/ConversationContext";
 import Home from "@/pages/Home";
 import PatientDashboard from "@/pages/PatientDashboard";
 import AIAssistant from "@/pages/AIAssistant";
@@ -13,7 +14,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
-// Create a client
 const queryClient = new QueryClient();
 
 function AppRoutes() {
@@ -45,10 +45,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AccessibilityProvider>
-        <BrowserRouter>
-          <AppRoutes />
-          <Toaster />
-        </BrowserRouter>
+        <ConversationProvider>
+          <BrowserRouter>
+            <AppRoutes />
+            <Toaster />
+          </BrowserRouter>
+        </ConversationProvider>
       </AccessibilityProvider>
     </QueryClientProvider>
   );
