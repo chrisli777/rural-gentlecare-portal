@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useConversation } from "@11labs/react";
 import { supabase } from "@/lib/supabase";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Message {
   role: "user" | "assistant";
@@ -295,20 +296,29 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
             
             <motion.button
               onClick={toggleVoiceRecording}
-              className={`w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 ${
+              className={`w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden ${
                 isRecording 
-                  ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
-                  : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90'
+                  ? 'ring-4 ring-destructive ring-offset-4 animate-pulse' 
+                  : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 ring-offset-4 hover:ring-4 hover:ring-[#1E5AAB]'
               }`}
               disabled={isLoading}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {isRecording ? (
-                <MicOff className="h-20 w-20 text-white" />
-              ) : (
-                <Mic className="h-20 w-20 text-white" />
-              )}
+              <Avatar className="w-full h-full">
+                <AvatarImage
+                  src="https://production.listennotes.com/podcasts/sarah-and-avneet/sarah-and-avneet-episode-46-BmqPz1w2sQl-vDU5PUMqVrY.1400x1400.jpg"
+                  alt="Lisa AI Assistant"
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-[#1E5AAB]">
+                  {isRecording ? (
+                    <MicOff className="h-20 w-20 text-white" />
+                  ) : (
+                    <Mic className="h-20 w-20 text-white" />
+                  )}
+                </AvatarFallback>
+              </Avatar>
             </motion.button>
 
             {currentTranscript && (
