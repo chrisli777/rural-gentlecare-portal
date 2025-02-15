@@ -1,9 +1,7 @@
-
 import { useRef, useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChatMessage } from "@/components/chat/ChatMessage";
 import { useChat } from "@/hooks/useChat";
 import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Mic, MicOff } from "lucide-react";
@@ -276,51 +274,30 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
               {language === 'en' ? 'Switch to Text Conversation' : 'Cambiar a Conversación de Texto'}
             </Button>
           </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
-            <AnimatePresence>
-              {messages.map((msg, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[80%] p-4 rounded-lg ${
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </motion.div>
-              ))}
-              {currentTranscript && (
-                <motion.div
-                  key="transcript"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-end"
-                >
-                  <div className="max-w-[80%] p-4 rounded-lg bg-primary text-primary-foreground opacity-70">
-                    {currentTranscript}
-                  </div>
-                </motion.div>
-              )}
-              <div ref={messagesEndRef} />
-            </AnimatePresence>
-          </div>
 
-          <div className="p-4 border-t flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-8">
+            <motion.div
+              className="text-center space-y-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <h2 className="text-2xl font-semibold text-gray-900">
+                {language === 'en' ? 'Talk to Us' : 'Habla con Nosotros'}
+              </h2>
+              <p className="text-muted-foreground">
+                {language === 'en' 
+                  ? 'Click the button below to start speaking with your AI Health assistant'
+                  : 'Haz clic en el botón para comenzar a hablar con tu asistente de salud IA'}
+              </p>
+            </motion.div>
+            
             <motion.button
               onClick={toggleVoiceRecording}
               className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
                 isRecording 
                   ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
-                  : 'bg-primary hover:bg-primary/90'
+                  : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90'
               }`}
               disabled={isLoading}
               whileHover={{ scale: 1.05 }}
@@ -332,6 +309,16 @@ Sé amable y conversacional mientras mantienes el profesionalismo. Siempre ofrec
                 <Mic className="h-14 w-14 text-white" />
               )}
             </motion.button>
+
+            {currentTranscript && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mt-4"
+              >
+                <p className="text-lg text-primary">{currentTranscript}</p>
+              </motion.div>
+            )}
           </div>
         </Card>
       </main>
