@@ -17,9 +17,9 @@ const PatientOnboarding = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-white">
       <Header />
-      <div className="container mx-auto px-4 pt-24 pb-12">
+      <div className="container mx-auto px-4 pt-24 pb-12 relative">
         {/* Provider Portal Button */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-0 right-4 z-50">
           <Button
             onClick={() => navigate("/provider/dashboard")}
             variant="outline"
