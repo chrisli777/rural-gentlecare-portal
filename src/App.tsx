@@ -10,6 +10,7 @@ import AIAssistant from "@/pages/AIAssistant";
 import BookAppointment from "@/pages/BookAppointment";
 import Appointments from "@/pages/Appointments";
 import PatientOnboarding from "@/pages/PatientOnboarding";
+import ProviderDashboard from "@/pages/ProviderDashboard";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -35,6 +36,7 @@ function AppRoutes() {
           <Route path="/patient/ai-assistant" element={<AIAssistant />} />
           <Route path="/patient/book-appointment" element={<BookAppointment />} />
           <Route path="/patient/appointments" element={<Appointments />} />
+          <Route path="/provider/dashboard" element={<ProviderDashboard />} />
         </Routes>
       </motion.div>
     </AnimatePresence>

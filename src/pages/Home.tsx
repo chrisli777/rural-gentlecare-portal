@@ -1,7 +1,6 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe, ALargeSmall } from "lucide-react";
+import { HandHeart, Stethoscope, Leaf, CalendarCheck, Bot, Video, Headphones, HelpCircle, Globe, ALargeSmall, UserCog } from "lucide-react";
 import { useState } from "react";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import {
@@ -62,6 +61,18 @@ const Home = () => {
     >
       {/* Overlay for better text readability */}
       <div className="absolute inset-0 bg-black/40" />
+
+      {/* Provider Portal Button */}
+      <div className="absolute top-4 right-4 z-50">
+        <Button
+          onClick={() => navigate("/provider/dashboard")}
+          variant="outline"
+          className="flex items-center gap-2 bg-white/90 hover:bg-white"
+        >
+          <UserCog className="h-4 w-4" />
+          Provider Portal
+        </Button>
+      </div>
 
       {/* Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
