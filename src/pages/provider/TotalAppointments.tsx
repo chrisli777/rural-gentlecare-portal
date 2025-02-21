@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { User, Video, Filter, Search } from "lucide-react";
@@ -94,7 +93,7 @@ const TotalAppointments = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -144,7 +143,12 @@ const TotalAppointments = () => {
                       <p className="text-sm text-gray-600">{appointment.status}</p>
                     </div>
                     {appointment.type === "Online consultation" && (
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-2"
+                        onClick={() => navigate("/provider/video-call")}
+                      >
                         <Video className="h-4 w-4" />
                         Join Meet
                       </Button>
