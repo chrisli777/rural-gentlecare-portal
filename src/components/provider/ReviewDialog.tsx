@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Play, FileText, Download, Send, MessageSquare, User, ChevronRight, Brain, Sparkles } from "lucide-react";
+import { FileText, Download, Send, Brain, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface ReviewDialogProps {
@@ -25,7 +25,6 @@ interface ReviewDialogProps {
 }
 
 export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogProps) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [diagnosticResults, setDiagnosticResults] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -44,10 +43,6 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
     "Patient history suggests potential need for physical therapy evaluation",
     "Recommend following up on previous medication effectiveness"
   ];
-
-  const handlePlayRecording = () => {
-    setIsPlaying(!isPlaying);
-  };
 
   const handleAnalyzeSymptoms = () => {
     setIsAnalyzing(true);
@@ -78,7 +73,7 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-            Review Recording - {appointment.patientName}
+            Review - {appointment.patientName}
           </DialogTitle>
         </DialogHeader>
         
@@ -86,61 +81,15 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
           {/* Patient Basic Info */}
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                  <User className="h-6 w-6 text-gray-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium">{appointment.patientName}</h3>
-                  <div className="text-sm text-gray-500 space-x-4">
-                    <span>Age: {patientInfo.age}</span>
-                    <span>•</span>
-                    <span>Gender: {patientInfo.gender}</span>
-                  </div>
+              <div>
+                <h3 className="font-medium">{appointment.patientName}</h3>
+                <div className="text-sm text-gray-500 space-x-4">
+                  <span>Age: {patientInfo.age}</span>
+                  <span>•</span>
+                  <span>Gender: {patientInfo.gender}</span>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                className="gap-2"
-                onClick={handleViewDetails}
-              >
-                View Details
-                <ChevronRight className="h-4 w-4" />
-              </Button>
             </div>
-          </div>
-
-          {/* Recording Player */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                Recorded on {appointment.date} at {appointment.time}
-              </p>
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={handlePlayRecording}
-              >
-                <Play className="h-4 w-4" />
-                {isPlaying ? "Pause Recording" : "Play Recording"}
-              </Button>
-            </div>
-            {isPlaying && (
-              <div className="bg-secondary/20 p-4 rounded-md">
-                <div className="flex gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-1 bg-primary rounded-full animate-[soundbar_1s_ease-in-out_infinite]`}
-                      style={{
-                        height: Math.random() * 24 + 8,
-                        animationDelay: `${i * 0.2}s`,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* AI Analysis Section */}
@@ -183,24 +132,14 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
               />
             </div>
 
-            <div className="flex justify-between items-center">
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => onOpenChange(false)}
-              >
-                <MessageSquare className="h-4 w-4" />
-                Contact for More Information
-              </Button>
-              <Button
-                variant="default"
-                className="gap-2"
-                onClick={handleGenerateReport}
-              >
-                <FileText className="h-4 w-4" />
-                Generate Report
-              </Button>
-            </div>
+            <Button
+              variant="default"
+              className="gap-2"
+              onClick={handleGenerateReport}
+            >
+              <FileText className="h-4 w-4" />
+              Generate Report
+            </Button>
             
             {showReport && (
               <div className="space-y-4 animate-fade-in">
