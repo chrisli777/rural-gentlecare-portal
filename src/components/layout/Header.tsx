@@ -21,6 +21,7 @@ export const Header = () => {
     location.pathname === '/provider/new-patients' ||
     location.pathname === '/provider/finished-appointments' ||
     location.pathname === '/provider/video-call' ||
+    location.pathname === '/provider/past-reviews' ||
     location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
     location.pathname === '/patient/onboarding';
@@ -37,6 +38,8 @@ export const Header = () => {
       location.pathname === '/provider/new-patients'
     ) {
       navigate('/provider/dashboard');
+    } else if (location.pathname === '/provider/past-reviews') {
+      navigate('/provider/pending-reviews');
     } else {
       navigate(-1);
     }

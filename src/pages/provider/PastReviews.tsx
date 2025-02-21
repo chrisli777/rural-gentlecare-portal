@@ -66,7 +66,7 @@ const PastReviews = () => {
                     variant="outline" 
                     size="sm"
                     className="gap-2"
-                    onClick={() => setSelectedAppointment(review)}
+                    onClick={() => setSelectedAppointment({ ...review, viewOnly: true })}
                   >
                     <FileText className="h-4 w-4" />
                     View Report
