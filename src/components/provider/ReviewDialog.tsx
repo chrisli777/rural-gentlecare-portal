@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Play, FileText, Download, Send, MessageSquare, Brain, Sparkles } from "lucide-react";
+import { Play, FileText, Download, Send, MessageSquare, User, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface ReviewDialogProps {
@@ -28,25 +28,17 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [diagnosticResults, setDiagnosticResults] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Demo AI suggestions
-  const aiSuggestions = [
-    "Based on the symptoms described, consider checking for chronic lower back strain",
-    "Patient history suggests potential need for physical therapy evaluation",
-    "Recommend following up on previous medication effectiveness"
-  ];
+  // Demo patient data
+  const patientInfo = {
+    age: 45,
+    gender: "Male",
+    contactNumber: "+1 (555) 123-4567",
+    lastVisit: "2024-01-15"
+  };
 
   const handlePlayRecording = () => {
     setIsPlaying(!isPlaying);
-  };
-
-  const handleAnalyzeSymptoms = () => {
-    setIsAnalyzing(true);
-    // Simulate AI analysis delay
-    setTimeout(() => {
-      setIsAnalyzing(false);
-    }, 1500);
   };
 
   const handleGenerateReport = () => {
@@ -61,15 +53,47 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
     console.log("Sending to patient...");
   };
 
+  const handleViewDetails = () => {
+    console.log("View patient details");
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
             Review Recording - {appointment.patientName}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
+        
+        <div className="flex-1 overflow-y-auto space-y-6 pr-4">
+          {/* Patient Basic Info */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <User className="h-6 w-6 text-gray-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{appointment.patientName}</h3>
+                  <div className="text-sm text-gray-500 space-x-4">
+                    <span>Age: {patientInfo.age}</span>
+                    <span>•</span>
+                    <span>Gender: {patientInfo.gender}</span>
+                  </div>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                className="gap-2"
+                onClick={handleViewDetails}
+              >
+                View Details
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
           {/* Recording Player */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -102,34 +126,6 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
               </div>
             )}
           </div>
-
-          {/* AI Analysis Section */}
-          <Card className="p-4 bg-blue-50/50">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-blue-600" />
-                <h3 className="font-medium">AI Assistant Insights</h3>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleAnalyzeSymptoms}
-                disabled={isAnalyzing}
-              >
-                <Sparkles className="h-4 w-4" />
-                {isAnalyzing ? "Analyzing..." : "Analyze Symptoms"}
-              </Button>
-            </div>
-            <div className="space-y-2">
-              {aiSuggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-start gap-2 text-sm">
-                  <div className="min-w-4">•</div>
-                  <p>{suggestion}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
 
           {/* Diagnostic Results */}
           <div className="space-y-4">
@@ -175,11 +171,6 @@ ${appointment.notes}
 
 Diagnostic Results:
 ${diagnosticResults}
-
-AI-Assisted Analysis:
-- Potential chronic lower back strain indicated
-- Consider physical therapy evaluation
-- Monitor medication effectiveness
 
 Assessment:
 Patient presents with stable condition, monitoring recommended.
