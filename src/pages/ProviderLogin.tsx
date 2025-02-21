@@ -20,8 +20,8 @@ const ProviderLogin = () => {
     // Accept any non-empty input
     if (email.trim() && password.trim()) {
       toast({
-        title: "Demo Login Successful",
-        description: "Redirecting to provider dashboard...",
+        title: "Login Successful",
+        description: "Redirecting to dashboard...",
         duration: 2000,
       });
       
