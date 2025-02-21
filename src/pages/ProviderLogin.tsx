@@ -47,7 +47,6 @@ const ProviderLogin = () => {
           </div>
           <CardTitle className="text-3xl font-bold">Provider Login</CardTitle>
           <p className="text-gray-600">Sign in to access the provider portal</p>
-          <p className="text-sm text-muted-foreground">(Demo: Any non-empty input will work)</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
