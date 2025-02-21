@@ -11,7 +11,13 @@ const VideoCall = () => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   
   const handleEndCall = () => {
-    navigate("/provider/total-appointments");
+    setIsReportDialogOpen(true);
+  };
+
+  const handleReportSubmit = (report: { diagnosis: string; prescription: string; recommendations: string }) => {
+    // Here you would typically save the report to your backend
+    console.log("Saving report:", report);
+    navigate("/provider/finished-appointments");
   };
 
   return (
@@ -58,6 +64,7 @@ const VideoCall = () => {
         open={isReportDialogOpen}
         onOpenChange={setIsReportDialogOpen}
         patientName="Sarah Johnson"
+        onSubmit={handleReportSubmit}
       />
     </div>
   );

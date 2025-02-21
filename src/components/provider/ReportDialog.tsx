@@ -14,16 +14,16 @@ interface ReportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   patientName: string;
+  onSubmit: (report: { diagnosis: string; prescription: string; recommendations: string }) => void;
 }
 
-export const ReportDialog = ({ open, onOpenChange, patientName }: ReportDialogProps) => {
+export const ReportDialog = ({ open, onOpenChange, patientName, onSubmit }: ReportDialogProps) => {
   const [diagnosis, setDiagnosis] = useState("");
   const [prescription, setPrescription] = useState("");
   const [recommendations, setRecommendations] = useState("");
 
   const handleSubmit = () => {
-    // Here you would typically save the report
-    console.log("Saving report:", { diagnosis, prescription, recommendations });
+    onSubmit({ diagnosis, prescription, recommendations });
     onOpenChange(false);
   };
 
