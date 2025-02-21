@@ -72,7 +72,7 @@ const ProviderLogin = () => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-[#1E5AAB] hover:bg-[#1E5AAB]/90">
               Sign In
             </Button>
           </form>

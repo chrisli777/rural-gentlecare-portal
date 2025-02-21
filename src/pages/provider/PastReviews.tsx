@@ -65,7 +65,7 @@ const PastReviews = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 text-[#1E5AAB] hover:text-[#1E5AAB]/90 hover:bg-[#1E5AAB]/10"
                     onClick={() => setSelectedAppointment({ ...review, viewOnly: true })}
                   >
                     <FileText className="h-4 w-4" />
