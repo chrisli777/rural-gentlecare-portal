@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Play, FileText } from "lucide-react";
+import { Play, FileText, Download, Send, MessageSquare } from "lucide-react";
 
 interface ReviewDialogProps {
   open: boolean;
@@ -26,15 +26,29 @@ interface ReviewDialogProps {
 export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [diagnosticResults, setDiagnosticResults] = useState("");
 
   const handlePlayRecording = () => {
     setIsPlaying(!isPlaying);
-    // In a real app, this would play the actual recording
   };
 
   const handleGenerateReport = () => {
     setShowReport(true);
-    // In a real app, this would call an AI service
+  };
+
+  const handleDownloadPDF = () => {
+    // In a real app, this would generate and download a PDF
+    console.log("Downloading PDF...");
+  };
+
+  const handleSendToPatient = () => {
+    // In a real app, this would send the report to the patient
+    console.log("Sending to patient...");
+  };
+
+  const handleContactPatient = () => {
+    // In a real app, this would open a communication channel
+    console.log("Contacting patient...");
   };
 
   return (
@@ -79,10 +93,27 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
           </div>
 
           <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Diagnostic Results</label>
+              <Textarea
+                placeholder="Enter your diagnostic findings here..."
+                value={diagnosticResults}
+                onChange={(e) => setDiagnosticResults(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Generated Report</h3>
               <Button
                 variant="outline"
+                className="gap-2"
+                onClick={handleContactPatient}
+              >
+                <MessageSquare className="h-4 w-4" />
+                Contact for More Information
+              </Button>
+              <Button
+                variant="default"
                 className="gap-2"
                 onClick={handleGenerateReport}
               >
@@ -95,7 +126,6 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
               <div className="space-y-4">
                 <Textarea
                   className="min-h-[200px]"
-                  placeholder="Report will be generated here..."
                   value={`Patient: ${appointment.patientName}
 Date: ${appointment.date}
 Time: ${appointment.time}
@@ -103,10 +133,8 @@ Time: ${appointment.time}
 Chief Complaint:
 ${appointment.notes}
 
-Key Findings:
-- Patient reports chronic symptoms
-- Recommends follow-up in 2 weeks
-- No immediate concerns identified
+Diagnostic Results:
+${diagnosticResults}
 
 Assessment:
 Patient presents with stable condition, monitoring recommended.
@@ -117,6 +145,16 @@ Plan:
 3. Monitor symptoms`}
                   readOnly
                 />
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" className="gap-2" onClick={handleDownloadPDF}>
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </Button>
+                  <Button className="gap-2" onClick={handleSendToPatient}>
+                    <Send className="h-4 w-4" />
+                    Send to Patient
+                  </Button>
+                </div>
               </div>
             )}
           </div>
