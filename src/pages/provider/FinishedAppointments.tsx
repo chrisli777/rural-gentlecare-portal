@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { User, FileText, Filter, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { PatientDetailDialog } from "@/components/provider/PatientDetailDialog";
+import { ReviewDialog } from "@/components/provider/ReviewDialog";
 import {
   Select,
   SelectContent,
@@ -16,19 +16,7 @@ import {
 const FinishedAppointments = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
-  const [selectedPatient, setSelectedPatient] = useState<{
-    id: number;
-    name: string;
-    dateJoined: string;
-    reason: string;
-    age: number;
-    report?: {
-      diagnosis: string;
-      prescription: string;
-      recommendations: string;
-    };
-  } | null>(null);
-  const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
   const finishedAppointments = [
     {
@@ -62,15 +50,7 @@ const FinishedAppointments = () => {
   ];
 
   const handleViewReport = (appointment: any) => {
-    setSelectedPatient({
-      id: appointment.id,
-      name: appointment.patientName,
-      dateJoined: "2024-01-01",
-      reason: appointment.notes,
-      age: 35,
-      report: appointment.report
-    });
-    setIsPatientDialogOpen(true);
+    setSelectedAppointment({ ...appointment, viewOnly: true });
   };
 
   const filteredAppointments = finishedAppointments.filter(appointment => {
@@ -157,11 +137,13 @@ const FinishedAppointments = () => {
         </div>
       </div>
 
-      <PatientDetailDialog 
-        open={isPatientDialogOpen}
-        onOpenChange={setIsPatientDialogOpen}
-        patient={selectedPatient}
-      />
+      {selectedAppointment && (
+        <ReviewDialog
+          open={!!selectedAppointment}
+          onOpenChange={(open) => !open && setSelectedAppointment(null)}
+          appointment={selectedAppointment}
+        />
+      )}
     </div>
   );
 };
