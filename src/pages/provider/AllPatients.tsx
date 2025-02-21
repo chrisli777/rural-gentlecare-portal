@@ -15,7 +15,7 @@ const AllPatients = () => {
     {
       id: 1,
       name: "Emma Wilson",
-      age: 28,
+      age: 58,
       condition: "General wellness",
       lastVisit: "2024-02-19",
       status: "Active"
@@ -23,7 +23,7 @@ const AllPatients = () => {
     {
       id: 2,
       name: "James Thompson",
-      age: 45,
+      age: 65,
       condition: "Chronic back pain",
       lastVisit: "2024-02-18",
       status: "Active"
@@ -31,7 +31,7 @@ const AllPatients = () => {
     {
       id: 3,
       name: "Sofia Rodriguez",
-      age: 32,
+      age: 52,
       condition: "Regular check-up",
       lastVisit: "2024-02-18",
       status: "Active"
@@ -39,7 +39,7 @@ const AllPatients = () => {
     {
       id: 4,
       name: "Michael Chen",
-      age: 52,
+      age: 72,
       condition: "Hypertension management",
       lastVisit: "2024-02-15",
       status: "Active"
@@ -47,7 +47,7 @@ const AllPatients = () => {
     {
       id: 5,
       name: "Sarah Johnson",
-      age: 35,
+      age: 61,
       condition: "Migraine treatment",
       lastVisit: "2024-02-14",
       status: "Active"
