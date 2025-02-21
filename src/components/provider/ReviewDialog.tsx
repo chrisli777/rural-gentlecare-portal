@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Play, FileText, Download, Send, MessageSquare, User, ChevronRight } from "lucide-react";
+import { Play, FileText, Download, Send, MessageSquare, User, ChevronRight, Brain, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface ReviewDialogProps {
@@ -28,6 +28,7 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [diagnosticResults, setDiagnosticResults] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Demo patient data
   const patientInfo = {
@@ -37,8 +38,23 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
     lastVisit: "2024-01-15"
   };
 
+  // Demo AI suggestions
+  const aiSuggestions = [
+    "Based on the symptoms described, consider checking for chronic lower back strain",
+    "Patient history suggests potential need for physical therapy evaluation",
+    "Recommend following up on previous medication effectiveness"
+  ];
+
   const handlePlayRecording = () => {
     setIsPlaying(!isPlaying);
+  };
+
+  const handleAnalyzeSymptoms = () => {
+    setIsAnalyzing(true);
+    // Simulate AI analysis delay
+    setTimeout(() => {
+      setIsAnalyzing(false);
+    }, 1500);
   };
 
   const handleGenerateReport = () => {
@@ -127,6 +143,34 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
             )}
           </div>
 
+          {/* AI Analysis Section */}
+          <Card className="p-4 bg-blue-50/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-blue-600" />
+                <h3 className="font-medium">AI Assistant Insights</h3>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleAnalyzeSymptoms}
+                disabled={isAnalyzing}
+              >
+                <Sparkles className="h-4 w-4" />
+                {isAnalyzing ? "Analyzing..." : "Analyze Symptoms"}
+              </Button>
+            </div>
+            <div className="mt-4 space-y-2">
+              {aiSuggestions.map((suggestion, index) => (
+                <div key={index} className="flex items-start gap-2 text-sm">
+                  <div className="min-w-4">•</div>
+                  <p>{suggestion}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
           {/* Diagnostic Results */}
           <div className="space-y-4">
             <div className="space-y-2">
@@ -171,6 +215,11 @@ ${appointment.notes}
 
 Diagnostic Results:
 ${diagnosticResults}
+
+AI-Assisted Analysis:
+- Potential chronic lower back strain indicated
+- Consider physical therapy evaluation
+- Monitor medication effectiveness
 
 Assessment:
 Patient presents with stable condition, monitoring recommended.
