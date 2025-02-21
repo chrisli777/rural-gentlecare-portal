@@ -12,8 +12,13 @@ import NewPatients from "@/pages/provider/NewPatients";
 import PendingReviews from "@/pages/provider/PendingReviews";
 import TotalAppointments from "@/pages/provider/TotalAppointments";
 import FinishedAppointments from "@/pages/provider/FinishedAppointments";
+import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { ConversationProvider } from "@/contexts/ConversationContext";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 import "./App.css";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -64,10 +69,14 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
-      <RouterProvider router={router} />
-      <Toaster />
-    </>
+    <QueryClientProvider client={queryClient}>
+      <AccessibilityProvider>
+        <ConversationProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </ConversationProvider>
+      </AccessibilityProvider>
+    </QueryClientProvider>
   );
 }
 
