@@ -1,11 +1,9 @@
 
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
-import { User, Video, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { User, Video } from "lucide-react";
 
 const TotalAppointments = () => {
-  const navigate = useNavigate();
   const upcomingAppointments = [
     {
       id: 1,
@@ -41,19 +39,9 @@ const TotalAppointments = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="gap-2"
-              onClick={() => navigate("/provider/dashboard")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Total Appointments</h1>
-              <p className="text-xl text-gray-600 mt-2">View and manage all appointments</p>
-            </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Total Appointments</h1>
+            <p className="text-xl text-gray-600 mt-2">View and manage all appointments</p>
           </div>
 
           <div className="space-y-4">
