@@ -5,10 +5,11 @@ import { User, Bell, FileText } from "lucide-react";
 import { useState } from "react";
 import { ReviewDialog } from "@/components/provider/ReviewDialog";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const PendingReviews = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
-  const [showReport, setShowReport] = useState(false);
+  const navigate = useNavigate();
 
   const pendingReviews = [
     {
@@ -43,7 +44,7 @@ const PendingReviews = () => {
             </div>
             <Button 
               variant="outline" 
-              onClick={() => setShowReport(true)}
+              onClick={() => navigate("/provider/finished-appointments")}
               className="gap-2"
             >
               <FileText className="h-4 w-4" />
