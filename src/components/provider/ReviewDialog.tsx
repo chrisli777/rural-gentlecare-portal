@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -30,6 +29,7 @@ interface ReviewDialogProps {
   };
   hidePlayRecording?: boolean;
   hideContactInfo?: boolean;
+  onSendToPatient?: () => void;
 }
 
 export const ReviewDialog = ({ 
@@ -37,7 +37,8 @@ export const ReviewDialog = ({
   onOpenChange, 
   appointment,
   hidePlayRecording = false,
-  hideContactInfo = false 
+  hideContactInfo = false,
+  onSendToPatient
 }: ReviewDialogProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showReport, setShowReport] = useState(appointment.viewOnly);
@@ -83,6 +84,9 @@ export const ReviewDialog = ({
 
   const handleSendToPatient = () => {
     console.log("Sending to patient...");
+    if (onSendToPatient) {
+      onSendToPatient();
+    }
   };
 
   const handleViewDetails = () => {

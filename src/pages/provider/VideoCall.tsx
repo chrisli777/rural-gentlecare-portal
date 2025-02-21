@@ -23,6 +23,16 @@ const VideoCall = () => {
     status: "In Progress"
   };
 
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setIsReportDialogOpen(false);
+    }
+  };
+
+  const handleSendToPatient = () => {
+    navigate('/provider/finished-appointments');
+  };
+
   return (
     <div className="min-h-screen bg-black">
       <Header />
@@ -66,10 +76,11 @@ const VideoCall = () => {
       {isReportDialogOpen && (
         <ReviewDialog
           open={isReportDialogOpen}
-          onOpenChange={(open) => setIsReportDialogOpen(open)}
+          onOpenChange={handleDialogChange}
           appointment={appointment}
           hidePlayRecording={true}
           hideContactInfo={true}
+          onSendToPatient={handleSendToPatient}
         />
       )}
     </div>
