@@ -68,6 +68,8 @@ const VideoCall = () => {
           open={isReportDialogOpen}
           onOpenChange={(open) => setIsReportDialogOpen(open)}
           appointment={appointment}
+          hidePlayRecording={true}
+          hideContactInfo={true}
         />
       )}
     </div>
