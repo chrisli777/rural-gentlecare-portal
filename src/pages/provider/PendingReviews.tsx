@@ -44,7 +44,7 @@ const PendingReviews = () => {
             </div>
             <Button 
               variant="outline" 
-              onClick={() => navigate("/provider/finished-appointments")}
+              onClick={() => navigate("/provider/past-reviews")}
               className="gap-2"
             >
               <FileText className="h-4 w-4" />
