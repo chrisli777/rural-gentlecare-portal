@@ -19,6 +19,7 @@ export const Header = () => {
     location.pathname === '/provider/total-appointments' ||
     location.pathname === '/provider/pending-reviews' ||
     location.pathname === '/provider/new-patients' ||
+    location.pathname === '/provider/finished-appointments' ||
     location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
     location.pathname === '/patient/onboarding';

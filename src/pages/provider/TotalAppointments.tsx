@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { User, Video, Filter, Search } from "lucide-react";
@@ -81,8 +82,9 @@ const TotalAppointments = () => {
             </div>
             <div className="flex gap-4">
               <Button 
-                variant="secondary"
+                variant="outline"
                 onClick={() => navigate("/provider/finished-appointments")}
+                className="text-gray-600"
               >
                 Finished Appointments
               </Button>
