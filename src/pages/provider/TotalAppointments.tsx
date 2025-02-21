@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { User, Video, Filter, Search } from "lucide-react";
@@ -79,16 +80,13 @@ const TotalAppointments = () => {
             <div>
               <h1 className="text-4xl font-bold text-gray-900">Upcoming Appointments</h1>
             </div>
-            <div className="flex gap-4">
+            <div>
               <Button 
-                variant="outline"
+                variant="default"
                 onClick={() => navigate("/provider/finished-appointments")}
-                className="text-gray-600"
+                className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
               >
                 Finished Appointments
-              </Button>
-              <Button onClick={() => console.log("Add new appointment")}>
-                Add Appointment
               </Button>
             </div>
           </div>
@@ -146,7 +144,7 @@ const TotalAppointments = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="gap-2"
+                        className="gap-2 text-[#1E5AAB] hover:text-[#1E5AAB]/90 hover:bg-[#1E5AAB]/10"
                         onClick={() => navigate("/provider/video-call")}
                       >
                         <Video className="h-4 w-4" />
