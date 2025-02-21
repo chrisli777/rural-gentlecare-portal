@@ -19,6 +19,7 @@ export const Header = () => {
     location.pathname === '/provider/total-appointments' ||
     location.pathname === '/provider/pending-reviews' ||
     location.pathname === '/provider/new-patients' ||
+    location.pathname === '/provider/all-patients' ||
     location.pathname === '/provider/finished-appointments' ||
     location.pathname === '/provider/video-call' ||
     location.pathname === '/provider/past-reviews' ||
@@ -40,6 +41,8 @@ export const Header = () => {
       navigate('/provider/dashboard');
     } else if (location.pathname === '/provider/past-reviews') {
       navigate('/provider/pending-reviews');
+    } else if (location.pathname === '/provider/all-patients') {
+      navigate('/provider/new-patients');
     } else {
       navigate(-1);
     }

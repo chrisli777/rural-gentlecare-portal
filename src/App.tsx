@@ -1,4 +1,3 @@
-
 import { BrowserRouter } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,6 +17,7 @@ import NewPatients from "@/pages/provider/NewPatients";
 import FinishedAppointments from "@/pages/provider/FinishedAppointments";
 import VideoCall from "@/pages/provider/VideoCall";
 import PastReviews from "@/pages/provider/PastReviews";
+import AllPatients from "@/pages/provider/AllPatients";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -48,6 +48,7 @@ function AppRoutes() {
           <Route path="/provider/total-appointments" element={<TotalAppointments />} />
           <Route path="/provider/pending-reviews" element={<PendingReviews />} />
           <Route path="/provider/new-patients" element={<NewPatients />} />
+          <Route path="/provider/all-patients" element={<AllPatients />} />
           <Route path="/provider/finished-appointments" element={<FinishedAppointments />} />
           <Route path="/provider/video-call" element={<VideoCall />} />
           <Route path="/provider/past-reviews" element={<PastReviews />} />
