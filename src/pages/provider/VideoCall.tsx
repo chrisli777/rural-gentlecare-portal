@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Phone, FileText } from "lucide-react";
 import { useState } from "react";
-import { PatientDetailDialog } from "@/components/provider/PatientDetailDialog";
+import { ReviewDialog } from "@/components/provider/ReviewDialog";
 
 const VideoCall = () => {
   const navigate = useNavigate();
@@ -14,16 +14,13 @@ const VideoCall = () => {
     setIsReportDialogOpen(true);
   };
 
-  const handleReportSubmit = () => {
-    navigate("/provider/finished-appointments");
-  };
-
-  const patient = {
+  const appointment = {
     id: 1,
-    name: "Sarah Johnson",
-    dateJoined: "2024-02-20",
-    reason: "Online consultation",
-    age: 32,
+    patientName: "Sarah Johnson",
+    time: "11:30 AM",
+    date: "2024-02-20",
+    notes: "Online consultation",
+    status: "In Progress"
   };
 
   return (
@@ -66,14 +63,13 @@ const VideoCall = () => {
         </div>
       </div>
 
-      <PatientDetailDialog
-        open={isReportDialogOpen}
-        onOpenChange={(open) => {
-          setIsReportDialogOpen(open);
-          if (!open) handleReportSubmit();
-        }}
-        patient={patient}
-      />
+      {isReportDialogOpen && (
+        <ReviewDialog
+          open={isReportDialogOpen}
+          onOpenChange={(open) => setIsReportDialogOpen(open)}
+          appointment={appointment}
+        />
+      )}
     </div>
   );
 };
