@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Heart, ArrowLeft, Menu } from "lucide-react";
+import { Heart, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
@@ -13,13 +13,19 @@ export const Header = () => {
   const { language } = useAccessibility();
   const t = translations[language];
   
-  // Add onboarding to the routes that should show only back button
+  // Add provider routes that should show only back button
   const showOnlyBackButton = location.pathname === '/provider/patients' || 
     location.pathname === '/provider/analytics' ||
+    location.pathname === '/provider/total-appointments' ||
+    location.pathname === '/provider/pending-reviews' ||
+    location.pathname === '/provider/new-patients' ||
     location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
     location.pathname === '/patient/onboarding';
   
+  // Check if current route is provider dashboard
+  const isProviderDashboard = location.pathname === '/provider/dashboard';
+
   if (showOnlyBackButton) {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -50,32 +56,15 @@ export const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-              {t.common.appointments}
-            </Link>
-          </nav>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <Menu className="w-6 h-6 text-gray-600" />
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <nav className="md:hidden py-4 animate-fade-in">
-            <div className="flex flex-col space-y-4">
+          {/* Desktop Navigation - Only show Appointments for patient routes */}
+          {!isProviderDashboard && (
+            <nav className="hidden md:flex items-center space-x-8">
               <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
                 {t.common.appointments}
               </Link>
-            </div>
-          </nav>
-        )}
+            </nav>
+          )}
+        </div>
       </div>
     </header>
   );
