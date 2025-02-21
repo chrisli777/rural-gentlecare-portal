@@ -17,6 +17,7 @@ const PastReviews = () => {
       date: "2024-02-15",
       notes: "Follow-up consultation - migraine treatment",
       status: "Completed",
+      age: 71,
       report: {
         diagnosis: "Chronic migraine with aura",
         prescription: "Sumatriptan 50mg",
@@ -30,6 +31,7 @@ const PastReviews = () => {
       date: "2024-02-14",
       notes: "Regular check-up - diabetes management",
       status: "Completed",
+      age: 68,
       report: {
         diagnosis: "Type 2 Diabetes - well controlled",
         prescription: "Continue current medication",
@@ -58,6 +60,7 @@ const PastReviews = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{review.patientName}</h3>
+                      <p className="text-sm text-gray-600">Age: {review.age}</p>
                       <p className="text-sm text-gray-600">{review.notes}</p>
                       <p className="text-sm text-gray-500 mt-1">{review.date} at {review.time}</p>
                     </div>

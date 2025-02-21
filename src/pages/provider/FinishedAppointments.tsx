@@ -1,10 +1,11 @@
 
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
-import { User, FileText, Filter, Search } from "lucide-react";
+import { User, Video, Filter, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { ReviewDialog } from "@/components/provider/ReviewDialog";
+import { PatientDetailDialog } from "@/components/provider/PatientDetailDialog";
+import { useNavigate } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -14,46 +15,57 @@ import {
 } from "@/components/ui/select";
 
 const FinishedAppointments = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
-  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [selectedPatient, setSelectedPatient] = useState<{
+    id: number;
+    name: string;
+    dateJoined: string;
+    reason: string;
+    age: number;
+    report?: {
+      diagnosis: string;
+      prescription: string;
+      recommendations: string;
+    };
+  } | null>(null);
+  const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
 
-  const finishedAppointments = [
+  const upcomingAppointments = [
     {
-      id: 4,
-      patientName: "David Wilson",
-      time: "9:00 AM",
-      date: "2024-02-20",
+      id: 1,
+      patientName: "Sarah Johnson",
+      time: "10:00 AM",
+      date: "2024-02-23",
       type: "In-person consultation",
-      notes: "Annual check-up",
-      status: "Completed",
-      report: {
-        diagnosis: "Healthy overall, minor vitamin D deficiency",
-        prescription: "Vitamin D supplements",
-        recommendations: "Regular exercise, balanced diet"
-      }
+      notes: "Follow-up for respiratory symptoms",
+      status: "Scheduled",
+      age: 71
     },
     {
-      id: 5,
-      patientName: "Lisa Zhang",
-      time: "3:30 PM",
-      date: "2024-02-21",
+      id: 2,
+      patientName: "Michael Chen",
+      time: "11:30 AM",
+      date: "2024-02-24",
       type: "Online consultation",
-      notes: "Follow-up on medication",
-      status: "Completed",
-      report: {
-        diagnosis: "Symptoms improving with current medication",
-        prescription: "Continue current medication",
-        recommendations: "Monthly follow-up"
-      }
+      notes: "Initial consultation - chronic back pain",
+      status: "Pending Review",
+      age: 68
+    },
+    {
+      id: 3,
+      patientName: "Emily Brown",
+      time: "2:15 PM",
+      date: "2024-02-25",
+      type: "Online consultation",
+      notes: "Medication review - anxiety management",
+      status: "Voice Recording Ready",
+      age: 65
     }
   ];
 
-  const handleViewReport = (appointment: any) => {
-    setSelectedAppointment({ ...appointment, viewOnly: true });
-  };
-
-  const filteredAppointments = finishedAppointments.filter(appointment => {
+  const filteredAppointments = upcomingAppointments.filter(appointment => {
     const matchesSearch = appointment.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          appointment.notes.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === "all" || 
@@ -67,11 +79,22 @@ const FinishedAppointments = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">Finished Appointments</h1>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">Upcoming Appointments</h1>
+            </div>
+            <div>
+              <Button 
+                variant="default"
+                onClick={() => navigate("/provider/finished-appointments")}
+                className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
+              >
+                Finished Appointments
+              </Button>
+            </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -107,6 +130,7 @@ const FinishedAppointments = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{appointment.patientName}</h3>
+                      <p className="text-sm text-gray-600">Age: {appointment.age}</p>
                       <p className="text-sm text-gray-600">{appointment.notes}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-sm text-gray-600">
@@ -120,15 +144,17 @@ const FinishedAppointments = () => {
                       <p className="text-sm font-medium text-gray-900">{appointment.type}</p>
                       <p className="text-sm text-gray-600">{appointment.status}</p>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2"
-                      onClick={() => handleViewReport(appointment)}
-                    >
-                      <FileText className="h-4 w-4" />
-                      View Report
-                    </Button>
+                    {appointment.type === "Online consultation" && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-2 text-[#1E5AAB] hover:text-[#1E5AAB]/90 hover:bg-[#1E5AAB]/10"
+                        onClick={() => navigate("/provider/video-call")}
+                      >
+                        <Video className="h-4 w-4" />
+                        Join Meet
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -137,13 +163,11 @@ const FinishedAppointments = () => {
         </div>
       </div>
 
-      {selectedAppointment && (
-        <ReviewDialog
-          open={!!selectedAppointment}
-          onOpenChange={(open) => !open && setSelectedAppointment(null)}
-          appointment={selectedAppointment}
-        />
-      )}
+      <PatientDetailDialog 
+        open={isPatientDialogOpen}
+        onOpenChange={setIsPatientDialogOpen}
+        patient={selectedPatient}
+      />
     </div>
   );
 };
