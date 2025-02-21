@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock, User, Bell } from "lucide-react";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
@@ -15,13 +15,33 @@ const ProviderDashboard = () => {
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex justify-between items-start">
             <div className="space-y-2">
-              <h1 className="text-4xl font-bold text-gray-900">Provider Dashboard</h1>
-              <p className="text-xl text-gray-600">Welcome back, Dr. Adams</p>
+              <h1 className="text-4xl font-bold text-[#1A1F2C]">Welcome back, Dr. Adams</h1>
+              <p className="text-xl text-gray-600">Today's Overview</p>
             </div>
             <Button variant="outline" onClick={() => navigate("/")} className="text-gray-600">
               Sign Out
             </Button>
           </div>
+
+          {/* Notification Card */}
+          <Card className="bg-[#F2FCE2] border-none">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                <Bell className="h-5 w-5 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">New Patient Records Available</h3>
+                <p className="text-sm text-gray-600">3 new patient records need your review</p>
+              </div>
+              <Button
+                variant="outline"
+                className="bg-white hover:bg-gray-50"
+                onClick={() => navigate("/provider/new-patients")}
+              >
+                Review Now
+              </Button>
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card 
