@@ -65,7 +65,7 @@ const Home = () => {
       {/* Provider Portal Button */}
       <div className="absolute top-4 right-4 z-50">
         <Button
-          onClick={() => navigate("/provider/dashboard")}
+          onClick={() => navigate("/provider/login")}
           variant="outline"
           className="flex items-center gap-2 bg-white/90 hover:bg-white"
         >
