@@ -73,7 +73,7 @@ const ProviderLogin = () => {
               />
             </div>
             <Button type="submit" className="w-full">
-              Provider Login
+              Sign In
             </Button>
           </form>
         </CardContent>
