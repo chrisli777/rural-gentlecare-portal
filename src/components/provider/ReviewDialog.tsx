@@ -132,14 +132,16 @@ export const ReviewDialog = ({ open, onOpenChange, appointment }: ReviewDialogPr
               />
             </div>
 
-            <Button
-              variant="default"
-              className="gap-2"
-              onClick={handleGenerateReport}
-            >
-              <FileText className="h-4 w-4" />
-              Generate Report
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                variant="default"
+                className="gap-2"
+                onClick={handleGenerateReport}
+              >
+                <FileText className="h-4 w-4" />
+                Generate Report
+              </Button>
+            </div>
             
             {showReport && (
               <div className="space-y-4 animate-fade-in">
