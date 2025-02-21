@@ -1,12 +1,15 @@
 
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Bell } from "lucide-react";
+import { User, Bell, FileText } from "lucide-react";
 import { useState } from "react";
 import { ReviewDialog } from "@/components/provider/ReviewDialog";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const PendingReviews = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const navigate = useNavigate();
 
   const pendingReviews = [
     {
@@ -32,9 +35,19 @@ const PendingReviews = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">Pending Reviews</h1>
-            <p className="text-xl text-gray-600 mt-2">Review patient recordings and generate reports</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">Pending Reviews</h1>
+              <p className="text-xl text-gray-600 mt-2">Review patient recordings and generate reports</p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/provider/past-reviews")}
+              className="gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Past Reviews
+            </Button>
           </div>
 
           <div className="space-y-4">
