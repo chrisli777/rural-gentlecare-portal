@@ -6,16 +6,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const ProviderLogin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle authentication here
-    navigate("/provider/dashboard");
+    
+    // Accept any non-empty input
+    if (email.trim() && password.trim()) {
+      toast({
+        title: "Demo Login Successful",
+        description: "Redirecting to provider dashboard...",
+        duration: 2000,
+      });
+      
+      // Short delay to show the toast before navigation
+      setTimeout(() => {
+        navigate("/provider/dashboard");
+      }, 500);
+    } else {
+      toast({
+        title: "Please fill in all fields",
+        description: "Both email and password are required",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -27,6 +47,7 @@ const ProviderLogin = () => {
           </div>
           <CardTitle className="text-3xl font-bold">Provider Login</CardTitle>
           <p className="text-gray-600">Sign in to access the provider portal</p>
+          <p className="text-sm text-muted-foreground">(Demo: Any non-empty input will work)</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
