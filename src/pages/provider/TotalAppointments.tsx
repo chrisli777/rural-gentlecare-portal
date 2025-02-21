@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { User, Video, Filter, Search } from "lucide-react";
@@ -14,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const UpcomingAppointments = () => {
+const TotalAppointments = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -165,4 +164,4 @@ const UpcomingAppointments = () => {
   );
 };
 
-export default UpcomingAppointments;
+export default TotalAppointments;
