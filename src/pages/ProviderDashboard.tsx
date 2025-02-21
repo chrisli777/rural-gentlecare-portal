@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, User, Bell } from "lucide-react";
+import { useState } from "react";
+import { ReviewDialog } from "@/components/provider/ReviewDialog";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
   const upcomingAppointments = [
     {
@@ -93,7 +96,12 @@ const ProviderDashboard = () => {
                   <div
                     key={appointment.id}
                     className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => navigate(`/provider/patient/${appointment.id}`)}
+                    onClick={() => {
+                      if (appointment.status === "Pending Review" || 
+                          appointment.status === "Voice Recording Ready") {
+                        setSelectedAppointment(appointment);
+                      }
+                    }}
                   >
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -109,7 +117,8 @@ const ProviderDashboard = () => {
                         <p className="text-sm font-medium text-gray-900">{appointment.time}</p>
                         <p className="text-sm text-gray-600">{appointment.status}</p>
                       </div>
-                      {appointment.status === "Voice Recording Ready" && (
+                      {(appointment.status === "Voice Recording Ready" || 
+                        appointment.status === "Pending Review") && (
                         <Bell className="h-5 w-5 text-blue-600" />
                       )}
                     </div>
@@ -120,6 +129,14 @@ const ProviderDashboard = () => {
           </Card>
         </div>
       </div>
+
+      {selectedAppointment && (
+        <ReviewDialog
+          open={!!selectedAppointment}
+          onOpenChange={(open) => !open && setSelectedAppointment(null)}
+          appointment={selectedAppointment}
+        />
+      )}
     </div>
   );
 };
