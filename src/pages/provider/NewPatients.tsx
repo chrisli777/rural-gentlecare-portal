@@ -1,12 +1,15 @@
 
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent } from "@/components/ui/card";
-import { User } from "lucide-react";
+import { User, Users } from "lucide-react";
 import { useState } from "react";
 import { PatientDetailDialog } from "@/components/provider/PatientDetailDialog";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const NewPatients = () => {
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const navigate = useNavigate();
 
   const newPatients = [
     {
@@ -37,9 +40,18 @@ const NewPatients = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">New Patients</h1>
-            <p className="text-xl text-gray-600 mt-2">Recently registered patients</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">New Patients</h1>
+              <p className="text-xl text-gray-600 mt-2">Recently registered patients</p>
+            </div>
+            <Button 
+              onClick={() => navigate("/provider/all-patients")}
+              className="gap-2 bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
+            >
+              <Users className="h-4 w-4" />
+              All Patients
+            </Button>
           </div>
 
           <div className="space-y-4">
