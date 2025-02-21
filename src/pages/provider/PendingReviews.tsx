@@ -41,9 +41,8 @@ const PendingReviews = () => {
               <p className="text-xl text-gray-600 mt-2">Review patient recordings and generate reports</p>
             </div>
             <Button 
-              variant="outline" 
               onClick={() => navigate("/provider/past-reviews")}
-              className="gap-2 text-[#1E5AAB] hover:text-[#1E5AAB]/90 hover:bg-[#1E5AAB]/10"
+              className="gap-2 bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
             >
               <FileText className="h-4 w-4" />
               Past Reviews
