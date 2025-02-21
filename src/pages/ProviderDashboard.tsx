@@ -3,40 +3,10 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, User, Bell } from "lucide-react";
-import { useState } from "react";
-import { ReviewDialog } from "@/components/provider/ReviewDialog";
+import { Calendar, Clock, User } from "lucide-react";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
-  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
-
-  const upcomingAppointments = [
-    {
-      id: 1,
-      patientName: "Sarah Johnson",
-      time: "10:00 AM",
-      date: "2024-02-20",
-      notes: "Follow-up for respiratory symptoms",
-      status: "Scheduled"
-    },
-    {
-      id: 2,
-      patientName: "Michael Chen",
-      time: "11:30 AM",
-      date: "2024-02-20",
-      notes: "Initial consultation - chronic back pain",
-      status: "Pending Review"
-    },
-    {
-      id: 3,
-      patientName: "Emily Brown",
-      time: "2:15 PM",
-      date: "2024-02-20",
-      notes: "Medication review - anxiety management",
-      status: "Voice Recording Ready"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-white">
@@ -54,7 +24,10 @@ const ProviderDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-blue-50">
+            <Card 
+              className="bg-blue-50 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate("/provider/total-appointments")}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Appointments</CardTitle>
                 <Calendar className="h-4 w-4 text-blue-600" />
@@ -64,7 +37,10 @@ const ProviderDashboard = () => {
                 <p className="text-xs text-gray-600">Today</p>
               </CardContent>
             </Card>
-            <Card className="bg-green-50">
+            <Card 
+              className="bg-green-50 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate("/provider/pending-reviews")}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
                 <Clock className="h-4 w-4 text-green-600" />
@@ -74,7 +50,10 @@ const ProviderDashboard = () => {
                 <p className="text-xs text-gray-600">Voice recordings to review</p>
               </CardContent>
             </Card>
-            <Card className="bg-purple-50">
+            <Card 
+              className="bg-purple-50 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate("/provider/new-patients")}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">New Patients</CardTitle>
                 <User className="h-4 w-4 text-purple-600" />
@@ -85,58 +64,8 @@ const ProviderDashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Today's Appointments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {upcomingAppointments.map((appointment) => (
-                  <div
-                    key={appointment.id}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg border cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => {
-                      if (appointment.status === "Pending Review" || 
-                          appointment.status === "Voice Recording Ready") {
-                        setSelectedAppointment(appointment);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        <User className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{appointment.patientName}</h3>
-                        <p className="text-sm text-gray-600">{appointment.notes}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{appointment.time}</p>
-                        <p className="text-sm text-gray-600">{appointment.status}</p>
-                      </div>
-                      {(appointment.status === "Voice Recording Ready" || 
-                        appointment.status === "Pending Review") && (
-                        <Bell className="h-5 w-5 text-blue-600" />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
-
-      {selectedAppointment && (
-        <ReviewDialog
-          open={!!selectedAppointment}
-          onOpenChange={(open) => !open && setSelectedAppointment(null)}
-          appointment={selectedAppointment}
-        />
-      )}
     </div>
   );
 };

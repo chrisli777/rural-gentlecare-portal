@@ -12,6 +12,9 @@ import Appointments from "@/pages/Appointments";
 import PatientOnboarding from "@/pages/PatientOnboarding";
 import ProviderDashboard from "@/pages/ProviderDashboard";
 import ProviderLogin from "@/pages/ProviderLogin";
+import TotalAppointments from "@/pages/provider/TotalAppointments";
+import PendingReviews from "@/pages/provider/PendingReviews";
+import NewPatients from "@/pages/provider/NewPatients";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -39,6 +42,9 @@ function AppRoutes() {
           <Route path="/patient/appointments" element={<Appointments />} />
           <Route path="/provider/login" element={<ProviderLogin />} />
           <Route path="/provider/dashboard" element={<ProviderDashboard />} />
+          <Route path="/provider/total-appointments" element={<TotalAppointments />} />
+          <Route path="/provider/pending-reviews" element={<PendingReviews />} />
+          <Route path="/provider/new-patients" element={<NewPatients />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
