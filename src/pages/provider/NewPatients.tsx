@@ -17,21 +17,21 @@ const NewPatients = () => {
       name: "Emma Wilson",
       dateJoined: "2024-02-19",
       reason: "General consultation",
-      age: 28
+      age: 58
     },
     {
       id: 2,
       name: "James Thompson",
       dateJoined: "2024-02-18",
       reason: "Back pain evaluation",
-      age: 45
+      age: 65
     },
     {
       id: 3,
       name: "Sofia Rodriguez",
       dateJoined: "2024-02-18",
       reason: "Annual check-up",
-      age: 32
+      age: 52
     }
   ];
 
