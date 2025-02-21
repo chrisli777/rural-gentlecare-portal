@@ -3,7 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, User, Bell } from "lucide-react";
+import { Calendar, Clock, User, Bell, MessageSquare, Calendar as CalendarIcon } from "lucide-react";
 
 const ProviderDashboard = () => {
   const navigate = useNavigate();
@@ -22,26 +22,6 @@ const ProviderDashboard = () => {
               Sign Out
             </Button>
           </div>
-
-          {/* Notification Card */}
-          <Card className="bg-[#F2FCE2] border-none">
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                <Bell className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">New Patient Records Available</h3>
-                <p className="text-sm text-gray-600">3 new patient records need your review</p>
-              </div>
-              <Button
-                variant="outline"
-                className="bg-white hover:bg-gray-50"
-                onClick={() => navigate("/provider/new-patients")}
-              >
-                Review Now
-              </Button>
-            </CardContent>
-          </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card 
@@ -81,6 +61,69 @@ const ProviderDashboard = () => {
               <CardContent>
                 <div className="text-2xl font-bold">3</div>
                 <p className="text-xs text-gray-600">This week</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold text-gray-900">Notifications & Tasks</h2>
+            
+            {/* New Patient Records Notification */}
+            <Card className="bg-[#F2FCE2] border-none">
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <Bell className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">New Patient Records Available</h3>
+                  <p className="text-sm text-gray-600">3 new patient records need your review</p>
+                </div>
+                <Button
+                  variant="outline"
+                  className="bg-white hover:bg-gray-50"
+                  onClick={() => navigate("/provider/new-patients")}
+                >
+                  Review Now
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Patient Messages Notification */}
+            <Card className="bg-blue-50/50 border-none">
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <MessageSquare className="h-5 w-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Unread Patient Messages</h3>
+                  <p className="text-sm text-gray-600">5 messages require your attention</p>
+                </div>
+                <Button
+                  variant="outline"
+                  className="bg-white hover:bg-gray-50"
+                >
+                  View Messages
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Upcoming Appointments Notification */}
+            <Card className="bg-purple-50/50 border-none">
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                  <CalendarIcon className="h-5 w-5 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Upcoming Appointments</h3>
+                  <p className="text-sm text-gray-600">2 appointments scheduled for tomorrow</p>
+                </div>
+                <Button
+                  variant="outline"
+                  className="bg-white hover:bg-gray-50"
+                  onClick={() => navigate("/provider/total-appointments")}
+                >
+                  View Schedule
+                </Button>
               </CardContent>
             </Card>
           </div>
