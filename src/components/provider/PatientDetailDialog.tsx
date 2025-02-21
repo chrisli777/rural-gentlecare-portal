@@ -7,6 +7,12 @@ import {
 } from "@/components/ui/dialog";
 import { User } from "lucide-react";
 
+interface PatientReport {
+  diagnosis?: string;
+  prescription?: string;
+  recommendations?: string;
+}
+
 interface PatientDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -16,10 +22,13 @@ interface PatientDetailDialogProps {
     dateJoined: string;
     reason: string;
     age: number;
-  };
+    report?: PatientReport;
+  } | null;
 }
 
 export const PatientDetailDialog = ({ open, onOpenChange, patient }: PatientDetailDialogProps) => {
+  if (!patient) return null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -45,18 +54,38 @@ export const PatientDetailDialog = ({ open, onOpenChange, patient }: PatientDeta
               <p className="text-sm text-gray-500">Reason for Visit</p>
               <p className="font-medium">{patient.reason}</p>
             </div>
-            <div className="col-span-2">
-              <p className="text-sm text-gray-500">Medical History</p>
-              <p className="font-medium">No previous visits</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-sm text-gray-500">Allergies</p>
-              <p className="font-medium">None reported</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-sm text-gray-500">Current Medications</p>
-              <p className="font-medium">None reported</p>
-            </div>
+            {patient.report && (
+              <>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Diagnosis</p>
+                  <p className="font-medium">{patient.report.diagnosis}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Prescription</p>
+                  <p className="font-medium">{patient.report.prescription}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Recommendations</p>
+                  <p className="font-medium">{patient.report.recommendations}</p>
+                </div>
+              </>
+            )}
+            {!patient.report && (
+              <>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Medical History</p>
+                  <p className="font-medium">No previous visits</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Allergies</p>
+                  <p className="font-medium">None reported</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-500">Current Medications</p>
+                  <p className="font-medium">None reported</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </DialogContent>

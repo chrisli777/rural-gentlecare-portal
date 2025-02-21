@@ -19,7 +19,18 @@ const TotalAppointments = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
-  const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const [selectedPatient, setSelectedPatient] = useState<{
+    id: number;
+    name: string;
+    dateJoined: string;
+    reason: string;
+    age: number;
+    report?: {
+      diagnosis: string;
+      prescription: string;
+      recommendations: string;
+    };
+  } | null>(null);
   const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false);
 
   const upcomingAppointments = [
