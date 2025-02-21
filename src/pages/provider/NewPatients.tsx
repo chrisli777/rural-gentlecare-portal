@@ -1,12 +1,15 @@
 
 import { Header } from "@/components/layout/Header";
 import { Card, CardContent } from "@/components/ui/card";
-import { User } from "lucide-react";
+import { User, Users, Calendar, FileText } from "lucide-react";
 import { useState } from "react";
 import { PatientDetailDialog } from "@/components/provider/PatientDetailDialog";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const NewPatients = () => {
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
+  const navigate = useNavigate();
 
   const newPatients = [
     {
@@ -14,21 +17,41 @@ const NewPatients = () => {
       name: "Emma Wilson",
       dateJoined: "2024-02-19",
       reason: "General consultation",
-      age: 28
+      age: 28,
+      appointments: [
+        {
+          date: "2024-02-19",
+          type: "Initial Consultation",
+          hasReport: true
+        },
+        {
+          date: "2024-02-15",
+          type: "Medical History Review",
+          hasReport: true
+        }
+      ]
     },
     {
       id: 2,
       name: "James Thompson",
       dateJoined: "2024-02-18",
       reason: "Back pain evaluation",
-      age: 45
+      age: 45,
+      appointments: [
+        {
+          date: "2024-02-18",
+          type: "Pain Assessment",
+          hasReport: true
+        }
+      ]
     },
     {
       id: 3,
       name: "Sofia Rodriguez",
       dateJoined: "2024-02-18",
       reason: "Annual check-up",
-      age: 32
+      age: 32,
+      appointments: []
     }
   ];
 
@@ -37,9 +60,19 @@ const NewPatients = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">New Patients</h1>
-            <p className="text-xl text-gray-600 mt-2">Recently registered patients</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900">New Patients</h1>
+              <p className="text-xl text-gray-600 mt-2">Recently registered patients</p>
+            </div>
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/provider/all-patients")}
+              className="gap-2"
+            >
+              <Users className="h-4 w-4" />
+              All Patients
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -58,6 +91,12 @@ const NewPatients = () => {
                       <h3 className="font-semibold text-gray-900">{patient.name}</h3>
                       <p className="text-sm text-gray-600">Age: {patient.age}</p>
                       <p className="text-sm text-gray-600">{patient.reason}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          {patient.appointments.length} past appointments
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
