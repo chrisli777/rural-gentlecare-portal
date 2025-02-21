@@ -21,6 +21,12 @@ interface ReviewDialogProps {
     date: string;
     notes: string;
     status: string;
+    viewOnly?: boolean;
+    report?: {
+      diagnosis: string;
+      prescription: string;
+      recommendations: string;
+    };
   };
   hidePlayRecording?: boolean;
   hideContactInfo?: boolean;
@@ -34,8 +40,10 @@ export const ReviewDialog = ({
   hideContactInfo = false 
 }: ReviewDialogProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showReport, setShowReport] = useState(false);
-  const [diagnosticResults, setDiagnosticResults] = useState("");
+  const [showReport, setShowReport] = useState(appointment.viewOnly);
+  const [diagnosticResults, setDiagnosticResults] = useState(
+    appointment.report?.diagnosis || ""
+  );
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Demo patient data
@@ -86,7 +94,7 @@ export const ReviewDialog = ({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-            Review Recording - {appointment.patientName}
+            {appointment.viewOnly ? "View Report" : "Review Recording"} - {appointment.patientName}
           </DialogTitle>
         </DialogHeader>
         
@@ -118,8 +126,8 @@ export const ReviewDialog = ({
             </div>
           </div>
 
-          {/* Recording Player */}
-          {!hidePlayRecording && (
+          {/* Recording Player - Only show if not viewOnly */}
+          {!hidePlayRecording && !appointment.viewOnly && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">
@@ -153,72 +161,97 @@ export const ReviewDialog = ({
             </div>
           )}
 
-          {/* AI Analysis Section */}
-          <Card className="p-4 bg-blue-50/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-blue-600" />
-                <h3 className="font-medium">AI Assistant Insights</h3>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleAnalyzeSymptoms}
-                disabled={isAnalyzing}
-              >
-                <Sparkles className="h-4 w-4" />
-                {isAnalyzing ? "Analyzing..." : "Analyze Symptoms"}
-              </Button>
-            </div>
-            <div className="mt-4 space-y-2">
-              {aiSuggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-start gap-2 text-sm">
-                  <div className="min-w-4">•</div>
-                  <p>{suggestion}</p>
+          {/* AI Analysis Section - Only show if not viewOnly */}
+          {!appointment.viewOnly && (
+            <Card className="p-4 bg-blue-50/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-medium">AI Assistant Insights</h3>
                 </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Diagnostic Results */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Diagnostic Results</label>
-              <Textarea
-                placeholder="Enter your diagnostic findings here..."
-                value={diagnosticResults}
-                onChange={(e) => setDiagnosticResults(e.target.value)}
-                className="min-h-[100px]"
-              />
-            </div>
-
-            <div className="flex justify-between items-center">
-              {!hideContactInfo && (
                 <Button
                   variant="outline"
+                  size="sm"
                   className="gap-2"
-                  onClick={() => onOpenChange(false)}
+                  onClick={handleAnalyzeSymptoms}
+                  disabled={isAnalyzing}
                 >
-                  <MessageSquare className="h-4 w-4" />
-                  Contact for More Information
+                  <Sparkles className="h-4 w-4" />
+                  {isAnalyzing ? "Analyzing..." : "Analyze Symptoms"}
                 </Button>
-              )}
-              <Button
-                variant="default"
-                className="gap-2"
-                onClick={handleGenerateReport}
-              >
-                <FileText className="h-4 w-4" />
-                Generate Report
-              </Button>
-            </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                {aiSuggestions.map((suggestion, index) => (
+                  <div key={index} className="flex items-start gap-2 text-sm">
+                    <div className="min-w-4">•</div>
+                    <p>{suggestion}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Report Section */}
+          <div className="space-y-4">
+            {!appointment.viewOnly && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Diagnostic Results</label>
+                <Textarea
+                  placeholder="Enter your diagnostic findings here..."
+                  value={diagnosticResults}
+                  onChange={(e) => setDiagnosticResults(e.target.value)}
+                  className="min-h-[100px]"
+                />
+              </div>
+            )}
+
+            {!appointment.viewOnly && (
+              <div className="flex justify-between items-center">
+                {!hideContactInfo && (
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Contact for More Information
+                  </Button>
+                )}
+                <Button
+                  variant="default"
+                  className="gap-2"
+                  onClick={handleGenerateReport}
+                >
+                  <FileText className="h-4 w-4" />
+                  Generate Report
+                </Button>
+              </div>
+            )}
             
-            {showReport && (
+            {(showReport || appointment.viewOnly) && (
               <div className="space-y-4 animate-fade-in">
                 <Textarea
                   className="min-h-[200px]"
-                  value={`Patient: ${appointment.patientName}
+                  value={appointment.viewOnly ? 
+`Patient: ${appointment.patientName}
+Date: ${appointment.date}
+Time: ${appointment.time}
+
+Chief Complaint:
+${appointment.notes}
+
+Diagnostic Results:
+${appointment.report?.diagnosis || ''}
+
+Prescription:
+${appointment.report?.prescription || ''}
+
+Recommendations:
+${appointment.report?.recommendations || ''}
+
+Status: ${appointment.status}`
+                    :
+`Patient: ${appointment.patientName}
 Date: ${appointment.date}
 Time: ${appointment.time}
 
@@ -247,10 +280,12 @@ Plan:
                     <Download className="h-4 w-4" />
                     Download PDF
                   </Button>
-                  <Button className="gap-2" onClick={handleSendToPatient}>
-                    <Send className="h-4 w-4" />
-                    Send to Patient
-                  </Button>
+                  {!appointment.viewOnly && (
+                    <Button className="gap-2" onClick={handleSendToPatient}>
+                      <Send className="h-4 w-4" />
+                      Send to Patient
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
