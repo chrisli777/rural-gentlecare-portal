@@ -20,12 +20,27 @@ export const Header = () => {
     location.pathname === '/provider/pending-reviews' ||
     location.pathname === '/provider/new-patients' ||
     location.pathname === '/provider/finished-appointments' ||
+    location.pathname === '/provider/video-call' ||
     location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
     location.pathname === '/patient/onboarding';
   
   // Check if current route is provider dashboard
   const isProviderDashboard = location.pathname === '/provider/dashboard';
+
+  const handleBackNavigation = () => {
+    if (location.pathname === '/provider/finished-appointments') {
+      navigate('/provider/total-appointments');
+    } else if (
+      location.pathname === '/provider/total-appointments' ||
+      location.pathname === '/provider/pending-reviews' ||
+      location.pathname === '/provider/new-patients'
+    ) {
+      navigate('/provider/dashboard');
+    } else {
+      navigate(-1);
+    }
+  };
 
   if (showOnlyBackButton) {
     return (
@@ -34,7 +49,7 @@ export const Header = () => {
           <div className="flex items-center h-16">
             <Button
               variant="ghost"
-              onClick={() => navigate(-1)}
+              onClick={handleBackNavigation}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />

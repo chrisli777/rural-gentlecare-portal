@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Phone, FileText } from "lucide-react";
 import { useState } from "react";
-import { ReportDialog } from "@/components/provider/ReportDialog";
+import { PatientDetailDialog } from "@/components/provider/PatientDetailDialog";
 
 const VideoCall = () => {
   const navigate = useNavigate();
@@ -14,10 +14,16 @@ const VideoCall = () => {
     setIsReportDialogOpen(true);
   };
 
-  const handleReportSubmit = (report: { diagnosis: string; prescription: string; recommendations: string }) => {
-    // Here you would typically save the report to your backend
-    console.log("Saving report:", report);
+  const handleReportSubmit = () => {
     navigate("/provider/finished-appointments");
+  };
+
+  const patient = {
+    id: 1,
+    name: "Sarah Johnson",
+    dateJoined: "2024-02-20",
+    reason: "Online consultation",
+    age: 32,
   };
 
   return (
@@ -60,11 +66,13 @@ const VideoCall = () => {
         </div>
       </div>
 
-      <ReportDialog
+      <PatientDetailDialog
         open={isReportDialogOpen}
-        onOpenChange={setIsReportDialogOpen}
-        patientName="Sarah Johnson"
-        onSubmit={handleReportSubmit}
+        onOpenChange={(open) => {
+          setIsReportDialogOpen(open);
+          if (!open) handleReportSubmit();
+        }}
+        patient={patient}
       />
     </div>
   );
