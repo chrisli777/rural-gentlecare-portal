@@ -81,7 +81,10 @@ const UpcomingAppointments = () => {
               <h1 className="text-4xl font-bold text-gray-900">Upcoming Appointments</h1>
             </div>
             <div className="flex gap-4">
-              <Button onClick={() => navigate("/provider/finished-appointments")}>
+              <Button 
+                variant="secondary"
+                onClick={() => navigate("/provider/finished-appointments")}
+              >
                 Finished Appointments
               </Button>
               <Button onClick={() => console.log("Add new appointment")}>
@@ -106,7 +109,7 @@ const UpcomingAppointments = () => {
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   <SelectItem value="all">All appointments</SelectItem>
                   <SelectItem value="online">Online only</SelectItem>
                   <SelectItem value="in-person">In-person only</SelectItem>

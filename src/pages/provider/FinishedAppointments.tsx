@@ -107,7 +107,7 @@ const FinishedAppointments = () => {
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   <SelectItem value="all">All appointments</SelectItem>
                   <SelectItem value="online">Online only</SelectItem>
                   <SelectItem value="in-person">In-person only</SelectItem>
@@ -119,7 +119,7 @@ const FinishedAppointments = () => {
               {filteredAppointments.map((appointment) => (
                 <div
                   key={appointment.id}
-                  className="flex items-center justify-between p-6 bg-gray-50 rounded-lg border cursor-pointer hover:shadow-md transition-shadow"
+                  className="flex items-center justify-between p-6 bg-white rounded-lg border cursor-pointer hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center gap-4">
                     <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
