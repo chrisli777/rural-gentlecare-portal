@@ -62,21 +62,21 @@ const AIAssistant = () => {
       description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
       color: 'bg-blue-50',
       path: '/patient/appointments',
-      image: 'public/lovable-uploads/cf728eee-8d3c-4462-a991-d1475f9b33e9.png' // Elder with doctor image
+      image: '/lovable-uploads/cf728eee-8d3c-4462-a991-d1475f9b33e9.png' // Elder with doctor image
     },
     {
       title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
       description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
       color: 'bg-green-50',
       path: '/patient/records',
-      image: 'public/lovable-uploads/99adc045-0e31-4fe3-8572-26f224f1e512.png' // Elder couple with tablet image
+      image: '/lovable-uploads/99adc045-0e31-4fe3-8572-26f224f1e512.png' // Elder couple with tablet image
     },
     {
       title: language === 'en' ? 'My Profile' : 'Mi Perfil',
       description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
       color: 'bg-purple-50',
       path: '/patient/profile',
-      image: 'public/lovable-uploads/7c5dfa2c-073f-41ef-98b0-8433d404b569.png' // Healthy elder image
+      image: '/lovable-uploads/7c5dfa2c-073f-41ef-98b0-8433d404b569.png' // Healthy elder image
     }
   ];
 
