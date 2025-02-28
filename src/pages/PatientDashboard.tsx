@@ -1,10 +1,10 @@
 
 import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageSquare, Mic, MicOff, Calendar, MessageCircle, Book } from "lucide-react";
+import { MessageSquare, Mic, MicOff, Calendar, MessageCircle, Book, FileText, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useVoiceConversation } from "@/contexts/ConversationContext";
@@ -60,10 +60,61 @@ const PatientDashboard = () => {
     }, 1000);
   };
 
+  const navigationCards = [
+    {
+      title: language === 'en' ? 'Appointments' : 'Citas',
+      description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
+      icon: <Calendar className="h-6 w-6 text-[#1E5AAB]" />,
+      color: 'bg-blue-50',
+      path: '/patient/appointments'
+    },
+    {
+      title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
+      description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
+      icon: <FileText className="h-6 w-6 text-[#1E5AAB]" />,
+      color: 'bg-green-50',
+      path: '/patient/records'
+    },
+    {
+      title: language === 'en' ? 'My Profile' : 'Mi Perfil',
+      description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
+      icon: <User className="h-6 w-6 text-[#1E5AAB]" />,
+      color: 'bg-purple-50',
+      path: '/patient/profile'
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex">
+      <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex flex-col gap-6">
+        {/* Navigation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {navigationCards.map((card, index) => (
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              onClick={() => navigate(card.path)}
+              className="cursor-pointer"
+            >
+              <Card className={`h-full hover:shadow-md transition-shadow ${card.color} border-none`}>
+                <CardContent className="p-6 flex items-start gap-4">
+                  <div className="p-3 rounded-full bg-white">
+                    {card.icon}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg">{card.title}</h3>
+                    <p className="text-sm text-gray-600">{card.description}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* AI Assistant Card */}
         <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
           <div className="p-4 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
