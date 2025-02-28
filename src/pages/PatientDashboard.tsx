@@ -161,7 +161,7 @@ const PatientDashboard = () => {
             )}
           </div>
           
-          <div className="p-4 border-t flex justify-center">
+          <div className="p-4 border-t flex flex-col items-center">
             <motion.button
               onClick={toggleVoiceRecording}
               className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
@@ -178,6 +178,12 @@ const PatientDashboard = () => {
                 <Mic className="h-6 w-6 text-white" />
               )}
             </motion.button>
+            
+            <p className="text-sm text-gray-500 mt-2">
+              {language === 'en' 
+                ? 'Click the microphone to speak with Clara' 
+                : 'Haz clic en el micrófono para hablar con Clara'}
+            </p>
 
             {currentTranscript && (
               <motion.div
