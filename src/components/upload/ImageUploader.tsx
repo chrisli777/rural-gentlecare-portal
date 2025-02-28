@@ -27,11 +27,15 @@ export const ImageUploader = ({ onSuccess, imageNumber, label = "Upload Image" }
       formData.append('fileName', file.name);
       formData.append('imageNumber', imageNumber.toString());
       
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/upload-image`, {
+      // Use environment variables or constants for Supabase URL
+      const supabaseUrl = 'https://pascdrwwolpnfljfzioj.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc2Nkcnd3b2xwbmZsamZ6aW9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg3MDU1NTIsImV4cCI6MjA1NDI4MTU1Mn0.fJXvzGjbbpqUWGREoZPVNSCVlaSU-cnP5iTWZA_oZ7g';
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/upload-image`, {
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`
+          'Authorization': `Bearer ${supabaseAnonKey}`
         }
       });
       
