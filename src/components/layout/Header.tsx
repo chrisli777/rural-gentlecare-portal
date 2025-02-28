@@ -25,7 +25,9 @@ export const Header = () => {
     location.pathname === '/provider/past-reviews' ||
     location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
-    location.pathname === '/patient/onboarding';
+    location.pathname === '/patient/onboarding' ||
+    location.pathname === '/patient/records' ||
+    location.pathname === '/patient/profile';
   
   // Check if current route is provider dashboard
   const isProviderDashboard = location.pathname === '/provider/dashboard';
