@@ -85,10 +85,11 @@ export const AccessibilityProvider = ({ children }: { children: React.ReactNode 
 
   // Apply font size changes globally
   useEffect(() => {
+    // Updated font sizes to be larger across all options
     const fontSizes = {
-      normal: '16px',
-      large: '20px',
-      'extra-large': '24px'
+      normal: '18px',     // Increased from 16px
+      large: '22px',      // Increased from 20px
+      'extra-large': '26px' // Increased from 24px
     };
     
     document.documentElement.style.fontSize = fontSizes[fontSize];
