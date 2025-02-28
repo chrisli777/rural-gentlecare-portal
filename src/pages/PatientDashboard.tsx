@@ -96,7 +96,7 @@ const PatientDashboard = () => {
                   {msg.role === "assistant" && (
                     <Avatar className="mt-1 h-10 w-10 border border-blue-100">
                       <AvatarImage 
-                        src="https://img.freepik.com/premium-vector/female-doctor-avatar-medical-healthcare-concept-flat-cartoon-character-illustration_51635-5051.jpg" 
+                        src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" 
                         alt="Clara AI Assistant" 
                       />
                       <AvatarFallback className="bg-blue-100 text-blue-800">
