@@ -65,7 +65,7 @@ const Home = () => {
                          border-2 border-[#1E5AAB]"
                 onClick={handleGetStarted}
               >
-                {translate('common.getStarted')}
+                Get Healthcare Support
               </Button>
 
               <div className="flex justify-center items-center gap-4">
