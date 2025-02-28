@@ -78,6 +78,10 @@ const AIAssistant = () => {
     }
   ];
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -90,7 +94,7 @@ const AIAssistant = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => navigate(card.path)}
+              onClick={() => handleNavigate(card.path)}
               className="cursor-pointer"
             >
               <Card className={`h-full hover:shadow-md transition-shadow ${card.color} border-none`}>
