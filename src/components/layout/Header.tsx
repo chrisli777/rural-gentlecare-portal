@@ -78,14 +78,7 @@ export const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation - Only show Appointments for patient routes */}
-          {!isProviderDashboard && (
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-                {t.common.appointments}
-              </Link>
-            </nav>
-          )}
+          {/* We're removing the Desktop Navigation section that had Appointments link */}
         </div>
       </div>
     </header>
