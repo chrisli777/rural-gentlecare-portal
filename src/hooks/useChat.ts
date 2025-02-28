@@ -11,11 +11,11 @@ export const useChat = () => {
     {
       role: "assistant",
       content: language === 'en' 
-        ? "Hello! 👋 I'm your AI Health Assistant. How can I help you today?"
-        : "¡Hola! 👋 Soy tu Asistente de Salud con IA. ¿Cómo puedo ayudarte hoy?",
+        ? "👋 Welcome, I'm your Health Assistant Clara. I can help you with:\n📅 Booking an appointment with a doctor\n💬 Getting medical advice\n📖 Accessing health information"
+        : "👋 Bienvenido, soy Clara, tu Asistente de Salud. Puedo ayudarte con:\n📅 Reservar una cita con un médico\n💬 Obtener consejo médico\n📖 Acceder a información de salud",
       options: language === 'en' 
-        ? ["Need to see a doctor?", "Get medical advice", "Health information"]
-        : ["¿Necesitas ver a un médico?", "Obtener consejo médico", "Información de salud"]
+        ? ["Booking an appointment with a doctor", "Getting medical advice", "Accessing health information"]
+        : ["Reservar una cita con un médico", "Obtener consejo médico", "Acceder a información de salud"]
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
