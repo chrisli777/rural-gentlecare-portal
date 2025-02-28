@@ -11,9 +11,15 @@ import { AccessibilityControls } from "@/components/home/AccessibilityControls";
 const Home = () => {
   const navigate = useNavigate();
   const [showFeatures, setShowFeatures] = useState(false);
-  const { translate } = useAccessibility();
+  const { translate, language } = useAccessibility();
 
   const handleGetStarted = () => {
+    // Instead of navigating directly, show the features dialog
+    setShowFeatures(true);
+  };
+
+  const handleContinueToDashboard = () => {
+    // Navigate to the dashboard after closing the dialog
     navigate("/patient/dashboard");
   };
 
@@ -65,21 +71,10 @@ const Home = () => {
                          border-2 border-[#1E5AAB]"
                 onClick={handleGetStarted}
               >
-                Get Healthcare Support
+                {language === 'en' ? 'Get Healthcare Support' : 'Obtener Asistencia Médica'}
               </Button>
 
               <div className="flex justify-center items-center gap-4">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setShowFeatures(true)}
-                  className="flex items-center gap-2 bg-[#1E5AAB]/20 hover:bg-[#1E5AAB]/30 transition-colors duration-300 
-                            text-lg px-6 py-3 text-white border-[#1E5AAB]/50"
-                >
-                  <HelpCircle className="h-6 w-6" />
-                  {translate('common.learnMore')}
-                </Button>
-
                 <AccessibilityControls />
               </div>
             </div>
@@ -87,7 +82,11 @@ const Home = () => {
         </div>
       </div>
 
-      <FeatureDialog open={showFeatures} onOpenChange={setShowFeatures} />
+      <FeatureDialog 
+        open={showFeatures} 
+        onOpenChange={setShowFeatures} 
+        onContinue={handleContinueToDashboard}
+      />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { CalendarCheck, Bot, Video, Headphones } from "lucide-react";
 import {
@@ -15,11 +14,18 @@ import {
 interface FeatureDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onContinue?: () => void;
 }
 
-export const FeatureDialog = ({ open, onOpenChange }: FeatureDialogProps) => {
-  const navigate = useNavigate();
+export const FeatureDialog = ({ open, onOpenChange, onContinue }: FeatureDialogProps) => {
   const { translate } = useAccessibility();
+
+  const handleContinue = () => {
+    onOpenChange(false);
+    if (onContinue) {
+      onContinue();
+    }
+  };
 
   const features = [
     {
@@ -73,10 +79,7 @@ export const FeatureDialog = ({ open, onOpenChange }: FeatureDialogProps) => {
 
         <DialogFooter className="sm:justify-center">
           <Button 
-            onClick={() => {
-              onOpenChange(false);
-              navigate("/patient/dashboard");
-            }}
+            onClick={handleContinue}
             className="w-full sm:w-auto bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white"
           >
             {translate('common.continueToDashboard')}
