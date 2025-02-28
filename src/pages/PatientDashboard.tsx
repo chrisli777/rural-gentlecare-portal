@@ -65,21 +65,21 @@ const PatientDashboard = () => {
       description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
       color: 'bg-blue-50',
       path: '/patient/appointments',
-      image: '/lovable-uploads/a608011b-57c1-4542-8948-fc4864347b7a.png'
+      image: 'public/lovable-uploads/a608011b-57c1-4542-8948-fc4864347b7a.png'
     },
     {
       title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
       description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
       color: 'bg-green-50',
       path: '/patient/records',
-      image: '/lovable-uploads/dfd571a3-62d9-4b86-9f35-3281f31bfee1.png'
+      image: 'public/lovable-uploads/dfd571a3-62d9-4b86-9f35-3281f31bfee1.png'
     },
     {
       title: language === 'en' ? 'My Profile' : 'Mi Perfil',
       description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
       color: 'bg-purple-50',
       path: '/patient/profile',
-      image: '/lovable-uploads/42c31649-5d5e-40af-a851-074166974829.png'
+      image: 'public/lovable-uploads/42c31649-5d5e-40af-a851-074166974829.png'
     }
   ];
 
@@ -100,17 +100,12 @@ const PatientDashboard = () => {
             >
               <Card className="h-full hover:shadow-md transition-shadow border-none overflow-hidden">
                 <div className="grid grid-cols-2 h-full">
-                  <div className="flex items-center justify-center h-full overflow-hidden bg-gray-100">
-                    <Avatar className="h-full w-full rounded-none">
-                      <AvatarImage 
-                        src={card.image} 
-                        alt={card.title} 
-                        className="object-cover object-center h-full w-full"
-                      />
-                      <AvatarFallback className="text-lg h-full w-full rounded-none">
-                        {card.title.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                  <div className="h-full overflow-hidden">
+                    <img 
+                      src={card.image} 
+                      alt={card.title} 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <CardContent className={`p-6 flex flex-col justify-center ${card.color}`}>
                     <div className="space-y-2">
