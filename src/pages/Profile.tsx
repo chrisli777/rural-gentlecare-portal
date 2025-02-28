@@ -1,178 +1,317 @@
 
+import { useState } from "react";
 import { Header } from "@/components/layout/Header";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { translations } from "@/utils/translations";
-import { User, Phone, Calendar, Home, Heart, AlertCircle, FileText, Activity, Bell } from "lucide-react";
+import { User, Phone, Mail, Home, Shield, Bell, Settings, Edit, Save } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 
 const Profile = () => {
   const { language } = useAccessibility();
-  const t = translations[language];
-
-  // Dummy profile data
-  const profile = {
+  const [editMode, setEditMode] = useState(false);
+  
+  // Sample user data
+  const [userData, setUserData] = useState({
     firstName: "Maria",
-    lastName: "Garcia",
-    dateOfBirth: "1965-09-23",
-    address: "267 Pine Road, Adams County, CO 80640",
-    phone: "+1 (303) 555-8127",
-    email: "maria.garcia@example.com",
-    emergency: {
-      name: "Robert Garcia",
-      relationship: "Son",
-      phone: "+1 (303) 555-9284"
-    },
-    medical: {
-      bloodType: "O+",
-      allergies: "Penicillin, Peanuts",
-      conditions: "Type 2 Diabetes, Hypertension",
-      medications: "Metformin 500mg, Lisinopril 10mg, Aspirin 81mg"
-    },
-    insurance: {
-      provider: "Medicare Advantage Plan",
-      policyNumber: "MA463891275",
-      groupNumber: "MAGRP7524",
-      expirationDate: "2023-12-31"
-    }
+    lastName: "Johnson",
+    email: "maria.johnson@example.com",
+    phone: "555-123-4567",
+    dob: "1985-04-12",
+    address: "123 Main St, Anytown, USA",
+    emergencyContact: "John Johnson (Husband)",
+    emergencyPhone: "555-987-6543",
+  });
+
+  const handleEditToggle = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleSave = () => {
+    // In a real app, we would save the data to the database here
+    setEditMode(false);
+    // Show success message (not implemented in this example)
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setUserData({
+      ...userData,
+      [field]: value
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 pt-20 pb-12">
-        <div className="max-w-3xl mx-auto">
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                <Avatar className="h-24 w-24 border-2 border-white shadow-md">
-                  <AvatarImage src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" />
+      <main className="container mx-auto px-4 pt-20 pb-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-4">
+            <h1 className="text-2xl md:text-3xl font-bold">
+              {language === 'en' ? 'My Profile' : 'Mi Perfil'}
+            </h1>
+            <Button 
+              onClick={editMode ? handleSave : handleEditToggle}
+              className="flex items-center gap-2 bg-[#1E5AAB] hover:bg-[#1E5AAB]/90"
+            >
+              {editMode ? (
+                <>
+                  <Save className="h-4 w-4" />
+                  {language === 'en' ? 'Save Changes' : 'Guardar Cambios'}
+                </>
+              ) : (
+                <>
+                  <Edit className="h-4 w-4" />
+                  {language === 'en' ? 'Edit Profile' : 'Editar Perfil'}
+                </>
+              )}
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Profile Summary Card */}
+            <Card className="lg:col-span-1">
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <Avatar className="w-24 h-24 border-4 border-white shadow-xl">
+                  <AvatarImage src="https://i.pravatar.cc/150?img=36" alt="Maria Johnson" />
                   <AvatarFallback className="bg-[#1E5AAB] text-white text-xl">
-                    {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+                    MJ
                   </AvatarFallback>
                 </Avatar>
-                <div className="text-center md:text-left">
-                  <h1 className="text-2xl font-bold">{profile.firstName} {profile.lastName}</h1>
-                  <p className="text-gray-600 flex items-center justify-center md:justify-start gap-2 mt-1">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(profile.dateOfBirth).toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                    {" "} • {" "}
-                    {new Date().getFullYear() - new Date(profile.dateOfBirth).getFullYear()} years
-                  </p>
+                <h2 className="text-xl font-semibold mt-4">{userData.firstName} {userData.lastName}</h2>
+                <p className="text-sm text-gray-500">
+                  {language === 'en' ? 'Patient ID: ' : 'ID de Paciente: '}P-78901234
+                </p>
+                <div className="w-full mt-6 space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <span>{userData.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="h-4 w-4 text-gray-500" />
+                    <span>{userData.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Home className="h-4 w-4 text-gray-500" />
+                    <span>{userData.address}</span>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <User className="h-5 w-5 text-[#1E5AAB]" />
-                {language === 'en' ? 'Personal Information' : 'Información Personal'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Phone Number' : 'Número de Teléfono'}
-                </h3>
-                <p className="flex items-center gap-2 mt-1">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  {profile.phone}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Email' : 'Correo Electrónico'}
-                </h3>
-                <p className="mt-1">{profile.email}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Address' : 'Dirección'}
-                </h3>
-                <p className="flex items-start gap-2 mt-1">
-                  <Home className="h-4 w-4 text-gray-400 mt-1" />
-                  {profile.address}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-[#1E5AAB]" />
-                {language === 'en' ? 'Emergency Contact' : 'Contacto de Emergencia'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Name' : 'Nombre'}
-                </h3>
-                <p className="mt-1">{profile.emergency.name} ({profile.emergency.relationship})</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Phone Number' : 'Número de Teléfono'}
-                </h3>
-                <p className="flex items-center gap-2 mt-1">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  {profile.emergency.phone}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Heart className="h-5 w-5 text-[#1E5AAB]" />
-                {language === 'en' ? 'Medical Information' : 'Información Médica'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Blood Type' : 'Tipo de Sangre'}
-                </h3>
-                <p className="mt-1">{profile.medical.bloodType}</p>
-              </div>
-              <Separator />
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Allergies' : 'Alergias'}
-                </h3>
-                <p className="mt-1">{profile.medical.allergies}</p>
-              </div>
-              <Separator />
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Medical Conditions' : 'Condiciones Médicas'}
-                </h3>
-                <p className="mt-1">{profile.medical.conditions}</p>
-              </div>
-              <Separator />
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  {language === 'en' ? 'Current Medications' : 'Medicamentos Actuales'}
-                </h3>
-                <p className="mt-1">{profile.medical.medications}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-center mt-8">
-            <Button className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white">
-              {language === 'en' ? 'Edit Profile' : 'Editar Perfil'}
-            </Button>
+              </CardContent>
+            </Card>
+            {/* Main Content */}
+            <div className="lg:col-span-3 space-y-6">
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="w-full grid grid-cols-3">
+                  <TabsTrigger value="personal" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    {language === 'en' ? 'Personal Info' : 'Información Personal'}
+                  </TabsTrigger>
+                  <TabsTrigger value="security" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    {language === 'en' ? 'Security' : 'Seguridad'}
+                  </TabsTrigger>
+                  <TabsTrigger value="preferences" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    {language === 'en' ? 'Preferences' : 'Preferencias'}
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="personal" className="space-y-6 pt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {language === 'en' ? 'Personal Information' : 'Información Personal'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstName">{language === 'en' ? 'First Name' : 'Nombre'}</Label>
+                          <Input 
+                            id="firstName" 
+                            value={userData.firstName} 
+                            onChange={(e) => handleInputChange('firstName', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastName">{language === 'en' ? 'Last Name' : 'Apellido'}</Label>
+                          <Input 
+                            id="lastName" 
+                            value={userData.lastName} 
+                            onChange={(e) => handleInputChange('lastName', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">{language === 'en' ? 'Email' : 'Correo Electrónico'}</Label>
+                          <Input 
+                            id="email" 
+                            type="email" 
+                            value={userData.email} 
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">{language === 'en' ? 'Phone' : 'Teléfono'}</Label>
+                          <Input 
+                            id="phone" 
+                            value={userData.phone} 
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="dob">{language === 'en' ? 'Date of Birth' : 'Fecha de Nacimiento'}</Label>
+                          <Input 
+                            id="dob" 
+                            type="date" 
+                            value={userData.dob} 
+                            onChange={(e) => handleInputChange('dob', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="address">{language === 'en' ? 'Address' : 'Dirección'}</Label>
+                          <Input 
+                            id="address" 
+                            value={userData.address} 
+                            onChange={(e) => handleInputChange('address', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                      </div>
+                      <Separator className="my-6" />
+                      <h3 className="text-lg font-medium mb-4">
+                        {language === 'en' ? 'Emergency Contact' : 'Contacto de Emergencia'}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="emergencyContact">
+                            {language === 'en' ? 'Contact Name & Relation' : 'Nombre y Relación del Contacto'}
+                          </Label>
+                          <Input 
+                            id="emergencyContact" 
+                            value={userData.emergencyContact} 
+                            onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="emergencyPhone">
+                            {language === 'en' ? 'Contact Phone' : 'Teléfono del Contacto'}
+                          </Label>
+                          <Input 
+                            id="emergencyPhone" 
+                            value={userData.emergencyPhone} 
+                            onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
+                            disabled={!editMode}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="security" className="space-y-6 pt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {language === 'en' ? 'Security Settings' : 'Configuración de Seguridad'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">
+                          {language === 'en' ? 'Login Security' : 'Seguridad de Inicio de Sesión'}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {language === 'en' ? 'Change Password' : 'Cambiar Contraseña'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {language === 'en' ? 'Last changed 3 months ago' : 'Último cambio hace 3 meses'}
+                            </p>
+                          </div>
+                          <Button variant="outline">
+                            {language === 'en' ? 'Update' : 'Actualizar'}
+                          </Button>
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {language === 'en' ? 'Two-Factor Authentication' : 'Autenticación de Dos Factores'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {language === 'en' ? 'Add an extra layer of security' : 'Añade una capa extra de seguridad'}
+                            </p>
+                          </div>
+                          <Switch />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                <TabsContent value="preferences" className="space-y-6 pt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {language === 'en' ? 'Notification Preferences' : 'Preferencias de Notificaciones'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {language === 'en' ? 'Appointment Reminders' : 'Recordatorios de Citas'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {language === 'en' ? 'Get notified about upcoming appointments' : 'Recibe notificaciones sobre próximas citas'}
+                            </p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {language === 'en' ? 'Medication Reminders' : 'Recordatorios de Medicación'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {language === 'en' ? 'Get reminders for your medications' : 'Recibe recordatorios para tus medicamentos'}
+                            </p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+                        
+                        <Separator />
+                        
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">
+                              {language === 'en' ? 'Health Tips & Updates' : 'Consejos de Salud y Actualizaciones'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {language === 'en' ? 'Receive occasional health tips and news' : 'Recibe consejos de salud y noticias ocasionales'}
+                            </p>
+                          </div>
+                          <Switch />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         </div>
       </main>
