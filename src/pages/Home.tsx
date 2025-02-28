@@ -11,7 +11,7 @@ import { AccessibilityControls } from "@/components/home/AccessibilityControls";
 const Home = () => {
   const navigate = useNavigate();
   const [showFeatures, setShowFeatures] = useState(false);
-  const { translate } = useAccessibility();
+  const { translate, language } = useAccessibility();
 
   const handleGetStarted = () => {
     navigate("/patient/dashboard");
@@ -58,16 +58,6 @@ const Home = () => {
             </div>
             
             <div className="flex flex-col items-center gap-8">
-              <Button
-                size="lg"
-                className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
-                         bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
-                         border-2 border-[#1E5AAB]"
-                onClick={handleGetStarted}
-              >
-                Get Healthcare Support
-              </Button>
-
               <div className="flex justify-center items-center gap-4">
                 <Button
                   variant="outline"
@@ -82,6 +72,16 @@ const Home = () => {
 
                 <AccessibilityControls />
               </div>
+
+              <Button
+                size="lg"
+                className="text-xl px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 
+                         bg-[#1E5AAB] hover:bg-[#1E5AAB]/90
+                         border-2 border-[#1E5AAB]"
+                onClick={handleGetStarted}
+              >
+                {language === 'en' ? 'Get Healthcare Support' : 'Obtener Asistencia Médica'}
+              </Button>
             </div>
           </div>
         </div>
