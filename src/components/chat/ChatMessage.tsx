@@ -1,7 +1,9 @@
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Speaker } from "lucide-react";
 
 interface ChatMessageProps {
   message: {
@@ -14,6 +16,37 @@ interface ChatMessageProps {
 }
 
 export const ChatMessage = ({ message, onOptionSelect, assistantAvatar }: ChatMessageProps) => {
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const speakMessage = (text: string) => {
+    if ('speechSynthesis' in window) {
+      setIsSpeaking(true);
+      
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Set a female voice if available
+      const voices = window.speechSynthesis.getVoices();
+      const femaleVoice = voices.find(voice => voice.name.includes('female') || voice.name.includes('Female'));
+      if (femaleVoice) {
+        utterance.voice = femaleVoice;
+      }
+      
+      // Adjust speech parameters for elderly users
+      utterance.rate = 0.9; // Slightly slower rate
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      utterance.onend = () => {
+        setIsSpeaking(false);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -43,6 +76,25 @@ export const ChatMessage = ({ message, onOptionSelect, assistantAvatar }: ChatMe
             }`}
           >
             {message.content}
+            
+            {/* Speaker button for assistant messages */}
+            {message.role === "assistant" && (
+              <div className="flex justify-end mt-2">
+                <button 
+                  onClick={() => speakMessage(message.content)}
+                  disabled={isSpeaking}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    isSpeaking 
+                      ? "bg-blue-200 text-blue-600 animate-pulse" 
+                      : "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                  }`}
+                  aria-label="Listen to this message"
+                  title="Listen to this message"
+                >
+                  <Speaker className="h-5 w-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
         {message.role === "user" && (

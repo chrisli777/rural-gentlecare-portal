@@ -32,6 +32,28 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [conversation]);
 
+  // Load speech synthesis voices when component mounts
+  useEffect(() => {
+    // Force loading of voices
+    if ('speechSynthesis' in window) {
+      // In some browsers, voices can only be populated after an utterance is created
+      const utterance = new SpeechSynthesisUtterance('');
+      
+      // Function to load voices
+      const loadVoices = () => {
+        window.speechSynthesis.getVoices();
+      };
+      
+      // Load voices initially
+      loadVoices();
+      
+      // Some browsers (like Chrome) load voices asynchronously
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
