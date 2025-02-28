@@ -62,21 +62,24 @@ const AIAssistant = () => {
       description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
       icon: <Calendar className="h-6 w-6 text-[#1E5AAB]" />,
       color: 'bg-blue-50',
-      path: '/patient/appointments'
+      path: '/patient/appointments',
+      image: 'https://images.unsplash.com/photo-1501286353178-1ec881214838?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
     },
     {
       title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
       description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
       icon: <FileText className="h-6 w-6 text-[#1E5AAB]" />,
       color: 'bg-green-50',
-      path: '/patient/records'
+      path: '/patient/records',
+      image: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
     },
     {
       title: language === 'en' ? 'My Profile' : 'Mi Perfil',
       description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
       icon: <User className="h-6 w-6 text-[#1E5AAB]" />,
       color: 'bg-purple-50',
-      path: '/patient/profile'
+      path: '/patient/profile',
+      image: 'https://images.unsplash.com/photo-1517022812141-23620dba5c23?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
     }
   ];
 
@@ -95,8 +98,15 @@ const AIAssistant = () => {
               onClick={() => navigate(card.path)}
               className="cursor-pointer"
             >
-              <Card className={`h-full hover:shadow-md transition-shadow ${card.color} border-none`}>
-                <CardContent className="p-6 flex items-start gap-4">
+              <Card className={`h-full hover:shadow-md transition-shadow border-none overflow-hidden`}>
+                <div className="h-36 overflow-hidden">
+                  <img 
+                    src={card.image} 
+                    alt={card.title} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardContent className={`p-6 flex items-start gap-4 ${card.color}`}>
                   <div className="p-3 rounded-full bg-white">
                     {card.icon}
                   </div>
