@@ -1,3 +1,4 @@
+
 import { BrowserRouter } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,6 +19,8 @@ import FinishedAppointments from "@/pages/provider/FinishedAppointments";
 import VideoCall from "@/pages/provider/VideoCall";
 import PastReviews from "@/pages/provider/PastReviews";
 import AllPatients from "@/pages/provider/AllPatients";
+import MedicalRecords from "@/pages/MedicalRecords";
+import Profile from "@/pages/Profile";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -43,6 +46,8 @@ function AppRoutes() {
           <Route path="/patient/ai-assistant" element={<AIAssistant />} />
           <Route path="/patient/book-appointment" element={<BookAppointment />} />
           <Route path="/patient/appointments" element={<Appointments />} />
+          <Route path="/patient/records" element={<MedicalRecords />} />
+          <Route path="/patient/profile" element={<Profile />} />
           <Route path="/provider/login" element={<ProviderLogin />} />
           <Route path="/provider/dashboard" element={<ProviderDashboard />} />
           <Route path="/provider/total-appointments" element={<TotalAppointments />} />

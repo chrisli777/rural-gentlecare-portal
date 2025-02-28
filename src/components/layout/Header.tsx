@@ -25,7 +25,9 @@ export const Header = () => {
     location.pathname === '/provider/past-reviews' ||
     location.pathname === '/patient/book-appointment' || 
     location.pathname === '/patient/messages' ||
-    location.pathname === '/patient/onboarding';
+    location.pathname === '/patient/onboarding' ||
+    location.pathname === '/patient/records' ||
+    location.pathname === '/patient/profile';
   
   // Check if current route is provider dashboard
   const isProviderDashboard = location.pathname === '/provider/dashboard';
@@ -77,15 +79,6 @@ export const Header = () => {
               <span className="text-xl font-semibold">Adams Rural Care</span>
             </Link>
           </div>
-
-          {/* Desktop Navigation - Only show Appointments for patient routes */}
-          {!isProviderDashboard && (
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/patient/appointments" className="text-gray-600 hover:text-[#9b87f5] transition-colors">
-                {t.common.appointments}
-              </Link>
-            </nav>
-          )}
         </div>
       </div>
     </header>
