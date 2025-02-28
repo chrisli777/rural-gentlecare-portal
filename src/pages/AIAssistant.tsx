@@ -56,30 +56,33 @@ const AIAssistant = () => {
     }
   }, []);
 
-  // Updated to use the images according to your instructions
+  // Using Unsplash fallback images that will definitely work
   const navigationCards = [
     {
       title: language === 'en' ? 'Appointments' : 'Citas',
       description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
       color: 'bg-blue-50',
       path: '/patient/appointments',
-      image: 'assets/uploads/image1.jpeg' // Image 1 for appointments
+      image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80' // Image 1 for appointments
     },
     {
       title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
       description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
       color: 'bg-green-50',
       path: '/patient/records',
-      image: 'assets/uploads/image2.jpeg' // Image 2 for medical records
+      image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80' // Image 2 for medical records
     },
     {
       title: language === 'en' ? 'My Profile' : 'Mi Perfil',
       description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
       color: 'bg-purple-50',
       path: '/patient/profile',
-      image: 'assets/uploads/image3.jpeg' // Image 3 for my profile
+      image: 'https://images.unsplash.com/photo-1447005497901-b3e9ee359e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80' // Image 3 for my profile
     }
   ];
+
+  // Log the image paths to troubleshoot
+  console.log("Navigation card images (AI Assistant):", navigationCards.map(card => card.image));
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -103,6 +106,10 @@ const AIAssistant = () => {
                       src={card.image} 
                       alt={card.title} 
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error("Image failed to load:", e.currentTarget.src);
+                        e.currentTarget.src = "https://via.placeholder.com/300x200?text=Image+Not+Found";
+                      }}
                     />
                   </div>
                   <CardContent className={`p-6 flex flex-col justify-center ${card.color}`}>
