@@ -112,17 +112,17 @@ const AIAssistant = () => {
         <Card className="flex-1 flex flex-col h-[calc(100vh-8rem)] bg-white">
           <div className="p-4 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-6 w-6 bg-[#1E5AAB] rounded-full animate-pulse" />
-              <h2 className="text-xl font-semibold">
+              <div className="h-5 w-5 bg-[#1E5AAB] rounded-full animate-pulse" />
+              <h2 className="text-lg font-semibold">
                 {language === 'en' ? 'AI Health Assistant Clara' : 'Asistente de Salud IA Clara'}
               </h2>
             </div>
             <Button
               onClick={() => navigate("/patient/dashboard")}
-              className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white flex items-center gap-2 text-base"
-              size="lg"
+              className="bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 text-white flex items-center gap-2"
+              size="sm"
             >
-              <Mic className="h-5 w-5" />
+              <Mic className="h-4 w-4" />
               {language === 'en' ? 'Switch to Voice Conversation' : 'Cambiar a Conversación de Voz'}
             </Button>
           </div>
