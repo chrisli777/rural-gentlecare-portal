@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Speaker } from "lucide-react";
+import { Volume } from "lucide-react";
 
 interface ChatMessageProps {
   message: {
@@ -77,7 +77,7 @@ export const ChatMessage = ({ message, onOptionSelect, assistantAvatar }: ChatMe
           >
             {message.content}
             
-            {/* Speaker button for assistant messages */}
+            {/* Sound button for assistant messages */}
             {message.role === "assistant" && (
               <div className="flex justify-end mt-2">
                 <button 
@@ -91,7 +91,7 @@ export const ChatMessage = ({ message, onOptionSelect, assistantAvatar }: ChatMe
                   aria-label="Listen to this message"
                   title="Listen to this message"
                 >
-                  <Speaker className="h-5 w-5" />
+                  <Volume className="h-5 w-5" />
                 </button>
               </div>
             )}
