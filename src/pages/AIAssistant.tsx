@@ -62,21 +62,21 @@ const AIAssistant = () => {
       description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
       color: 'bg-blue-50',
       path: '/patient/appointments',
-      image: 'https://i.imgur.com/ZKcWpEE.jpg' // Elder with doctor image
+      image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80' // Elder with doctor image
     },
     {
       title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
       description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
       color: 'bg-green-50',
       path: '/patient/records',
-      image: 'https://i.imgur.com/EPXadPj.jpg' // Elder with medical records image
+      image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80' // Elder with medical documents
     },
     {
       title: language === 'en' ? 'My Profile' : 'Mi Perfil',
       description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
       color: 'bg-purple-50',
       path: '/patient/profile',
-      image: 'https://i.imgur.com/ybPv2Ua.jpg' // Healthy elder image
+      image: 'https://images.unsplash.com/photo-1447005497901-b3e9ee359e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80' // Healthy elder image
     }
   ];
 
