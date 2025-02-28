@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -42,21 +43,26 @@ const Appointments = () => {
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['appointments'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('*')
-        .order('appointment_date', { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('*')
+          .order('appointment_date', { ascending: true });
 
-      if (error) {
-        toast({
-          title: t.appointments.error,
-          description: error.message,
-          variant: "destructive",
-        });
-        throw error;
+        if (error) {
+          toast({
+            title: t.appointments.error,
+            description: error.message,
+            variant: "destructive",
+          });
+          throw error;
+        }
+
+        return data as Appointment[];
+      } catch (error: any) {
+        console.error("Error fetching appointments:", error);
+        return [];
       }
-
-      return data as Appointment[];
     },
   });
 
