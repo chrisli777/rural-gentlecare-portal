@@ -69,7 +69,7 @@ export const ChatMessage = ({ message, onOptionSelect, assistantAvatar }: ChatMe
         )}
         <div className={`flex-1 ${message.role === "user" ? "flex justify-end" : ""}`}>
           <div
-            className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap text-lg ${
+            className={`max-w-[80%] p-4 rounded-lg whitespace-pre-wrap text-base ${
               message.role === "user"
                 ? "bg-[#1E5AAB] text-white ml-auto"
                 : "bg-gray-100"
