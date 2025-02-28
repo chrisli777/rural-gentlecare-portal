@@ -4,67 +4,20 @@ import { Header } from "@/components/layout/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageSquare, Mic, MicOff, Calendar, MessageCircle, Book, Settings } from "lucide-react";
+import { MessageSquare, Mic, MicOff, Calendar, MessageCircle, Book } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useVoiceConversation } from "@/contexts/ConversationContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { supabase } from "@/lib/supabase";
-import { useToast } from "@/components/ui/use-toast";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { language } = useAccessibility();
   const { isRecording, currentTranscript, toggleVoiceRecording } = useVoiceConversation();
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
   const [messages, setMessages] = useState<Array<{role: string, content: string}>>([]);
-  const [cardImages, setCardImages] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load the images from Supabase
-    const loadImages = async () => {
-      try {
-        const images = [];
-        
-        for (let i = 1; i <= 3; i++) {
-          try {
-            const { data } = supabase.storage
-              .from('profile-images')
-              .getPublicUrl(`image${i}.jpeg`);
-            
-            if (data?.publicUrl) {
-              images.push(data.publicUrl);
-            } else {
-              // Fallback images if custom ones aren't uploaded yet
-              if (i === 1) {
-                images.push('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80');
-              } else if (i === 2) {
-                images.push('https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80');
-              } else {
-                images.push('https://images.unsplash.com/photo-1447005497901-b3e9ee359e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80');
-              }
-            }
-          } catch (error) {
-            console.error(`Error loading image ${i}:`, error);
-            // Add fallback image
-            images.push(`https://via.placeholder.com/300x200?text=Image+${i}`);
-          }
-        }
-        
-        setCardImages(images);
-      } catch (error) {
-        console.error("Error loading images:", error);
-        toast({
-          variant: "destructive",
-          title: "Error loading images",
-          description: "There was an error loading your navigation images.",
-        });
-      }
-    };
-    
-    loadImages();
-
     // Add welcome message on initial load
     if (showWelcomeMessage) {
       const welcomeMessage = {
@@ -76,7 +29,7 @@ const PatientDashboard = () => {
       setMessages([welcomeMessage]);
       setShowWelcomeMessage(false);
     }
-  }, [showWelcomeMessage, language, toast]);
+  }, [showWelcomeMessage, language]);
 
   const handleOptionSelect = (option: string) => {
     // Handle user selecting one of the quick options
@@ -106,52 +59,34 @@ const PatientDashboard = () => {
     }, 1000);
   };
 
-  // Navigation cards with dynamic images from Supabase
   const navigationCards = [
     {
       title: language === 'en' ? 'Appointments' : 'Citas',
       description: language === 'en' ? 'View and manage your upcoming appointments' : 'Ver y gestionar tus próximas citas',
       color: 'bg-blue-50',
       path: '/patient/appointments',
-      image: cardImages[0] || 'https://via.placeholder.com/300x200?text=Appointments'
+      image: 'https://i.imgur.com/ZKcWpEE.jpg' // Elder with doctor image
     },
     {
       title: language === 'en' ? 'Medical Records' : 'Registros Médicos',
       description: language === 'en' ? 'Access your medical history and reports' : 'Acceder a tu historial médico e informes',
       color: 'bg-green-50',
       path: '/patient/records',
-      image: cardImages[1] || 'https://via.placeholder.com/300x200?text=Medical+Records'
+      image: 'https://i.imgur.com/EPXadPj.jpg' // Elder with medical records image
     },
     {
       title: language === 'en' ? 'My Profile' : 'Mi Perfil',
       description: language === 'en' ? 'Update your personal information' : 'Actualizar tu información personal',
       color: 'bg-purple-50',
       path: '/patient/profile',
-      image: cardImages[2] || 'https://via.placeholder.com/300x200?text=Profile'
+      image: 'https://i.imgur.com/ybPv2Ua.jpg' // Healthy elder image
     }
   ];
-
-  console.log("Navigation card images:", navigationCards.map(card => card.image));
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 pt-20 pb-6 flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">
-            {language === 'en' ? 'Dashboard' : 'Panel Principal'}
-          </h1>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-2"
-            onClick={() => navigate('/patient/image-manager')}
-          >
-            <Settings className="h-4 w-4" />
-            {language === 'en' ? 'Manage Images' : 'Gestionar Imágenes'}
-          </Button>
-        </div>
-        
         {/* Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {navigationCards.map((card, index) => (
@@ -170,10 +105,6 @@ const PatientDashboard = () => {
                       src={card.image} 
                       alt={card.title} 
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        console.error("Image failed to load:", e.currentTarget.src);
-                        e.currentTarget.src = "https://via.placeholder.com/300x200?text=Image+Not+Found";
-                      }}
                     />
                   </div>
                   <CardContent className={`p-6 flex flex-col justify-center ${card.color}`}>
