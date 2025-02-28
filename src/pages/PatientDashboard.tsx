@@ -1,19 +1,64 @@
 
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageSquare, Mic, MicOff } from "lucide-react";
+import { MessageSquare, Mic, MicOff, Calendar, MessageCircle, Book } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useVoiceConversation } from "@/contexts/ConversationContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ChatMessage } from "@/components/chat/ChatMessage";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const { language } = useAccessibility();
   const { isRecording, currentTranscript, toggleVoiceRecording } = useVoiceConversation();
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
+  const [messages, setMessages] = useState<Array<{role: string, content: string}>>([]);
+
+  useEffect(() => {
+    // Add welcome message on initial load
+    if (showWelcomeMessage) {
+      const welcomeMessage = {
+        role: "assistant",
+        content: language === 'en' 
+          ? "👋 Welcome, I'm your Health Assistant Clara. I can help you with:\n📅 Booking an appointment with a doctor\n💬 Getting medical advice\n📖 Accessing health information"
+          : "👋 Bienvenido, soy Clara, tu Asistente de Salud. Puedo ayudarte con:\n📅 Reservar una cita con un médico\n💬 Obtener consejo médico\n📖 Acceder a información de salud"
+      };
+      setMessages([welcomeMessage]);
+      setShowWelcomeMessage(false);
+    }
+  }, [showWelcomeMessage, language]);
+
+  const handleOptionSelect = (option: string) => {
+    // Handle user selecting one of the quick options
+    const userMessage = { role: "user", content: option };
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Simulate AI response
+    setTimeout(() => {
+      let response = "";
+      
+      if (option.includes("appointment") || option.includes("cita")) {
+        response = language === 'en'
+          ? "I can help you book an appointment. Please go to the Appointments section using the navigation menu, or I can guide you through the process here."
+          : "Puedo ayudarte a reservar una cita. Por favor, ve a la sección de Citas usando el menú de navegación, o puedo guiarte a través del proceso aquí.";
+      } else if (option.includes("advice") || option.includes("consejo")) {
+        response = language === 'en'
+          ? "What medical concerns do you have today? I'm here to provide general guidance, but remember I'm not a replacement for professional medical care."
+          : "¿Qué preocupaciones médicas tienes hoy? Estoy aquí para brindarte orientación general, pero recuerda que no soy un reemplazo para la atención médica profesional.";
+      } else if (option.includes("information") || option.includes("información")) {
+        response = language === 'en'
+          ? "What health information are you looking for today? I can provide general information about common conditions, preventive care, and healthy habits."
+          : "¿Qué información de salud estás buscando hoy? Puedo proporcionarte información general sobre condiciones comunes, cuidados preventivos y hábitos saludables.";
+      }
+      
+      const assistantMessage = { role: "assistant", content: response };
+      setMessages(prev => [...prev, assistantMessage]);
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -24,7 +69,7 @@ const PatientDashboard = () => {
             <div className="flex items-center gap-2">
               <div className="h-5 w-5 bg-[#1E5AAB] rounded-full animate-pulse" />
               <h2 className="text-lg font-semibold">
-                {language === 'en' ? 'AI Health Assistant' : 'Asistente de Salud IA'}
+                {language === 'en' ? 'AI Health Assistant Clara' : 'Asistente de Salud IA Clara'}
               </h2>
             </div>
             <Button
@@ -37,56 +82,110 @@ const PatientDashboard = () => {
             </Button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-12">
-            <motion.div
-              className="text-center space-y-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <h2 className="text-3xl font-semibold text-gray-900">
-                {language === 'en' ? 'Talk to Us' : 'Habla con Nosotros'}
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                {language === 'en' 
-                  ? 'Click the button below to start speaking with your AI Health assistant'
-                  : 'Haz clic en el botón para comenzar a hablar con tu asistente de salud IA'}
-              </p>
-            </motion.div>
-            
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <AnimatePresence>
+              {messages.map((msg, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex items-start gap-3"
+                >
+                  {msg.role === "assistant" && (
+                    <Avatar className="mt-1 h-10 w-10 border border-blue-100">
+                      <AvatarImage 
+                        src="https://img.freepik.com/premium-vector/female-doctor-avatar-medical-healthcare-concept-flat-cartoon-character-illustration_51635-5051.jpg" 
+                        alt="Clara AI Assistant" 
+                      />
+                      <AvatarFallback className="bg-blue-100 text-blue-800">
+                        CA
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div className={`flex-1 ${msg.role === "user" ? "flex justify-end" : ""}`}>
+                    <div 
+                      className={`p-3 rounded-lg max-w-[80%] whitespace-pre-wrap ${
+                        msg.role === "user" 
+                          ? "bg-[#1E5AAB] text-white ml-auto" 
+                          : "bg-gray-100"
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                  </div>
+                  {msg.role === "user" && (
+                    <Avatar className="mt-1 h-10 w-10 border border-blue-100">
+                      <AvatarFallback className="bg-[#1E5AAB] text-white">
+                        U
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {messages.length === 1 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.3 }}
+                className="flex flex-wrap gap-2 justify-center mt-6"
+              >
+                <Button
+                  onClick={() => handleOptionSelect(language === 'en' ? "Booking an appointment with a doctor" : "Reservar una cita con un médico")}
+                  className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 flex items-center gap-2"
+                  size="lg"
+                >
+                  <Calendar className="h-5 w-5 text-[#1E5AAB]" />
+                  {language === 'en' ? 'Book Appointment' : 'Reservar Cita'}
+                </Button>
+                <Button
+                  onClick={() => handleOptionSelect(language === 'en' ? "Getting medical advice" : "Obtener consejo médico")}
+                  className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 flex items-center gap-2"
+                  size="lg"
+                >
+                  <MessageCircle className="h-5 w-5 text-[#1E5AAB]" />
+                  {language === 'en' ? 'Medical Advice' : 'Consejo Médico'}
+                </Button>
+                <Button
+                  onClick={() => handleOptionSelect(language === 'en' ? "Accessing health information" : "Acceder a información de salud")}
+                  className="bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 flex items-center gap-2"
+                  size="lg"
+                >
+                  <Book className="h-5 w-5 text-[#1E5AAB]" />
+                  {language === 'en' ? 'Health Information' : 'Información de Salud'}
+                </Button>
+              </motion.div>
+            )}
+          </div>
+          
+          <div className="p-4 border-t flex justify-center">
             <motion.button
               onClick={toggleVoiceRecording}
-              className={`w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden ${
+              className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
                 isRecording 
-                  ? 'ring-4 ring-[#1E5AAB] ring-offset-4 animate-pulse' 
-                  : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90 ring-offset-4 hover:ring-4 hover:ring-[#1E5AAB]'
+                  ? 'ring-4 ring-[#1E5AAB] ring-offset-2 animate-pulse bg-red-500' 
+                  : 'bg-[#1E5AAB] hover:bg-[#1E5AAB]/90'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Avatar className="w-full h-full">
-                <AvatarImage
-                  src="https://production.listennotes.com/podcasts/sarah-and-avneet/sarah-and-avneet-episode-46-BmqPz1w2sQl-vDU5PUMqVrY.1400x1400.jpg"
-                  alt="Lisa AI Assistant"
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-[#1E5AAB]">
-                  {isRecording ? (
-                    <MicOff className="h-20 w-20 text-white" />
-                  ) : (
-                    <Mic className="h-20 w-20 text-white" />
-                  )}
-                </AvatarFallback>
-              </Avatar>
+              {isRecording ? (
+                <MicOff className="h-6 w-6 text-white" />
+              ) : (
+                <Mic className="h-6 w-6 text-white" />
+              )}
             </motion.button>
 
             {currentTranscript && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center mt-4"
+                className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-white p-2 rounded-lg shadow-lg"
               >
-                <p className="text-lg text-[#1E5AAB]">{currentTranscript}</p>
+                <p className="text-sm text-[#1E5AAB]">{currentTranscript}</p>
               </motion.div>
             )}
           </div>
