@@ -11,6 +11,7 @@ import { Mic } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { translations } from "@/utils/translations";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const AIAssistant = () => {
   const navigate = useNavigate();
@@ -97,16 +98,17 @@ const AIAssistant = () => {
             >
               <Card className="h-full hover:shadow-md transition-shadow border-none overflow-hidden">
                 <div className="grid grid-cols-2 h-full">
-                  <div className="h-full overflow-hidden">
-                    <img 
-                      src={card.image} 
-                      alt={card.title} 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        console.error("Image failed to load:", card.image);
-                        e.currentTarget.src = "https://via.placeholder.com/300x200?text=Image+Not+Found";
-                      }}
-                    />
+                  <div className="flex items-center justify-center h-full overflow-hidden bg-gray-100">
+                    <Avatar className="h-full w-full rounded-none">
+                      <AvatarImage 
+                        src={card.image} 
+                        alt={card.title} 
+                        className="object-cover object-center h-full w-full"
+                      />
+                      <AvatarFallback className="text-lg h-full w-full rounded-none">
+                        {card.title.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <CardContent className={`p-6 flex flex-col justify-center ${card.color}`}>
                     <div className="space-y-2">
