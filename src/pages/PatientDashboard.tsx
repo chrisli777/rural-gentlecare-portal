@@ -57,6 +57,8 @@ const PatientDashboard = () => {
   }, [showWelcomeMessage, language]);
 
   const handleConsentGiven = () => {
+    setShowConsentDialog(false);
+    
     toast({
       title: "Thank you!",
       description: "Your consent has been recorded. You now have full access to the platform.",
