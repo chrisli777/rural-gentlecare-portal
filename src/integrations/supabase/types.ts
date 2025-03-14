@@ -62,6 +62,42 @@ export type Database = {
           },
         ]
       }
+      patient_consents: {
+        Row: {
+          additional_data: Json | null
+          consent_date: string
+          consent_given: boolean
+          consent_type: string
+          consent_version: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          patient_id: string
+        }
+        Insert: {
+          additional_data?: Json | null
+          consent_date?: string
+          consent_given?: boolean
+          consent_type: string
+          consent_version: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          patient_id: string
+        }
+        Update: {
+          additional_data?: Json | null
+          consent_date?: string
+          consent_given?: boolean
+          consent_type?: string
+          consent_version?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          patient_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
