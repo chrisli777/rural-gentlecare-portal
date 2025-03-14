@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import { useAccessibility } from "@/contexts/AccessibilityContext";
 import { useVoiceConversation } from "@/contexts/ConversationContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import ConsentDialog from "@/components/ConsentDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -16,6 +19,55 @@ const PatientDashboard = () => {
   const { isRecording, currentTranscript, toggleVoiceRecording } = useVoiceConversation();
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
   const [messages, setMessages] = useState<Array<{role: string, content: string}>>([]);
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [hasConsented, setHasConsented] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check user authentication and consent status
+    const checkUserAndConsent = async () => {
+      try {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setUserId(user.id);
+          
+          // Check if user has already given consent
+          const { data: consents, error } = await supabase
+            .from('patient_consents')
+            .select('*')
+            .eq('patient_id', user.id)
+            .eq('consent_type', 'treatment_and_data')
+            .order('consent_date', { ascending: false })
+            .limit(1);
+            
+          if (error) {
+            console.error("Error checking consent:", error);
+          } else {
+            // If no consent record is found, show the consent dialog
+            if (consents && consents.length > 0) {
+              setHasConsented(true);
+            } else {
+              setShowConsentDialog(true);
+            }
+          }
+        } else {
+          // If user is not logged in, redirect to login
+          // In a real app, you might want to handle this differently
+          console.log("User not logged in");
+        }
+      } catch (error) {
+        console.error("Error in auth check:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkUserAndConsent();
+  }, []);
 
   useEffect(() => {
     // Add welcome message on initial load
@@ -30,6 +82,18 @@ const PatientDashboard = () => {
       setShowWelcomeMessage(false);
     }
   }, [showWelcomeMessage, language]);
+
+  const handleConsentGiven = () => {
+    setHasConsented(true);
+    setShowConsentDialog(false);
+    
+    // Show a success toast
+    toast({
+      title: "Thank you!",
+      description: "Your consent has been recorded. You now have full access to the platform.",
+      duration: 5000,
+    });
+  };
 
   const handleOptionSelect = (option: string) => {
     // Handle user selecting one of the quick options
@@ -82,6 +146,14 @@ const PatientDashboard = () => {
       image: '/3.jpg'
     }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -259,6 +331,16 @@ const PatientDashboard = () => {
           </div>
         </Card>
       </main>
+
+      {/* Consent Dialog */}
+      {userId && (
+        <ConsentDialog 
+          open={showConsentDialog} 
+          onOpenChange={setShowConsentDialog}
+          onConsentGiven={handleConsentGiven}
+          patientId={userId}
+        />
+      )}
     </div>
   );
 };
